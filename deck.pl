@@ -49,6 +49,7 @@ card( Suit, Rank ) :-
 
 %% Get the value of card
 value( Value, card( S, R ) ) :-
+	(S = ♣; S = ♦; S = ♥; S = ♠ ), !,
 	( R = ace   -> ( Value is 10 ; Value is 1 )
 	; R = jack  -> Value is 10
 	; R = queen -> Value is 10
@@ -59,10 +60,13 @@ value( Value, card( S, R ) ) :-
 %% calculate card value | Hand is a list of *card* objects
 score( Score, Hand ) :- % Hand
 	score( Score, Hand, 0 ).
-%% score( Score, [Card|Hand], V ) :-
-%% 	value(Q, Card),
-%% 	Score is V + ,
-%% 	pass.
+score( Score, [Card|Hand], V ) :-
+	value(Q, Card),
+	Score is V + Q,
+	score(Score, Hand, Score).
+score( Score, [Card], V ) :-
+	value(Q, Card),
+	Score is V + Q.
 
 % functions definitions
 %% generate a deck
