@@ -133,19 +133,57 @@ initDeal(Table, NewDeck, TemporaryTable, DissortingD, Deck, AtTable, Current) :-
 	initDeal(Table, NewDeck, Table2, Deck2, Deck, AtTable, Next).
 
 %% DEFINE COUPLE OF SHUFFLE MODES
-%% shuffle a deck by A-shuffle split into half and toss a coin
+%% shuffle a deck by RIFLE-shuffle split into half and toss a coin
 %% for each card to decide whether it goes on the bottom or on the top
 %% or just do it in the right order
-%% shuffle(Shuffled, Deck) :-
-	%% shuffleMode(random),
-	%% shuffleMode(deterministic),
-	%% random(0,2,X).
+shuffle(Shuffled, Deck) :-
+	shuffleMode(random),
+	random(0,2,X).
+shuffle(Shuffled, Deck) :-
+	shuffleMode(deterministic),
+	proper_length(Deck, Len),
+	Half is Len / 2,
+	getPiles(A, B, Half),
+	A1 is A + 1,
+	split(P1, P2, Deck, A1), % get two piles
+	rifleDet(Shuffled, P1, P2).
+
+%% rifle shuffle two piles deterministically
+rifleDet(Out, A, B) :-
+	random(0, 2, Rand), % decide whether left pile goes on top or bottom,
+	( Rand = 0 -> rifleDet(Out, [], A, B)
+	; Rand = 1 -> rifleDet(Out, [], B, A)
+	).
+rifleDet(Out, Em, [A1|A2], [B1|B2]) :-
+	append(Em, [A1], O1),
+	append(O1, [B1], O2),
+	rifleDet(Out, O2, A2, B2).
+rifleDet(Out, Em, [], [B1|B2]) :-
+	append(Em, [B1], O),
+	rifleDet(Out, O, [], B2).
+rifleDet(Out, Em, [A1|A2], []) :-
+	append(Em, [A1], O),
+	rifleDet(Out, O, A2, []).
+rifleDet(Out, Out, [], []) :-
+	!.
+
+%% generate two piles counters
+getPiles(A, B, Half) :-
+	float(Half),
+	random(0,2,Rand), % decide whether round up left or right pile
+	( Rand = 0 -> A is Half - 0.5, B is Half + 0.5
+	; Rand = 1 -> A is Half + 0.5, B is Half - 0.5
+	),
+	!.
+getPiles(Half, Half, Half) :-
+	integer(Half).
 
 %% Split a list into Pre-element-Post
 split(A, B, List, Num) :-
 	split_(A, [], List, Num),
 	append(A, B, List).
 split_(A, A, _, 1) :- !.
+split_(A, A, _, 1.0) :- !.
 split_(A, Acum, [H|T], Num) :-
 	NumN is Num - 1,
 	append(Acum, [H], Sup),
