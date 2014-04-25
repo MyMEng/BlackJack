@@ -137,16 +137,16 @@ initDeal(Table, NewDeck, TemporaryTable, DissortingD, Deck, AtTable, Current) :-
 %% for each card to decide whether it goes on the bottom or on the top
 %% or just do it in the right order
 shuffle(Shuffled, Deck) :-
-	shuffleMode(random),
-	random(0,2,X).
-shuffle(Shuffled, Deck) :-
-	shuffleMode(deterministic),
+	shuffleMode(Mode),
 	proper_length(Deck, Len),
 	Half is Len / 2,
-	getPiles(A, B, Half),
+	getPiles(A, _, Half),
 	A1 is A + 1,
 	split(P1, P2, Deck, A1), % get two piles
-	rifleDet(Shuffled, P1, P2).
+	% random or deterministic
+	( Mode = random        -> rifleRan(Shuffled, P1, P2)
+	; Mode = deterministic -> rifleDet(Shuffled, P1, P2)
+	).
 
 %% rifle shuffle two piles deterministically
 rifleDet(Out, A, B) :-
@@ -165,6 +165,29 @@ rifleDet(Out, Em, [A1|A2], []) :-
 	append(Em, [A1], O),
 	rifleDet(Out, O, A2, []).
 rifleDet(Out, Out, [], []) :-
+	!.
+
+%% rifle shuffle two piles randomly
+rifleRan(Out, A, B) :-
+	random(0, 2, Rand), % decide whether left pile goes on top or bottom
+	rifleRan(Out, [], A, B, Rand).
+rifleRan(Out, Em, [A1|A2], [B1|B2], 0) :-
+	append(Em, [A1], O1),
+	append(O1, [B1], O2),
+	random(0, 2, Rand),
+	rifleRan(Out, O2, A2, B2, Rand).
+rifleRan(Out, Em, [A1|A2], [B1|B2], 1) :-
+	append(Em, [B1], O1),
+	append(O1, [A1], O2),
+	random(0, 2, Rand),
+	rifleRan(Out, O2, A2, B2, Rand).
+rifleRan(Out, Em, [], [B1|B2], Rand) :-
+	append(Em, [B1], O),
+	rifleRan(Out, O, [], B2, Rand).
+rifleRan(Out, Em, [A1|A2], [], Rand) :-
+	append(Em, [A1], O),
+	rifleRan(Out, O, A2, [], Rand).
+rifleRan(Out, Out, [], [], _) :-
 	!.
 
 %% generate two piles counters
