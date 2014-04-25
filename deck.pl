@@ -87,17 +87,33 @@ deck(Deck, Holder, No) :-
 	append(Holder, New, NewHolder),
 	deck(Deck, NewHolder, Np).
 
+%% check for user player
+userPlayer(N) :-
+	playerMode(M),
+	userPlayer(N, M).
+userPlayer(N, interactive) :-
+	N is 1.
+userPlayer(N, experimental) :-
+	N is 0.
+
 %% deal the cards to N players-- we begin with two cards each + shuffler
 %%  + player(/no-player mode)
-%% deal :-
-	%% true.
+%% Return list of lists with cards---hands
+%% % hand(L) :- [ card(), card(), card(), card(),... ]
+initDeal(Table, Deck) :-
+	players(P),
+	userPlayer(Q),
+	AtTable is N + 1 + Q,
+	CardDeals is AtTable * 2,
+	initDeal(Table, Deck, [], CardDeals).
+
+initDeal(Table, Deck, [], CardDeals) :-
+	pass.
+
 
 %% shuffle(Shuffled, Deck) :-
 	%% shuffleMode(d),
 	%% true.
-
-%% later on define Hand with cards and full deck
-%% hand(L) :- [ card(), card(), card(), card(),... ]
 
 %% shuffle a deck by A-shuffle split into half and toss a coin
 %% for each card to decide whether it goes on the bottom or on the top
