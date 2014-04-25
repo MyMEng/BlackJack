@@ -96,24 +96,46 @@ userPlayer(N, interactive) :-
 userPlayer(N, experimental) :-
 	N is 0.
 
-%% deal the cards to N players-- we begin with two cards each + shuffler
+%% extract N-th element from a list
+elementN(H, [H|_], 1) :- !.
+elementN(Element, [_|T], N) :-
+	NN is N - 1,
+	elementN(Element, T, NN).
+
+%% Return list without element E
+woN(Out, E, In) :-
+	select(E, In, Out), !.
+
+%% deal the cards to N players---we begin with two cards each + shuffler
 %%  + player(/no-player mode)
 %% Return list of lists with cards---hands
 %% % hand(L) :- [ card(), card(), card(), card(),... ]
-initDeal(Table, Deck) :-
+initDeal(Table, NewDeck, Deck) :-
 	players(P),
 	userPlayer(Q),
-	AtTable is N + 1 + Q,
-	CardDeals is AtTable * 2,
-	initDeal(Table, Deck, [], CardDeals).
+	AtTable is P + 1 + Q,
+	%% CardDeals is AtTable * 2, % deal 2 cards for each player
+	initDeal(Table, NewDeck, [],   Deck, AtTable, 1).
+initDeal(Table, Deck, Table, Deck, AtTable, Current) :-
+	AtTable is Current - 1, !.
+initDeal(Table, NewDeck, TemporaryTable, Deck, AtTable, Current) :-
+	elementN(C1, Deck, Current), % draw element N
+	Current1 is Current + AtTable, % get new index
+	elementN(C2, Deck, Current1), % draw next card
+	woN(Deck1, C1, Deck), % delete first card
+	woN(Deck2, C2, Deck1), % delete first card
+	Next is Current + 1, % new current player
+	append([C1], [C2], Person), % create one hand
+	append(TemporaryTable, [Person], Table2),% generate i-th player
+	initDeal(Table, NewDeck, Table2, Deck2, AtTable, Next).
 
-initDeal(Table, Deck, [], CardDeals) :-
-	pass.
 
 
 %% shuffle(Shuffled, Deck) :-
 	%% shuffleMode(d),
 	%% true.
+
+%% Deal additional card to player *i*
 
 %% shuffle a deck by A-shuffle split into half and toss a coin
 %% for each card to decide whether it goes on the bottom or on the top
