@@ -5,16 +5,24 @@
 %% define number of decks
 decks(1).
 
+%% define number of players
+players(2).
+
+%% activate interactive player or experiment mode
+playerMode(interactive).
+%% playerMode(experimental).
+
+
 %% define suits
 %% clubs (♣), diamonds (♦), hearts (♥) and spades (♠) 
-%% suits(c).
-suits(♣).
 %% suits(d).
 suits(♦).
 %% suits(h).
 suits(♥).
 %% suits(s).
 suits(♠).
+%% suits(c).
+suits(♣).
 
 %% define ranks
 ranks(  ace).
@@ -39,13 +47,12 @@ ranks( king).
 shuffleMode(d). % deterministic
 %shuffleMode(r). % random
 
+
+% functions definitions
 %% card representation
 %% c( suit, rank ).
 card( Suit, Rank ) :-
 	suits( Suit ), ranks( Rank ).
-
-%% later on define Hand with cards
-%% hand(L) :- [ card(), card(), card(), card(),... ]
 
 %% Get the value of card
 value( Value, card( S, R ) ) :-
@@ -62,15 +69,35 @@ score( Score, Hand ) :- % Hand
 	score( Score, Hand, 0 ).
 score( Score, [Card|Hand], V ) :-
 	value(Q, Card),
-	Score is V + Q,
-	score(Score, Hand, Score).
-score( Score, [Card], V ) :-
-	value(Q, Card),
-	Score is V + Q.
+	Vn is V + Q,
+	score(Score, Hand, Vn).
+score( Score, [], V ) :-
+	Score is V.
 
-% functions definitions
-%% generate a deck
-%% deckGen :- pass.
+%% generate predefined number deck---return a list with all cards
+deck(Deck) :-
+	decks(No),
+	deck(Deck, [], No).
+deck(Deck, Holder, 0) :-
+	append(Holder, [], Deck),
+	!.
+deck(Deck, Holder, No) :-
+	Np is No - 1,
+	findall(card(S,R), card(S, R), New),
+	append(Holder, New, NewHolder),
+	deck(Deck, NewHolder, Np).
+
+%% deal the cards to N players-- we begin with two cards each + shuffler
+%%  + player(/no-player mode)
+%% deal :-
+	%% true.
+
+%% shuffle(Shuffled, Deck) :-
+	%% shuffleMode(d),
+	%% true.
+
+%% later on define Hand with cards and full deck
+%% hand(L) :- [ card(), card(), card(), card(),... ]
 
 %% shuffle a deck by A-shuffle split into half and toss a coin
 %% for each card to decide whether it goes on the bottom or on the top
