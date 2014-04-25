@@ -115,19 +115,19 @@ initDeal(Table, NewDeck, Deck) :-
 	userPlayer(Q),
 	AtTable is P + 1 + Q,
 	%% CardDeals is AtTable * 2, % deal 2 cards for each player
-	initDeal(Table, NewDeck, [],   Deck, AtTable, 1).
-initDeal(Table, Deck, Table, Deck, AtTable, Current) :-
+	initDeal(Table, NewDeck, [], Deck ,Deck, AtTable, 1).
+initDeal(Table, Deck, Table, Deck, _, AtTable, Current) :-
 	AtTable is Current - 1, !.
-initDeal(Table, NewDeck, TemporaryTable, Deck, AtTable, Current) :-
+initDeal(Table, NewDeck, TemporaryTable, DissortingD, Deck, AtTable, Current) :-
 	elementN(C1, Deck, Current), % draw element N
 	Current1 is Current + AtTable, % get new index
 	elementN(C2, Deck, Current1), % draw next card
-	woN(Deck1, C1, Deck), % delete first card
+	woN(Deck1, C1, DissortingD), % delete first card
 	woN(Deck2, C2, Deck1), % delete first card
 	Next is Current + 1, % new current player
 	append([C1], [C2], Person), % create one hand
 	append(TemporaryTable, [Person], Table2),% generate i-th player
-	initDeal(Table, NewDeck, Table2, Deck2, AtTable, Next).
+	initDeal(Table, NewDeck, Table2, Deck2, Deck, AtTable, Next).
 
 
 
