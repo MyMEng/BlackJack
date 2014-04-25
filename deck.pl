@@ -44,8 +44,11 @@ ranks( king).
 %% king  :-    10.
 
 %% decide whether shuffle is made with coin toss or it is deterministic
-shuffleMode(d). % deterministic
-%shuffleMode(r). % random
+shuffleMode(deterministic). % deterministic
+%shuffleMode(random). % random
+
+%% define number of shuffles after each game
+shuffles(1).
 
 
 % functions definitions
@@ -129,14 +132,28 @@ initDeal(Table, NewDeck, TemporaryTable, DissortingD, Deck, AtTable, Current) :-
 	append(TemporaryTable, [Person], Table2),% generate i-th player
 	initDeal(Table, NewDeck, Table2, Deck2, Deck, AtTable, Next).
 
-
-
-%% shuffle(Shuffled, Deck) :-
-	%% shuffleMode(d),
-	%% true.
-
-%% Deal additional card to player *i*
-
+%% DEFINE COUPLE OF SHUFFLE MODES
 %% shuffle a deck by A-shuffle split into half and toss a coin
 %% for each card to decide whether it goes on the bottom or on the top
 %% or just do it in the right order
+%% shuffle(Shuffled, Deck) :-
+	%% shuffleMode(random),
+	%% shuffleMode(deterministic),
+	%% random(0,2,X).
+
+%% Split a list into Pre-element-Post
+split(A, B, List, Num) :-
+	split_(A, [], List, Num),
+	append(A, B, List).
+split_(A, A, _, 1) :- !.
+split_(A, Acum, [H|T], Num) :-
+	NumN is Num - 1,
+	append(Acum, [H], Sup),
+	split_(A, Sup, T, NumN).
+
+%% Deal additional card to player *i*
+addCard(NewDeal, NewDeck, [Card|NewDeck], OldDeal, PlayerNo) :-
+	split(A, [X|C], OldDeal, PlayerNo), % get sublist
+	append(X, [Card], Y), % extend sublist
+	append(A, [Y], Alpha), % put at the same place new list
+	append(Alpha, C, NewDeal). % put at the same place new list
