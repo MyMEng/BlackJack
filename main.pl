@@ -15,10 +15,10 @@ play :-
 	theGame(Table, NewDeck).
 
 theGame(Table, Deck) :-
+	userPlayer(U),
+	checkBJ(Allowence, _, Table), % check for initial BlackJack
 	% what if there is no player
-	((	userPlayer(U),
-		U = 1,
-		checkBJ(Allowence, _, Table), % check for initial BlackJack
+	((	U = 1,
 		getNoPlayers(R), % get player ID
 		elementN(Elem, Allowence, R),
 		( \+ (Elem = -1)  -> askCard(Answer) % ask if player has not already lost
@@ -28,7 +28,9 @@ theGame(Table, Deck) :-
 		; Answer = 0 -> ( NewTable = Table, NewDeck = Deck )
 		)
 	 ) ; (
-	 	true
+	 	U = 0,
+	 	NewTable = Table,
+	 	NewDeck = Deck
 	 )
 	),
 	printGame(NewTable),
