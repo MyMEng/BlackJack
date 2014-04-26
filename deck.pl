@@ -1,5 +1,4 @@
-% check load
-:- ensure_loaded( library(real) ).
+% Deck class %
 
 % define constants
 %% define number of decks
@@ -77,6 +76,19 @@ score( Score, [Card|Hand], V ) :-
 score( Score, [], V ) :-
 	Score is V.
 
+%% check win and end game
+checkBJ( ScoreTable, Values, Table ) :-
+	checkBJ( ScoreTable, Values, [], [], Table ).
+checkBJ( ScoreTable, Values, Accum1, Accum2, [H|Table] ) :-
+	score(S, H),
+	append( [S], Accum2, V1 ),
+	( S = 21 -> append( Accum1, [1], Ulated )
+	; S < 21 -> append( Accum1, [0], Ulated )
+	; S > 21 -> append( Accum1, [-1], Ulated )
+	),
+	checkBJ(ScoreTable, Values, Ulated, V1, Table).
+checkBJ(Score, Values, Score, Values, []).
+
 %% generate predefined number deck---return a list with all cards
 deck(Deck) :-
 	decks(No),
@@ -108,6 +120,12 @@ elementN(Element, [_|T], N) :-
 %% Return list without element E
 woN(Out, E, In) :-
 	select(E, In, Out), !.
+
+%% get number of players
+getNoPlayers(R) :-
+	players(P),
+	userPlayer(Q),
+	R is P + 1 + Q.
 
 %% deal the cards to N players---we begin with two cards each + shuffler
 %%  + player(/no-player mode)

@@ -1,4 +1,6 @@
 %% define strategy
+% check load
+:- ensure_loaded( library(real) ).
 
 %% players comunicate | do not comunicate--- team/oponents
 
