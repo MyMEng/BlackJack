@@ -4,14 +4,15 @@
 :- consult(deck).
 :- consult(player).
 :- consult(strategy).
+:- consult('BFS.pl').
 
 %% change for breath-first-search---to check all possibilities at given round
-
 
 % play the game
 play :-
 	deck(Deck), % generate deck
-	shuffle(Shuffled, Deck), % initial deck shuffle
+	initShuffles(N),
+	shuffle(Shuffled, Deck, N), % initial deck shuffle
 	initDeal(Table, NewDeck, Shuffled), % deal the table
 	write('Initial table state:'), nl,
 	printGame(Table),
@@ -19,7 +20,10 @@ play :-
 
 theGame(Table, Deck) :-
 	userPlayer(U),
+
+	% Failure Driven Loops
 	checkBJ(Allowence, _, Table), % check for initial BlackJack
+
 	% what if there is no player
 	((	U = 1,
 		getNoPlayers(R), % get player ID

@@ -8,8 +8,8 @@ decks(1).
 players(2).
 
 %% activate interactive player or experiment mode
-%% playerMode(interactive).
-playerMode(experimental).
+playerMode(interactive).
+%% playerMode(experimental).
 
 
 %% define suits
@@ -43,11 +43,12 @@ ranks( king).
 %% king  :-    10.
 
 %% decide whether shuffle is made with coin toss or it is deterministic
-shuffleMode(deterministic). % deterministic
-%% shuffleMode(random). % random
+%% shuffleMode(deterministic). % deterministic
+shuffleMode(random). % random
 
 %% define number of shuffles after each game
-shuffles(1).
+shuffles(2).
+initShuffles(10).
 
 
 % functions definitions
@@ -154,7 +155,9 @@ initDeal(Table, NewDeck, TemporaryTable, DissortingD, Deck, AtTable, Current) :-
 %% shuffle a deck by RIFLE-shuffle split into half and toss a coin
 %% for each card to decide whether it goes on the bottom or on the top
 %% or just do it in the right order
-shuffle(Shuffled, Deck) :-
+shuffle(Shf, Shf, 0) :-
+	!.
+shuffle(Shuffled, Deck, N) :-
 	shuffleMode(Mode),
 	proper_length(Deck, Len),
 	Half is Len / 2,
@@ -162,9 +165,11 @@ shuffle(Shuffled, Deck) :-
 	A1 is A + 1,
 	split(P1, P2, Deck, A1), % get two piles
 	% random or deterministic
-	( Mode = random        -> rifleRan(Shuffled, P1, P2)
-	; Mode = deterministic -> rifleDet(Shuffled, P1, P2)
-	).
+	( Mode = random        -> rifleRan(Forward, P1, P2)
+	; Mode = deterministic -> rifleDet(Forward, P1, P2)
+	),
+	N1 is N - 1,
+	shuffle( Shuffled, Forward, N1 ).
 
 %% rifle shuffle two piles deterministically
 rifleDet(Out, A, B) :-
