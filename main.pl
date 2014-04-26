@@ -1,9 +1,12 @@
 %% Main function---program engine and fuel
+% check load
+:- ensure_loaded(library(real)).
 :- consult(deck).
 :- consult(player).
 :- consult(strategy).
 
-%% change for breath first seatch
+%% change for breath-first-search---to check all possibilities at given round
+
 
 % play the game
 play :-
@@ -34,7 +37,7 @@ theGame(Table, Deck) :-
 	 )
 	),
 	printGame(NewTable),
-	%%, % do the AI magic
+	%% , % do the AI magic
 	\+ checkTheEnd( Allowence ), % for the moment end the game-normally shuffle and new deal
 	theGame(NewTable, NewDeck).
 
@@ -42,5 +45,3 @@ theGame(Table, Deck) :-
 checkTheEnd( [ -1|Aa ] ) :-
 	checkTheEnd( Aa ).
 checkTheEnd( [] ).
-
-%% write(Score), nl, write(Allowence).

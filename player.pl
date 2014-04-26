@@ -7,9 +7,10 @@ printGame(Table) :-
 	write('Table:'), nl,
 	printHands(Table, Total, 1).
 printHands([H|T], Total, N) :-
-	( N = 1     -> write('Casino')
-	; N = Total -> write('My')
-	; otherwise -> ( write('AI'), No is N - 1, write(No) )
+	userPlayer(U),
+	( N = 1                -> write('Casino')
+	; ( N = Total, U = 1 ) -> write('My')
+	; otherwise            -> ( write('AI'), No is N - 1, write(No) )
 	),
 	write(':	'),
 	printHand(H), nl,

@@ -44,7 +44,7 @@ ranks( king).
 
 %% decide whether shuffle is made with coin toss or it is deterministic
 shuffleMode(deterministic). % deterministic
-%shuffleMode(random). % random
+%% shuffleMode(random). % random
 
 %% define number of shuffles after each game
 shuffles(1).
