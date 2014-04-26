@@ -8,8 +8,8 @@ decks(1).
 players(2).
 
 %% activate interactive player or experiment mode
-playerMode(interactive).
-%% playerMode(experimental).
+%% playerMode(interactive).
+playerMode(experimental).
 
 
 %% define suits
