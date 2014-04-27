@@ -57,6 +57,12 @@ aceDillemaHit(Decision, Type, Aces, [S|Score]) :-
 
 %% etc.
 
+%% Strategy vs. Shuffle tracking
+%% 1. deterministic | 2. based on deck probabilities | 3. based on MAB
+playAI(NTable, NDeck, NewTable, NewDeck) :- % do the AI magic
 
-%% playAI(NTable, NDeck, NewTable, NewDeck), % do the AI magic
+	%% i <- [1,2,3,4],
+	%% <- i,
+	%% I <- i,
+	%% write( i(I) ), nl.
 
