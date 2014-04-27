@@ -81,14 +81,26 @@ score( Score, [], V ) :-
 checkBJ( ScoreTable, Values, Table ) :-
 	checkBJ( ScoreTable, Values, [], [], Table ).
 checkBJ( ScoreTable, Values, Accum1, Accum2, [H|Table] ) :-
-	score(S, H),
-	append( [S], Accum2, V1 ),
-	( S = 21 -> append( Accum1, [1], Ulated )
-	; S < 21 -> append( Accum1, [0], Ulated )
-	; S > 21 -> append( Accum1, [-1], Ulated )
+	findall( S, score(S, H), Scores ),
+	append( Accum2, [Scores], V1 ),
+	findMin( Smin, Scores ),
+	( Smin = 21 -> append( Accum1, [1], Ulated )
+	; Smin < 21 -> append( Accum1, [0], Ulated )
+	; Smin > 21 -> append( Accum1, [-1], Ulated )
 	),
 	checkBJ(ScoreTable, Values, Ulated, V1, Table).
 checkBJ(Score, Values, Score, Values, []).
+
+%% find minimum of a list
+findMin( Smin, [S|Scores] ) :-
+	Min is S,
+	findMin(Smin, Min, Scores).
+findMin(Smin, Min, [S|Scores]) :-
+	( Min >= S  -> NewMin is S
+	; otherwise -> NewMin is Min
+	),
+	findMin(Smin, NewMin, Scores).
+findMin(S, S, []).
 
 %% generate predefined number deck---return a list with all cards
 deck(Deck) :-

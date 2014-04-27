@@ -4,7 +4,6 @@
 :- consult(deck).
 :- consult(player).
 :- consult(strategy).
-:- consult('BFS.pl').
 
 %% change for breath-first-search---to check all possibilities at given round
 
@@ -20,6 +19,9 @@ play :-
 
 theGame(Table, Deck) :-
 	userPlayer(U),
+
+	checkBJ(Allowence, _, Table), % check for initial BlackJack
+
 	% what if there is no player
 	((	U = 1,
 		getNoPlayers(R), % get player ID
@@ -36,24 +38,11 @@ theGame(Table, Deck) :-
 	 	NewDeck = Deck
 	 )
 	),
-	printGame(NewTable),
 	playAI(NTable, NDeck, NewTable, NewDeck), % do the AI magic
 	croupierAI(NNTable, NNDeck, NTable, NDeck), % do the AI magic
+	printGame(NNTable),
 	\+ checkTheEnd( Allowence ), % for the moment end the game-normally shuffle and new deal
-
-	% Failure Driven Loops
-	%% checkBJ(Allowence, _, Table), % check for initial BlackJack
-	failDriven(Allowence, Table),
-
 	theGame(NNTable, NNDeck).
-
-% Failure Driven Loop
-failDriven(Y, X) :-
-	checkBJ(Y, _, X),
-	%% write(Y), nl,
-	fail.
-failDriven(_, _) :-
-	true.
 
 % check whether all players are done playing
 checkTheEnd( [ -1|Aa ] ) :-
