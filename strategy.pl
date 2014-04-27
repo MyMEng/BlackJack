@@ -16,9 +16,9 @@ stand(NNTable, NNDeck, [E|RTable], [C|NDeck]) :-
 	findall( S , score( S, E ), Score ),
 	aceDillemaStand(Decision, Score),
 	( Decision =< 16 -> ( append(E, [C], NewHand), NewC = [] ) % hit
-	; Decision >= 17 -> ( NewHand = [E], NewC = [C] )
+	; Decision >= 17 -> ( NewHand = E, NewC = [C] )
 	),
-	append( NewHand, RTable, NNTable ),
+	append( [NewHand], RTable, NNTable ),
 	append( NewC, NDeck, NNDeck ).
 
 aceDillemaStand(Decision, [S|Score]) :-
@@ -41,8 +41,8 @@ hit(NNTable, NNDeck, [E|RTable], [C|NDeck]) :-
 	; Score >  17                  -> ( NewHand = E, NewC = [C] )
 	),
 	append( [NewHand], RTable, NNTable ),
-	append( NewC, NDeck, NNDeck ),
-	write(NNTable), nl, write(NNDeck), nl.
+	append( NewC, NDeck, NNDeck ).
+	%% write(NNTable), nl, write(NNDeck), nl.
 
 aceDillemaHit(Decision, Type, Aces, [S|Score]) :-
 	( Aces = 0  -> (Type = hard, Decision = S)
