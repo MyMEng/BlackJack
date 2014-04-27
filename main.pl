@@ -38,7 +38,10 @@ theGame(Table, Deck) :-
 	 	NewDeck = Deck
 	 )
 	),
-	playAI(NTable, NDeck, NewTable, NewDeck), % do the AI magic
+
+	%% playAI(NTable, NDeck, NewTable, NewDeck), % do the AI magic
+	NTable=NewTable, NDeck= NewDeck,
+
 	croupierAI(NNTable, NNDeck, NTable, NDeck), % do the AI magic
 	printGame(NNTable),
 	\+ checkTheEnd( Allowence ), % for the moment end the game-normally shuffle and new deal
