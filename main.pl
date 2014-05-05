@@ -44,7 +44,11 @@ play(Gno) :-
 
 % put everything into R variable plots etc. and play again
 appendScores(FinalTable, Gno) :-
-	play.
+	getScoreTable(Lis, FinalTable),
+	%% Lis = [1,2,3,4,5,6],
+	'scores[Gno, ]' <- Lis.
+getScoreTable(Lis, FinalTable) :-
+	otherwise.
 
 
 % finish the game
