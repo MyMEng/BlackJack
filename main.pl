@@ -14,7 +14,7 @@ play :-
 	shuffle(Shuffled, Deck, N), % initial deck shuffle
 	initDeal(Table, NewDeck, Shuffled), % deal the table
 	write('Initial table state:'), nl,
-	printGame(Table),
+	printGame(Table, init),
 	theGame(Table, NewDeck, 1).
 
 theGame(Table, Deck, Ask) :-
@@ -47,7 +47,7 @@ theGame(Table, Deck, Ask) :-
 	NTable=NewTable, NDeck= NewDeck,
 
 	croupierAI(NNTable, NNDeck, NTable, NDeck), % do the AI magic
-	printGame(NNTable),
+	printGame(NNTable, cont),
 	\+ checkTheEnd( Allowence ), % for the moment end the game-normally shuffle and new deal
 	theGame(NNTable, NNDeck, Ask1).
 

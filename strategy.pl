@@ -51,18 +51,21 @@ aceDillemaHit(Decision, Type, Aces, [S|Score]) :-
 	; otherwise -> (Type = hard, aceDillemaStand(Decision, [S|Score]))
 	).
 
-%% players comunicate | do not comunicate--- team/oponents
 
-%% same strategy different strategy
+% Players strategies
+%% assign strategy for each player and invoke them
 
-%% etc.
+%% 1. Deterministic Strategy
+playAIDet(NPlayer, NDeck, Player, Deck) :-
+	dealType(T, Player),
+	playAIDet(NPlayer, NDeck, Player, Deck, T).
 
-%% Strategy vs. Shuffle tracking
-%% 1. deterministic | 2. based on deck probabilities | 3. based on MAB
-playAI(NTable, NDeck, NewTable, NewDeck) :- % do the AI magic
 
+%% 2. Shuffle tracking --- Deck Probabilities
+%% playAI(NTable, NDeck, NewTable, NewDeck) :- % do the AI magic
 	%% i <- [1,2,3,4],
 	%% <- i,
 	%% I <- i,
 	%% write( i(I) ), nl.
 
+%% 1. MAB inspired

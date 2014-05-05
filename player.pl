@@ -1,26 +1,36 @@
 % interactive player---interface
 
 %% display state of game
-printGame(Table) :-
+printGame(Table, Type) :-
 	players(X), userPlayer(Y),
 	Total is X + Y + 1,
 	write('Table:'), nl,
-	printHands(Table, Total, 1).
-printHands([H|T], Total, N) :-
+	printHands(Table, Total, 1, Type).
+
+% Restrict <- Casino shows only on card
+printHands([H|T], Total, N, Type) :-
 	userPlayer(U),
-	( N = 1                -> write('Casino')
-	; ( N = Total, U = 1 ) -> write('My')
-	; otherwise            -> ( write('AI'), No is N - 1, write(No) )
+	( N = 1                -> ( write('Casino'), Restrict is 1 )
+	; ( N = Total, U = 1 ) -> ( write('My'), Restrict is 0 )
+	; otherwise            -> ( write('AI'), No is N - 1, write(No), Restrict is 0 )
 	),
 	write(':	'),
-	printHand(H), nl,
+	printHand(H, Restrict, Type), nl,
 	N =< Total,
 	N1 is N + 1,
-	printHands(T, Total, N1).
-printHands([], N, N1) :-
+	printHands(T, Total, N1, Type).
+printHands([], N, N1, _) :-
 	N1 is N + 1.
 printHands([], _).
-printHand([card( Suit, Rank )|T]) :-
+
+printHand([card( _, _ )|T], 1, init) :-
+	write('_'),
+	write('_'),
+	write(' '),
+	printHand(T, 0, init).
+printHand( D, 1, cont) :-
+	printHand( D, 0, cont).
+printHand([card( Suit, Rank )|T], 0, _) :-
 	write(Suit),
 	( Rank = ace    -> write('A')
 	; Rank = jack   -> write('J')
@@ -29,8 +39,8 @@ printHand([card( Suit, Rank )|T]) :-
 	; integer(Rank) -> write(Rank)
 	),
 	write(' '),
-	printHand(T).
-printHand([]).
+	printHand(T, 0, _).
+printHand([], _, _).
 
 
 %% ask whether user want to grab a card
