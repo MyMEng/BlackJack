@@ -67,7 +67,7 @@ dealerFaceUp( ValueR, [ _, card(_, Value)| [] ] ) :-
 	( Value = jack  -> ValueR is 10
 	; Value = queen -> ValueR is 10
 	; Value = king  -> ValueR is 10
-	; otherwise     -> ValueR is Value
+	; otherwise     -> ValueR = Value
 	).
 
 % attach back *Elem* to Ls at position X

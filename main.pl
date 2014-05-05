@@ -18,15 +18,23 @@ play :-
 	write('Initial table state:'), nl,
 	printGame(Table, init),
 	players(X), refusal(Refused, X, 0), % get list of players who refused to play
-	theGame(FinalTable, Table, NewDeck, 1, Refused),
-	write('FinalTable').
+	plays(Gno), %Get nubmer of games
+	play(Gno, FinalTable, Table, NewDeck, 1, Refused).
+	%% write('FinalTable').
 	% put everything into R variable plots etc. and play again
+
+play(0, FinalTable, Table, NewDeck, H, Refused) :- !.
+play(Gno, FinalTable, Table, NewDeck, H, Refused) :-
+	theGame(FinalTable, Table, NewDeck, H, Refused),
+	Gno1 is Gno - 1,
+	play(Gno, FinalTable, Table, NewDeck, H, Refused).
 
 % finish the game
 theGame(Table, Table, _, 0, Refused) :-
 	players(X),
 	refusal(Refused, X, 1),
 	write('The End'), nl,
+	write('================================================================================'), nl,
 	%% printGame(Table, cont),
 	!.
 % play the game
@@ -35,7 +43,8 @@ theGame(FinalTable, Table, Deck, Ask, Refused) :-
 
 	%% write('before Bj'), nl,
 	checkBJ(Allowence, _, Table), % check for initial BlackJack
-	%% write(Allowence), nl,
+	write(Allowence), nl,
+	aIbj(ReRefused, Allowence, Refused),
 
 	% what if there is no player
 	((	U = 1,
@@ -59,11 +68,17 @@ theGame(FinalTable, Table, Deck, Ask, Refused) :-
 	),
 
 	%% write('before AI'), nl,
-	playAI(NTable, NDeck, NRefused, NewTable, NewDeck, Refused), % do the AI magic
+	playAI(NTable, NDeck, NRefused, NewTable, NewDeck, ReRefused), % do the AI magic
 	%% NTable=NewTable, NDeck= NewDeck, NRefused = Refused,
 
 	%% write('before Croup'), nl,
-	croupierAI(NNTable, NNDeck, NTable, NDeck), % do the AI magic
+	% if BJ do not allow`
+	elementN(Cru, Allowence, 1),
+	( Cru =  1 -> (NNTable = NTable, NNDeck = NDeck)
+	; Cru = -1 -> (NNTable = NTable, NNDeck = NDeck)
+	; Cru =  0 -> croupierAI(NNTable, NNDeck, NTable, NDeck) % do the AI magic
+	),
+
 	printGame(NNTable, cont),
 	%% \+ checkTheEnd( Allowence ), % for the moment end the game-normally shuffle and new deal
 	%% write(NRefused), nl,
@@ -73,3 +88,13 @@ theGame(FinalTable, Table, Deck, Ask, Refused) :-
 checkTheEnd( [ -1|Aa ] ) :-
 	checkTheEnd( Aa ).
 checkTheEnd( [] ).
+
+% if BJ copy to the vector
+aIbj(ReRefused, [_|Allowence], Refused) :-
+	aIbj(ReRefused, [], Allowence, Refused).
+aIbj(Refused, Refused, _, []) :- !.
+aIbj(Refused, Collector, [A|Allowence], [R|RRefused]) :-
+	( A = 1     -> append( Collector, [A], NewCollector )
+	; otherwise -> append( Collector, [R], NewCollector )
+	),
+	aIbj(Refused, NewCollector, Allowence, RRefused).

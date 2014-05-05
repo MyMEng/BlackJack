@@ -83,13 +83,19 @@ checkBJ( ScoreTable, Values, Table ) :-
 checkBJ( ScoreTable, Values, Accum1, Accum2, [H|Table] ) :-
 	findall( S, score(S, H), Scores ),
 	append( Accum2, [Scores], V1 ),
-	findMin( Smin, Scores ),
-	( Smin = 21 -> append( Accum1, [1], Ulated )
-	; Smin < 21 -> append( Accum1, [0], Ulated )
+	findMinBJ( Smin, Scores ),
+	( Smin = 21 -> append( Accum1, [1 ], Ulated )
+	; Smin < 21 -> append( Accum1, [0 ], Ulated )
 	; Smin > 21 -> append( Accum1, [-1], Ulated )
 	),
 	checkBJ(ScoreTable, Values, Ulated, V1, Table).
 checkBJ(Score, Values, Score, Values, []).
+
+findMinBJ( Smin, Scores ) :-
+	member(21, Scores), !,
+	Smin is 21.
+findMinBJ( Smin, Scores ) :-
+	findMin(Smin, Scores).
 
 %% find minimum of a list
 findMin( Smin, [S|Scores] ) :-
