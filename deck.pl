@@ -59,7 +59,7 @@ card( Suit, Rank ) :-
 
 %% Get the value of card
 value( Value, card( S, R ) ) :-
-	(S = ♣; S = ♦; S = ♥; S = ♠ ), !,
+	( S = ♣; S = ♦; S = ♥; S = ♠ ), !,
 	( R = ace   -> ( Value is 11 ; Value is 1 )
 	; R = jack  -> Value is 10
 	; R = queen -> Value is 10

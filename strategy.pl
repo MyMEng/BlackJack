@@ -53,21 +53,36 @@ aceDillemaHit(Decision, Type, Aces, [S|Score]) :-
 
 
 % Players strategies
-%% assign strategy for each player and invoke them
+%% general functions
 
-%% 1. Deterministic Strategy -- can only hit in the first round
+% check hand type: Soft or Hard
 dealType(T, Player) :-
 	aggregate_all(count, member(card(_,ace), Player), Aces), % count number of aces
 	( Aces = 0  -> T = hard 
 	; otherwise -> T = soft
 	).
 
-playAIDet(NPlayer, NDeck, Player, Deck, Dealer) :-
-	dealType(T, Player),
-	playAIDet(NPlayer, NDeck, Player, Deck, T, Dealer).
+% check dealer's face-up card
+dealerFaceUp( Value, [ _, card(_, Value)| [] ] ).
 
-playAIDet(NPlayer, NDeck, Player, Deck, T, Dealer) :-
-	action(A, Dealer, Total).
+%% assign strategy for each player and invoke them
+playAI(_, _, _, _).
+
+%% 1. Deterministic Strategy -- can only hit in the first round
+playAIDet(NPlayer, NDeck, Player, Deck, Dealer) :-
+	dealType(P, Player),
+	dealerFaceUp(D, Dealer),
+	score(V, Player), % cards value V
+	playAIDet(Action, V, P, D),
+	% take an action
+	( Action = hit   -> T = hard 
+	; Action = stand -> T = soft
+	).
+
+playAIDet(Action, V, hard, D) :-
+	hardAction(Action, D, V).
+playAIDet(Action, V, soft, D) :-
+	softAction(Action, D, V).
 
 
 %% 2. Shuffle tracking --- Deck Probabilities
