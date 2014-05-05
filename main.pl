@@ -17,7 +17,7 @@ main :-
 	<- scores,
 	main(Gno),
 	% save matrix and plot and save graph---histogram
-	<- write..matrix(scores, file = paste(targetPath, "dat2.csv", sep="/"), sep=",").
+	<- 'write.csv(scores, file = "./scores.csv", sep=",")'.
 main(0) :- !.
 main(X) :-
 	play(Gno),
