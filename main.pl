@@ -16,9 +16,11 @@ play :-
 	initDeal(Table, NewDeck, Shuffled), % deal the table
 	write('Initial table state:'), nl,
 	printGame(Table, init),
-	theGame(Table, NewDeck, 1).
+	Refused = [], % get list of players who refused to play
+	theGame(Table, NewDeck, 1, Refused).
+	% put everything into R variable plots etc. and play again
 
-theGame(Table, Deck, Ask) :-
+theGame(Table, Deck, Ask, Refused) :-
 	userPlayer(U),
 
 	checkBJ(Allowence, _, Table), % check for initial BlackJack
@@ -44,13 +46,13 @@ theGame(Table, Deck, Ask) :-
 	 )
 	),
 
-	%% playAI(NTable, NDeck, NewTable, NewDeck), % do the AI magic
-	NTable=NewTable, NDeck= NewDeck,
+	playAI(NTable, NDeck, NRefused, NewTable, NewDeck, Refused), % do the AI magic
+	%% NTable=NewTable, NDeck= NewDeck, NRefused = Refused,
 
 	croupierAI(NNTable, NNDeck, NTable, NDeck), % do the AI magic
 	printGame(NNTable, cont),
 	\+ checkTheEnd( Allowence ), % for the moment end the game-normally shuffle and new deal
-	theGame(NNTable, NNDeck, Ask1).
+	theGame(NNTable, NNDeck, Ask1, NRefused).
 
 % check whether all players are done playing
 checkTheEnd( [ -1|Aa ] ) :-

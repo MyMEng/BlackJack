@@ -65,8 +65,60 @@ dealType(T, Player) :-
 % check dealer's face-up card
 dealerFaceUp( Value, [ _, card(_, Value)| [] ] ).
 
+% attach back *Elem* to Ls at position X
+attach( [Elem|Ls], Ls, Elem, 1) :- !.
+attach( [Elem], [], Elem, _) :- !.
+attach( NLs, [First|Ls], Elem, X) :-
+	attach(NLs, [First], Ls, Elem, X, 2).
+
+attach(NLs, Head, Tail, Elem, X, X) :-
+	append(Head, [Elem|Tail] , NLs), !.
+attach(NLs, Head, [Bg|Tail], Elem, X, Current) :-
+	Current1 is Current + 1,
+	append(Head, [Bg] , NewHead),
+	attach(NLs, NewHead, Tail, Elem, X, Current1).
+
+% replace back *Elem* to Ls at position X
+replace( [Elem|Ls], [_|Ls], Elem, 1) :- !.
+replace( [Elem], [], Elem, _) :- !.
+replace( NLs, [First|Ls], Elem, X) :-
+	replace(NLs, [First], Ls, Elem, X, 2).
+
+replace(NLs, Head, [_|Tail], Elem, X, X) :-
+	append(Head, [Elem|Tail], NLs), !.
+replace(NLs, Head, [Bg|Tail], Elem, X, Current) :-
+	Current1 is Current + 1,
+	append(Head, [Bg] , NewHead),
+	replace(NLs, NewHead, Tail, Elem, X, Current1).
+
+
 %% assign strategy for each player and invoke them
-playAI(_, _, _, _).
+playAI([Dealer|NTable1], NNDeck, NRefuse, [Dealer|NTable], NDeck, Refuse) :-
+	players(X),
+	playAISequence(NTable1, NNDeck, NRefuse, NTable, NDeck, Dealer, 1, X, Refuse).
+
+playAISequence(Table, Deck, Refuse, Table, Deck, _, X1, X, Refuse) :-
+	X1 is X +1,
+	!.
+playAISequence(NewTable, NNDeck, NRefuse, Table, NDeck, Dealer, Counter, X, Refuse) :-
+	% if AI once refused do not allow any more
+	NewRefuse = Refuse,
+
+	% player B is,
+	elementN(PlayerB, Table, Counter),
+
+	% do different strategy for each player
+	( Counter = 1 -> playAIDet( PlayerA, ChDeck, PlayerB, NDeck, Dealer )
+	; Counter = 2 -> playAIDet( PlayerA, ChDeck, PlayerB, NDeck, Dealer )
+	; Counter = 3 -> playAIDet( PlayerA, ChDeck, PlayerB, NDeck, Dealer )
+	; otherwise   -> playAIDet( PlayerA, ChDeck, PlayerB, NDeck, Dealer ) 
+	),
+
+	% attach back player A.
+	replace( ChTable, Table, PlayerA, Counter),
+
+	Counter1 is Counter + 1,
+	playAISequence(NewTable, NNDeck, NRefuse, ChTable, ChDeck, Dealer, Counter1, X, NewRefuse).
 
 %% 1. Deterministic Strategy -- can only hit in the first round
 playAIDet(NPlayer, NDeck, Player, Deck, Dealer) :-
@@ -84,10 +136,9 @@ playAIDet(Action, V, hard, D) :-
 playAIDet(Action, V, soft, D) :-
 	softAction(Action, D, V).
 
-hitDet(NPlayer, NDeck, Player, Deck) :-
-	lol.
-standDet(NPlayer, NDeck, Player, Deck) :-
-	lol.
+hitDet(NPlayer, Deck, Player, [C|Deck]) :-
+	append(Player, [C], NPlayer).
+standDet(Player, Deck, Player, Deck).
 
 
 %% 2. Shuffle tracking --- Deck Probabilities
