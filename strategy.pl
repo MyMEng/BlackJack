@@ -75,14 +75,19 @@ playAIDet(NPlayer, NDeck, Player, Deck, Dealer) :-
 	score(V, Player), % cards value V
 	playAIDet(Action, V, P, D),
 	% take an action
-	( Action = hit   -> T = hard 
-	; Action = stand -> T = soft
+	( Action = hit   -> hitDet(NPlayer, NDeck, Player, Deck)
+	; Action = stand -> standDet(NPlayer, NDeck, Player, Deck)
 	).
 
 playAIDet(Action, V, hard, D) :-
 	hardAction(Action, D, V).
 playAIDet(Action, V, soft, D) :-
 	softAction(Action, D, V).
+
+hitDet(NPlayer, NDeck, Player, Deck) :-
+	lol.
+standDet(NPlayer, NDeck, Player, Deck) :-
+	lol.
 
 
 %% 2. Shuffle tracking --- Deck Probabilities
@@ -92,4 +97,4 @@ playAIDet(Action, V, soft, D) :-
 	%% I <- i,
 	%% write( i(I) ), nl.
 
-%% 1. MAB inspired
+%% 1. MAB inspired - 50% contribution deterministic | 50% contribution deck memory
