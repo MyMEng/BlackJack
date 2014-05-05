@@ -63,7 +63,12 @@ dealType(T, Player) :-
 	).
 
 % check dealer's face-up card
-dealerFaceUp( Value, [ _, card(_, Value)| [] ] ).
+dealerFaceUp( ValueR, [ _, card(_, Value)| [] ] ) :-
+	( Value = jack  -> ValueR is 10
+	; Value = queen -> ValueR is 10
+	; Value = king  -> ValueR is 10
+	; otherwise     -> ValueR is Value
+	).
 
 % attach back *Elem* to Ls at position X
 attach( [Elem|Ls], Ls, Elem, 1) :- !.
@@ -106,31 +111,35 @@ playAISequence(NewTable, NNDeck, NRefuse, Table, NDeck, Dealer, Counter, X, Refu
 
 	% do different strategy for each player
 	elementN(Status, Refuse, Counter),
-	( ( Counter = 1, Status = 0 ) -> ( playAIDet( PlayerA, ChDeck, PlayerB, NDeck, Dealer ),
-									   replace( NewRefuse, Refuse, 1, Counter) )
-	; ( Counter = 2, Status = 0 ) -> ( PlayerA = PlayerB, ChDeck = NDeck )
-	; ( Counter = 3, Status = 0 ) -> ( PlayerA = PlayerB, ChDeck = NDeck )
-	; Status = 0                  -> ( playAIDet( PlayerA, ChDeck, PlayerB, NDeck, Dealer ),
-									   replace( NewRefuse, Refuse, 1, Counter) )
-	; otherwise                   -> ( PlayerA = PlayerB, ChDeck = NDeck )
+	( Status = 0 ->
+		( Counter = 1 -> ( playAIDet( PlayerA, ChDeck, PlayerB, NDeck, Dealer ),
+						   replace( NewRefuse, Refuse, 1, Counter) )
+		; Counter = 2 -> ( PlayerA = PlayerB, ChDeck = NDeck, replace( NewRefuse, Refuse, 1, Counter) )
+		; Counter = 3 -> ( PlayerA = PlayerB, ChDeck = NDeck, replace( NewRefuse, Refuse, 1, Counter) )
+		; otherwise   -> ( playAIDet( PlayerA, ChDeck, PlayerB, NDeck, Dealer ),
+						   replace( NewRefuse, Refuse, 1, Counter) )
+		)
+	; otherwise ->
+		( PlayerA = PlayerB, ChDeck = NDeck, NewRefuse = Refuse )
 	),
 
 	% if AI once refused do not allow any more
-	( PlayerA = PlayerB -> replace( NewRefuse, Refuse, 1, Counter) % refusal
-	; otherwise         -> NewRefuse = Refuse % action taken
-	),
-	%% NewRefuse = Refuse,
+	%% ( PlayerA = PlayerB -> replace( NewNewRefuse, NewRefuse, 1, Counter) % refusal
+	%% ; otherwise         -> NewNewRefuse = NewRefuse % action taken
+	%% ),
+	NewNewRefuse = NewRefuse,
 
 	% attach back player A.
 	replace( ChTable, Table, PlayerA, Counter),
 
 	Counter1 is Counter + 1,
-	playAISequence(NewTable, NNDeck, NRefuse, ChTable, ChDeck, Dealer, Counter1, X, NewRefuse).
+	playAISequence(NewTable, NNDeck, NRefuse, ChTable, ChDeck, Dealer, Counter1, X, NewNewRefuse).
 
 %% 1. Deterministic Strategy -- can only hit in the first round
 playAIDet(NPlayer, NDeck, Player, Deck, Dealer) :-
 	dealType(P, Player),
 	dealerFaceUp(D, Dealer),
+	%% write('Dealer face: '), write(D), nl,
 	score(V, Player), % cards value V
 	playAIDet(Action, V, P, D),
 	% take an action

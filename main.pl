@@ -19,7 +19,7 @@ play :-
 	printGame(Table, init),
 	players(X), refusal(Refused, X, 0), % get list of players who refused to play
 	theGame(FinalTable, Table, NewDeck, 1, Refused),
-	write('FinalTable'), nl, write(FinalTable).
+	write('FinalTable').
 	% put everything into R variable plots etc. and play again
 
 % finish the game
@@ -27,13 +27,15 @@ theGame(Table, Table, _, 0, Refused) :-
 	players(X),
 	refusal(Refused, X, 1),
 	write('The End'), nl,
-	printGame(Table, cont),
+	%% printGame(Table, cont),
 	!.
 % play the game
 theGame(FinalTable, Table, Deck, Ask, Refused) :-
 	userPlayer(U),
 
+	%% write('before Bj'), nl,
 	checkBJ(Allowence, _, Table), % check for initial BlackJack
+	%% write(Allowence), nl,
 
 	% what if there is no player
 	((	U = 1,
@@ -56,13 +58,15 @@ theGame(FinalTable, Table, Deck, Ask, Refused) :-
 	 )
 	),
 
+	%% write('before AI'), nl,
 	playAI(NTable, NDeck, NRefused, NewTable, NewDeck, Refused), % do the AI magic
 	%% NTable=NewTable, NDeck= NewDeck, NRefused = Refused,
 
+	%% write('before Croup'), nl,
 	croupierAI(NNTable, NNDeck, NTable, NDeck), % do the AI magic
 	printGame(NNTable, cont),
 	%% \+ checkTheEnd( Allowence ), % for the moment end the game-normally shuffle and new deal
-	write(NRefused), nl,
+	%% write(NRefused), nl,
 	theGame(FinalTable, NNTable, NNDeck, Ask1, NRefused).
 
 % check whether all players are done playing
