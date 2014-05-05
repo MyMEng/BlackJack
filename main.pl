@@ -6,7 +6,8 @@
 :- consult(strategy).
 :- consult(deterministicTable).
 
-%% change for breath-first-search---to check all possibilities at given round
+% define number of plays
+plays(100).
 
 % play the game
 play :-
@@ -16,11 +17,20 @@ play :-
 	initDeal(Table, NewDeck, Shuffled), % deal the table
 	write('Initial table state:'), nl,
 	printGame(Table, init),
-	Refused = [], % get list of players who refused to play
-	theGame(Table, NewDeck, 1, Refused).
+	players(X), refusal(Refused, X, 0), % get list of players who refused to play
+	theGame(FinalTable, Table, NewDeck, 1, Refused),
+	write('FinalTable'), nl, write(FinalTable).
 	% put everything into R variable plots etc. and play again
 
-theGame(Table, Deck, Ask, Refused) :-
+% finish the game
+theGame(Table, Table, _, 0, Refused) :-
+	players(X),
+	refusal(Refused, X, 1),
+	write('The End'), nl,
+	printGame(Table, cont),
+	!.
+% play the game
+theGame(FinalTable, Table, Deck, Ask, Refused) :-
 	userPlayer(U),
 
 	checkBJ(Allowence, _, Table), % check for initial BlackJack
@@ -51,8 +61,9 @@ theGame(Table, Deck, Ask, Refused) :-
 
 	croupierAI(NNTable, NNDeck, NTable, NDeck), % do the AI magic
 	printGame(NNTable, cont),
-	\+ checkTheEnd( Allowence ), % for the moment end the game-normally shuffle and new deal
-	theGame(NNTable, NNDeck, Ask1, NRefused).
+	%% \+ checkTheEnd( Allowence ), % for the moment end the game-normally shuffle and new deal
+	write(NRefused), nl,
+	theGame(FinalTable, NNTable, NNDeck, Ask1, NRefused).
 
 % check whether all players are done playing
 checkTheEnd( [ -1|Aa ] ) :-

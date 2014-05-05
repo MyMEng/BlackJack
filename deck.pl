@@ -253,3 +253,16 @@ addCard(NewDeal, NewDeck, [Card|NewDeck], OldDeal, PlayerNo) :-
 	append(X, [Card], Y), % extend sublist
 	append(A, [Y], Alpha), % put at the same place new list
 	append(Alpha, C, NewDeal). % put at the same place new list
+
+%% generate list with N 0's
+refusal([], 0, _) :- !.
+refusal([Content], 1, Content) :- !.
+refusal(Ls, X, Content) :-
+	L = [Content],
+	refusal(Ls, L, 1, X, Content).
+
+refusal(L, L, X, X, _) :- !.
+refusal(Ls, L, C, X, Content) :-
+	C1 is C + 1,
+	append(L, [Content], L1),
+	refusal(Ls, L1, C1, X, Content).

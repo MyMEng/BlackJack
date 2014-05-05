@@ -101,18 +101,25 @@ playAISequence(Table, Deck, Refuse, Table, Deck, _, X1, X, Refuse) :-
 	X1 is X +1,
 	!.
 playAISequence(NewTable, NNDeck, NRefuse, Table, NDeck, Dealer, Counter, X, Refuse) :-
-	% if AI once refused do not allow any more
-	NewRefuse = Refuse,
-
 	% player B is,
 	elementN(PlayerB, Table, Counter),
 
 	% do different strategy for each player
-	( Counter = 1 -> playAIDet( PlayerA, ChDeck, PlayerB, NDeck, Dealer )
-	; Counter = 2 -> playAIDet( PlayerA, ChDeck, PlayerB, NDeck, Dealer )
-	; Counter = 3 -> playAIDet( PlayerA, ChDeck, PlayerB, NDeck, Dealer )
-	; otherwise   -> playAIDet( PlayerA, ChDeck, PlayerB, NDeck, Dealer ) 
+	elementN(Status, Refuse, Counter),
+	( ( Counter = 1, Status = 0 ) -> ( playAIDet( PlayerA, ChDeck, PlayerB, NDeck, Dealer ),
+									   replace( NewRefuse, Refuse, 1, Counter) )
+	; ( Counter = 2, Status = 0 ) -> ( PlayerA = PlayerB, ChDeck = NDeck )
+	; ( Counter = 3, Status = 0 ) -> ( PlayerA = PlayerB, ChDeck = NDeck )
+	; Status = 0                  -> ( playAIDet( PlayerA, ChDeck, PlayerB, NDeck, Dealer ),
+									   replace( NewRefuse, Refuse, 1, Counter) )
+	; otherwise                   -> ( PlayerA = PlayerB, ChDeck = NDeck )
 	),
+
+	% if AI once refused do not allow any more
+	( PlayerA = PlayerB -> replace( NewRefuse, Refuse, 1, Counter) % refusal
+	; otherwise         -> NewRefuse = Refuse % action taken
+	),
+	%% NewRefuse = Refuse,
 
 	% attach back player A.
 	replace( ChTable, Table, PlayerA, Counter),
