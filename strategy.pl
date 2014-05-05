@@ -55,10 +55,19 @@ aceDillemaHit(Decision, Type, Aces, [S|Score]) :-
 % Players strategies
 %% assign strategy for each player and invoke them
 
-%% 1. Deterministic Strategy
-playAIDet(NPlayer, NDeck, Player, Deck) :-
+%% 1. Deterministic Strategy -- can only hit in the first round
+dealType(T, Player) :-
+	aggregate_all(count, member(card(_,ace), Player), Aces), % count number of aces
+	( Aces = 0  -> T = hard 
+	; otherwise -> T = soft
+	).
+
+playAIDet(NPlayer, NDeck, Player, Deck, Dealer) :-
 	dealType(T, Player),
-	playAIDet(NPlayer, NDeck, Player, Deck, T).
+	playAIDet(NPlayer, NDeck, Player, Deck, T, Dealer).
+
+playAIDet(NPlayer, NDeck, Player, Deck, T, Dealer) :-
+	action(A, Dealer, Total).
 
 
 %% 2. Shuffle tracking --- Deck Probabilities

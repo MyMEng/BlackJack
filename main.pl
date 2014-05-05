@@ -4,6 +4,7 @@
 :- consult(deck).
 :- consult(player).
 :- consult(strategy).
+:- consult(deterministicTable).
 
 %% change for breath-first-search---to check all possibilities at given round
 
