@@ -9,8 +9,24 @@
 % define number of plays
 plays(100).
 
+main :-
+	plays(Gno), %Get nubmer of games
+	getNoPlayers(Pno),
+	scores <- matrix(data=0, nrow=Gno, ncol=Pno), % initialise score mx
+	write('scores:'), nl,
+	<- scores,
+	main(Gno),
+	% save matrix and plot and save graph---histogram
+	<- write..matrix(scores, file = paste(targetPath, "dat2.csv", sep="/"), sep=",").
+main(0) :- !.
+main(X) :-
+	play(Gno),
+	X1 is X - 1,
+	main(X1).
+
+
 % play the game
-play :-
+play(Gno) :-
 	deck(Deck), % generate deck
 	initShuffles(N),
 	shuffle(Shuffled, Deck, N), % initial deck shuffle
@@ -18,16 +34,13 @@ play :-
 	write('Initial table state:'), nl,
 	printGame(Table, init),
 	players(X), refusal(Refused, X, 0), % get list of players who refused to play
-	plays(Gno), %Get nubmer of games
-	play(Gno, FinalTable, Table, NewDeck, 1, Refused).
-	%% write('FinalTable').
-	% put everything into R variable plots etc. and play again
+	theGame(FinalTable, Table, NewDeck, 1, Refused),
+	appendScores(FinalTable, Gno).
 
-play(0, FinalTable, Table, NewDeck, H, Refused) :- !.
-play(Gno, FinalTable, Table, NewDeck, H, Refused) :-
-	theGame(FinalTable, Table, NewDeck, H, Refused),
-	Gno1 is Gno - 1,
-	play(Gno, FinalTable, Table, NewDeck, H, Refused).
+% put everything into R variable plots etc. and play again
+appendScores(FinalTable, Gno) :-
+	play.
+
 
 % finish the game
 theGame(Table, Table, _, 0, Refused) :-

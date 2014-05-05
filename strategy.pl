@@ -116,6 +116,7 @@ playAISequence(NewTable, NNDeck, NRefuse, Table, NDeck, Dealer, Counter, X, Refu
 						   replace( NewRefuse, Refuse, 1, Counter) )
 		; Counter = 2 -> ( PlayerA = PlayerB, ChDeck = NDeck, replace( NewRefuse, Refuse, 1, Counter) )
 		; Counter = 3 -> ( PlayerA = PlayerB, ChDeck = NDeck, replace( NewRefuse, Refuse, 1, Counter) )
+		; Counter = 4 -> ( PlayerA = PlayerB, ChDeck = NDeck, replace( NewRefuse, Refuse, 1, Counter) )
 		; otherwise   -> ( playAIDet( PlayerA, ChDeck, PlayerB, NDeck, Dealer ),
 						   replace( NewRefuse, Refuse, 1, Counter) )
 		)

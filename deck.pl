@@ -5,7 +5,7 @@
 decks(1).
 
 %% define number of players
-players(3).
+players(4).
 
 %% activate interactive player or experiment mode
 playerMode(interactive).
