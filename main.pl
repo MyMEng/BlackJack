@@ -17,7 +17,12 @@ main :-
 	<- scores,
 	main(Gno),
 	% save matrix and plot and save graph---histogram
-	<- 'write.csv(scores, file = "./scores.csv", sep=",")'.
+	<- 'write.csv(scores, file = "./scores.csv", sep=",")',
+	sums <- 'colSums(scores, na.rm = FALSE, dims = 1)',
+	<- barplot(sums),
+	<- 'png(filename="./scores.png")',
+	<- barplot(sums),
+	<- 'dev.off()'.
 main(0) :- !.
 main(X) :-
 	play(Gno),
