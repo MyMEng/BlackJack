@@ -44,25 +44,38 @@ play(Gno) :-
 
 % put everything into R variable plots etc. and play again
 appendScores(FinalTable, Gno) :-
-	getScoreTable(Lis, FinalTable),
+	getScoreTable(Lis, FinalTable), % <- this failed <- resolved
 	%% Lis = [1,2,3,4,5,6],
 	write('Lis:'), nl, write(Lis), nl,
 	scores[Gno,*] <- Lis.
 getScoreTable(Lis, [Dealer|FinalTable]) :-
-	score(D, Dealer),
+	scoreTop(D, Dealer),
 	getScores(LisPlay, Deals, 0, [], D, FinalTable ),
 	append([Deals], LisPlay, Lis).
 getScores(Lis, Deals, Deals, Lis, _, [] ) :- !.
 getScores(Lis, Deals, DCount, Accum, D, [Curr|FinalTable] ) :-
-	score(C, Curr),
+	scoreTop(C, Curr),
 	( (C = D, C =< 21)  -> (append(Accum, [1], AccumPlus), NDCount is 1 + DCount )
 	; (C < D, D =< 21)  -> (append(Accum, [0], AccumPlus), NDCount is 1 + DCount )
 	; (C =< 21, D > 21) -> (append(Accum, [1], AccumPlus), NDCount is DCount )
-	; (C > 21, D > 21) -> (append(Accum, [0], AccumPlus), NDCount is DCount )
+	; (C > 21, D > 21)  -> (append(Accum, [0], AccumPlus), NDCount is DCount )
 	; (C > D, C =< 21)  -> (append(Accum, [1], AccumPlus), NDCount is DCount )
+	; (C > 21, D =< 21) -> (append(Accum, [0], AccumPlus), NDCount is 1 + DCount )
 	),
 	getScores(Lis, Deals, NDCount, AccumPlus, D, FinalTable ).
 
+% get highest score closest to 21
+scoreTop(Sc, Hand) :-
+	findall( S, score(S, Hand), Scores ),
+	getTop(Sc, Scores).
+getTop(Sc, [H|Scores]) :-
+	getTop(Sc, H, Scores).
+getTop(Sc, Sc, []).
+getTop(Sc, Current, [H|Rest]) :-
+	( (H > Current, H =< 21)       -> getTop(Sc, H, Rest)
+	; (H < Current, Current > 21 ) -> getTop(Sc, H, Rest)
+	; otherwise                    -> getTop(Sc, Current, Rest)
+	).
 
 % finish the game
 theGame(Table, Table, _, 0, Refused) :-
