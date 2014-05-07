@@ -6,8 +6,28 @@
 :- consult(strategy).
 :- consult(deterministicTable).
 
-% define number of plays
+% define constants
+%% define number of plays
 plays(100).
+%% define number of decks
+decks(1).
+%% define number of players
+players(4).
+%% activate interactive player or experiment mode
+% playerMode(interactive).
+playerMode(experimental).
+%% decide whether shuffle is made with coin toss or it is deterministic
+% shuffleMode(deterministic). % deterministic
+shuffleMode(random). % random
+%% define number of shuffles before game starts
+initShuffles(10).
+%% define number of shuffles after each game
+shuffles(2).
+%% define dealer's strategy --- S17 is better for the player
+dealer(h17). % hit soft 17
+% dealer(s17). % stand on ALL 17's
+
+
 
 main :-
 	plays(Gno), %Get nubmer of games

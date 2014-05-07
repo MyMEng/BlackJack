@@ -1,17 +1,5 @@
 % Deck class %
 
-% define constants
-%% define number of decks
-decks(1).
-
-%% define number of players
-players(4).
-
-%% activate interactive player or experiment mode
-%% playerMode(interactive).
-playerMode(experimental).
-
-
 %% define suits
 %% clubs (♣), diamonds (♦), hearts (♥) and spades (♠) 
 %% suits(d).
@@ -41,15 +29,6 @@ ranks( king).
 %% jack  :-    10.
 %% queen :-    10.
 %% king  :-    10.
-
-%% decide whether shuffle is made with coin toss or it is deterministic
-%% shuffleMode(deterministic). % deterministic
-shuffleMode(random). % random
-
-%% define number of shuffles after each game
-shuffles(2).
-initShuffles(10).
-
 
 % functions definitions
 %% card representation

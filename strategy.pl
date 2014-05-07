@@ -1,7 +1,4 @@
-%% define strategy
-% S17 is better for the player
-dealer(h17). % hit soft 17
-%% dealer(s17). % stand on ALL 17's
+%% Define AI algorithms
 
 % play deterministic croupier strategy---H17 | S17
 % dealer is always last in queue
