@@ -19,6 +19,7 @@ main :-
 	% save matrix and plot and save graph---histogram
 	<- 'write.csv(scores, file = "./scores.csv", sep=",")',
 	sums <- 'colSums(scores, na.rm = FALSE, dims = 1)',
+	sums[1] <- sums[1] / (Pno-1),
 	<- barplot(sums),
 	<- 'png(filename="./scores.png")',
 	<- barplot(sums),

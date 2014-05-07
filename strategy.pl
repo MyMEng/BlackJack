@@ -1,7 +1,7 @@
 %% define strategy
 % S17 is better for the player
-%% dealer(h17). % hit soft 17
-dealer(s17). % stand on ALL 17's
+dealer(h17). % hit soft 17
+%% dealer(s17). % stand on ALL 17's
 
 % play deterministic croupier strategy---H17 | S17
 % dealer is always last in queue
@@ -30,7 +30,7 @@ aceDillemaStand(Decision, S, [Sin|Score]) :-
 aceDillemaStand(S, S, []).
 
 
-% jezeli as i mniej niz 17 treat as 11 | > 17 swap for 1
+% if: ace & <17 treat as 11 | >17 swap for 1
 hit(NNTable, NNDeck, [E|RTable], [C|NDeck]) :-
 	findall( S , score( S, E ), Solutions ),
 	aggregate_all(count, member(card(_,ace),E), Aces), % count number of positives
@@ -159,11 +159,15 @@ hitDet(NPlayer, Deck, Player, [C|Deck]) :-
 standDet(Player, Deck, Player, Deck).
 
 
-%% 2. Shuffle tracking --- Deck Probabilities
+%% 2. Shuffle tracking --- Deck Probabilities --- we assume deck has started being in ordered
+% get probabilities of each card occurring and decide based on the one with highest probabilitys
+playAIDet( PlayerA, ChDeck, PlayerB, NDeck, Dealer).
 %% playAI(NTable, NDeck, NewTable, NewDeck) :- % do the AI magic
 	%% i <- [1,2,3,4],
 	%% <- i,
 	%% I <- i,
 	%% write( i(I) ), nl.
 
-%% 1. MAB inspired - 50% contribution deterministic | 50% contribution deck memory
+%% 3. 50% contribution deterministic | 50% contribution deck memory
+% create a sampling distribution over all possible cards that can be drawn and sample a card
+% based on that card predict according to table whether it is worth taking it or not
