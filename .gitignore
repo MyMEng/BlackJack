@@ -1,3 +1,11 @@
 scores.csv
 scores.png
 test.pl
+
+#Mac OS X
+*DS_Store
+
+# LaTeX
+report/*.aux
+report/*.log
+report/*.pdf

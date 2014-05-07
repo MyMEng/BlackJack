@@ -1,38 +1,4 @@
-% Report in LaTeX
-
-
-Concept of failure driven loops
-
-the house play last it gives advantage
-Describe strategy of dealer---H17
-
-
-use repl to make statistical computations
-
-
-EXPLORATION STEP  -  *HIT* take a card
-EXPLoitation STEP - *HOLD* 
-
-%% The report will consist of code description: key choices; game theory and results for different number of decks for different strategies.
-
-It would be nice to mention that split is not imlemented and why and that it would be even incer o do so
-
-sovf vs. hard dealer
-AI vs AI
-noDecks
-
-Player1 -> deterministic table
-Player2 -> calculates deck probabilities
-Player3 -> combines strategies of Player1&2
-Player4 -> never takes a card
-______
-Player5 -> my przeczucie
-
-
 % Report --- ks1591
-% include a brief discussion about how the limitation of leaf instances affects
-% the performance of the decision tree algorithm.
-
 \documentclass[12pt,a4paper,twocolumn]{article}
 \usepackage{times} % times font
 \usepackage{mathptmx} % times font in maths
@@ -69,7 +35,7 @@ Player5 -> my przeczucie
 \begin{center}
 	\begin{large}
 	{\HRule \\[0.2cm]}
-	\textsc{Firing rate analysis based on current mouse position}
+	\textsc{Artificial intelligence algorithms for BlackJack}
 	{\HRule \\[0.3cm]}
 	\end{large}
 
@@ -81,25 +47,59 @@ Player5 -> my przeczucie
 	\end{minipage}
 	\begin{minipage}{ 0.44\textwidth }
 		\begin{flushright}
-			{COMS30127 $|$ Computational Neuroscience\\
-			Lab M: Analysis of hippocampal data\\[0.3cm]}
+			{COMS30106 $|$ Artificial Intelligence with Logic Programming\\
+			Assignment 2: BlackJack\\[0.3cm]}
 		\end{flushright}
 	\end{minipage}
 \end{center}
 \end{@twocolumnfalse}
 ] % \lipsum[1]~\\[0.4cm]
 
-\section*{\texttt{Experiment design}}
+\section*{\texttt{The experiment}}
+
+% Report in LaTeX
+
+
+Concept of failure driven loops
+
+the house play last it gives advantage
+Describe strategy of dealer---H17
+
+
+use repl to make statistical computations
+
+
+EXPLORATION STEP  -  *HIT* take a card
+EXPLoitation STEP - *HOLD* 
+
+%% The report will consist of code description: key choices; game theory and results for different number of decks for different strategies.
+
+It would be nice to mention that split is not imlemented and why and that it would be even incer o do so
+
+sovf vs. hard dealer
+AI vs AI
+noDecks
+
+Player1 - deterministic table
+Player2 - calculates deck probabilities
+Player3 - combines strategies of Player1\&2
+Player4 - never takes a card
+
+Player5 - my przeczucie
+
+
+
 Conducted experiment concerned path finding in the `\texttt{H}' shaped maze by a rat. The construction was divided into 4 main points top-left(TL), bottom-left(BL), top-right(TR) and bottom-right(BR). TL and BL were start points and TR, BR were destination points, where correct destination(awarded with snack) was placed at the same height(top or bottom) as the chosen start point: \emph{T}L---\emph{T}R and \emph{B}L---\emph{B}R.\\
 \let\thefootnote\relax\footnote{Theta Rhythms Coordinate\\Hippocampal–--Prefrontal Interactions\\in a Spatial Memory Task\\Matthew W. Jones, Matthew A. Wilson}
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.5\textwidth]{figure1.png}
-% \begin{tiny}
-\caption{Discretized maze.\label{fig:maze}}
-% \end{tiny}
-\vspace{0.2cm}
-\end{figure}
+
+% \begin{figure}[htbp]
+% \centering
+% \includegraphics[width=0.5\textwidth]{figure1.png}
+% % \begin{tiny}
+% \caption{Discretized maze.\label{fig:maze}}
+% % \end{tiny}
+% \vspace{0.2cm}
+% \end{figure}
 
 We can divide the experiment into a number of stages:
 \begin{description}
@@ -121,43 +121,43 @@ The animal is directed to TL or BL randomly by moving barrier.
 \section*{\texttt{Decision making}}
 It is considered that Stages 1 \& 2 requires \emph{spatial working-memory}---the rat memorized starting position. By Stage 3 the decision which direction to follow on the right junction should be made. Stages 4--6 did not require working-memory as all turns were forced with barriers.\\
 
-\begin{figure}[htbp]
-  \begin{subfigure}{.49\linewidth}\centering
-    \includegraphics[width=1.1\textwidth]{figure2.png}
-    \caption{Neuron 1\label{fig:FiringPosition_N1}}
-  \end{subfigure}
-  \begin{subfigure}{.49\linewidth}\centering
-    \includegraphics[width=1.1\textwidth]{figure3.png}
-    \caption{Neuron 2\label{fig:FiringPosition_N2}}
-  \end{subfigure}\\[1ex]
+% \begin{figure}[htbp]
+%   \begin{subfigure}{.49\linewidth}\centering
+%     \includegraphics[width=1.1\textwidth]{figure2.png}
+%     \caption{Neuron 1\label{fig:FiringPosition_N1}}
+%   \end{subfigure}
+%   \begin{subfigure}{.49\linewidth}\centering
+%     \includegraphics[width=1.1\textwidth]{figure3.png}
+%     \caption{Neuron 2\label{fig:FiringPosition_N2}}
+%   \end{subfigure}\\[1ex]
 
-    \begin{subfigure}{.49\linewidth}\centering
-    \includegraphics[width=1.1\textwidth]{figure3.png}
-    \caption{Neuron 3\label{fig:FiringPosition_N3}}
-  \end{subfigure}
-  \begin{subfigure}{.49\linewidth}\centering
-    \includegraphics[width=1.1\textwidth]{figure4.png}
-    \caption{Neuron 4\label{fig:FiringPosition_N4}}
-  \end{subfigure}
+%     \begin{subfigure}{.49\linewidth}\centering
+%     \includegraphics[width=1.1\textwidth]{figure3.png}
+%     \caption{Neuron 3\label{fig:FiringPosition_N3}}
+%   \end{subfigure}
+%   \begin{subfigure}{.49\linewidth}\centering
+%     \includegraphics[width=1.1\textwidth]{figure4.png}
+%     \caption{Neuron 4\label{fig:FiringPosition_N4}}
+%   \end{subfigure}
 
-  \caption{Neurons firing rates based on position change of a rat.\label{fig:FiringPosition_ALL}}
-\end{figure}
+%   \caption{Neurons firing rates based on position change of a rat.\label{fig:FiringPosition_ALL}}
+% \end{figure}
 
 \section*{\texttt{Analysis}}
 I performed analysis of firing rate based on rat's position for all 4 neurons. To smooth-out the movement I first performed discretization(see figure~\ref{fig:maze}) of X-Y space and match firing times to particular position on the plane.\\
 
-\begin{figure}[h]
-  \begin{subfigure}{.99\linewidth}\centering
-    \includegraphics[width=1.1\textwidth]{figure6_a.png}
-    \caption{\label{fig:3d_n1_a}}
-  \end{subfigure}\\[1ex]
-  \begin{subfigure}{.99\linewidth}\centering
-    \includegraphics[width=1.1\textwidth]{figure6_b.png}
-    \caption{\label{fig:3d_n1_b}}
-  \end{subfigure}
+% \begin{figure}[h]
+%   \begin{subfigure}{.99\linewidth}\centering
+%     \includegraphics[width=1.1\textwidth]{figure6_a.png}
+%     \caption{\label{fig:3d_n1_a}}
+%   \end{subfigure}\\[1ex]
+%   \begin{subfigure}{.99\linewidth}\centering
+%     \includegraphics[width=1.1\textwidth]{figure6_b.png}
+%     \caption{\label{fig:3d_n1_b}}
+%   \end{subfigure}
 
-  \caption{Neuron 1---spatial activity.\label{fig:3d_n1}}
-\end{figure}
+%   \caption{Neuron 1---spatial activity.\label{fig:3d_n1}}
+% \end{figure}
 
 Figure~\ref{fig:FiringPosition_ALL} shows firing rate after each move for all 4 neurons. Sub-plot~\ref{fig:FiringPosition_N1} contains characteristic regular spikes---possibly place at the maze where a rat makes the call to its memory.\\
 Figure~\ref{fig:FiringPosition_N2} is characterized by a high activity at the beginning of the experiment---while new places are visited---and average number of spikes later on---when the parts of maze are re-visited. I guess that it corresponds to learning in the new environment; once the rat has adjusted to surrounding the neural activity lowers.\\
@@ -166,56 +166,17 @@ Finally, graph~\ref{fig:FiringPosition_N4} presenting neuron~4, shows high activ
 
 After projecting neurons activity on the maze plot we can make more informative guesses regarding the role of each neuron and partially deduce its functionality.\\
 
-\begin{figure}[htbp]
-  \begin{subfigure}{.99\linewidth}\centering
-    \includegraphics[width=1.1\textwidth]{figure7_a.png}
-    \caption{\label{fig:3d_n2_a}}
-  \end{subfigure}\\[1ex]
-  \begin{subfigure}{.99\linewidth}\centering
-    \includegraphics[width=1.1\textwidth]{figure7_b.png}
-    \caption{\label{fig:3d_n2_b}}
-  \end{subfigure}
-
-  \caption{Neuron 2---spatial activity.\label{fig:3d_n2}}
-\end{figure}
-
 Figure~\ref{fig:3d_n1} can be interpreted as use of memory(first neuron). Once rat reaches right junction and is forced to make a turn it makes a call to memory to choose between TR and BR to get the reward.\\
 
 Neuron 2 which activity is plotted in the figure~\ref{fig:3d_n2} corresponds to memorizing initial turn at the left junction forced by a removable barrier. Once the turn is made the rat memorizes the ``choice'' to make a rewarded decision at the right junction.\\
 
 Figure~\ref{fig:3d_n3}, presenting neuron 3 activity, shows high spiking rates at the reward points---TR and BR. These neuron spikes triggered by reward seems to reinforce learning effect probably by linking choices at left and right junctions.\\
 
-\begin{figure}[htbp]
-  \begin{subfigure}{.99\linewidth}\centering
-    \includegraphics[width=1.1\textwidth]{figure8_a.png}
-    \caption{\label{fig:3d_n3_a}}
-  \end{subfigure}\\[1ex]
-  \begin{subfigure}{.99\linewidth}\centering
-    \includegraphics[width=1.1\textwidth]{figure8_b.png}
-    \caption{\label{fig:3d_n3_b}}
-  \end{subfigure}
-
-  \caption{Neuron 3---spatial activity.\label{fig:3d_n3}}
-\end{figure}
-
 Figure~\ref{fig:3d_n4}, which plots the activity of neuron 4, seems to be active in a similar place as neuron 2. This means that it is also responsible for forced, left junction turn needed to make rewarded choice later in the experiment.\\
 
-\begin{figure}[htbp]
-  \begin{subfigure}{.99\linewidth}\centering
-    \includegraphics[width=1.1\textwidth]{figure9_a.png}
-    \caption{\label{fig:3d_n4_a}}
-  \end{subfigure}\\[1ex]
-  \begin{subfigure}{.99\linewidth}\centering
-    \includegraphics[width=1.1\textwidth]{figure9_b.png}
-    \caption{\label{fig:3d_n4_b}}
-  \end{subfigure}
-
-  \caption{Neuron 4---spatial activity.\label{fig:3d_n4}}
-\end{figure}
 
 \section*{\texttt{Conclusions}}
 Neurons 2 \& 4 seem to correspond to memorizing the turn made(forced by a barrier) at left junction. Neuron 1 is responsible for decision making at right junction based on previously memorized left junction choice. Neuron 3 acts like a factor which reinforces learning by spiking at the reward points.\\
 All in all, system based on 4 aforementioned neurons allow rat to memorize initial turn and match---by means of the reward---corresponding direction choice at the next junction. Rat seems to move across designed maze as intended by authors of the experiment.\\
 
 \end{document}
-
