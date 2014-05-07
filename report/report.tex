@@ -69,38 +69,44 @@ The source code together with this report is available at:\\https://github.com/S
 \end{abstract}
 
 \section*{\texttt{The experiment}}
-To examine aforementioned strategies BlackJack game was implemented with number of parameters being user configurable. There are two house strategies implemented, which are documented to be the most popular: \emph{H17} and \emph{S17}. i.e.\ dealer can... only one card is revealed to the players. Furthermore, the house plays as last in each round therefore being aware of the table situation.\\
+To examine aforementioned strategies a BlackJack game was implemented with number of parameters being user configurable.\\
+There are two house strategies implemented, which are documented to be the most popular: \emph{H17} and \emph{S17}. Both these strategies indicate to \emph{hit} i.e.\ take a card, if current score is less than $17$ and \emph{stand} i.e.\ refuse to take a card, if the score is more than $17$. The difference is that \emph{H17} dictates dealer to \emph{hit} on \emph{soft} $17$ and stand on hard $17$, while \emph{S17} defines to \emph{stand} on all types of $17$. In general, \emph{S17} is regarded as more beneficial for players.\\
+To clarify, we distinguish two types of hand: \emph{soft} and \emph{hard}. The first one contains and \emph{ace} and the later one does not. Furthermore, while calculating score of a hand we count: number cards with their value, face cards(jack, queen, king) are treated as $10$ points and ace is counted as $1$ or $11$ with value chosen by player.\\
 
-At each stage the player can either:  *HIT* or *HOLD*\\
+The advantage of house is also built upon the fact that only one card of dealer is \emph{face up} i.e.\ only one card is revealed to the players. Furthermore, the house plays as a last in each round therefore being aware of the table situation.\\
 
-use repl to make statistical computations\\
-
-code description: key choices; game theory and results for different number of decks for different strategies\\
-
-\section*{\texttt{Strategies}}
-
+The game simulation is predefined with the following factors:
 \begin{description}
-\item{\textbf{Deterministic table}} \hfill\\
-Rat begin in TL or BL and run toward left junction. The movable barrier is placed there to direct the animal into the central arm. See table~\ref{tab:det}.
-\item{\textbf{Deck probabilities}} \hfill\\
-The rat gets to the right junction---decision point---where it choses left or right turn.
-\item{\textbf{Stand on all}} \hfill\\
-Only the choice which leads to the point at the same height as the starting position is awarded.
-\item{\textbf{Probabilistic choice}} \hfill\\
-After reaching TR or BR the rat returns to the right junction where another movable barrier is placed to direct the rat into central arm.
+\item{\texttt{Plays}} \hfill\\
+Number of games to be played.
+\item{\texttt{Decks}} \hfill\\
+Number of decks used in a single game.
+\item{\texttt{Players}} \hfill\\
+Number of AI players. AI1 plays \emph{deterministic table}, AI2 plays \emph{deck probabilities}, AI3 plays \emph{probabilistic choice}, AI4 plays \emph{stand on all} and all other defined players play \emph{deterministic table}.
+\item{\texttt{PlayerMode}} \hfill\\
+The game-play can be either defined to be: \emph{experimental}---no user interaction required, this mode is mainly used to test AI algorithms; or \emph{interactive}---user can play along AI algorithms.
+\item{\texttt{ShuffleMode}} \hfill\\
+The simulation performs \emph{riffle shuffle}(see below); it can be either \emph{deterministic}--- ;or \emph{random}---lol.
+\item{\texttt{InitShuffles}} \hfill\\
+Number of deck shuffles before game starts.
+\item{\texttt{Shuffles}} \hfill\\
+Number of deck shuffles between games.
+\item{\texttt{Dealer}} \hfill\\
+Dealer strategies: \emph{H17} and \emph{S17}, described above.
 \end{description}
 
-It would be nice to mention that split is not imlemented and why and that it would be even incer o do so
-
-sovf vs. hard dealer
-AI vs AI
-noDecks
-
-Player1 - deterministic table
-Player2 - calculates deck probabilities
-Player3 - combines strategies of Player1\&2
-Player4 - never takes a card
-Player5 - my przeczucie
+\section*{\texttt{Strategies}}
+The following strategies were employed:
+\begin{description}
+\item{\textbf{Deterministic table}} \hfill\\
+The action taken by AI module was predetermined according to widely used BlackJack table(Table~\ref{tab:det}). The table was simplified in a way that \emph{split} is not allowed i.e\ when the player is dealt with two same valued cards he cannot split his hand into two separate hands each containing one card.
+\item{\textbf{Deck probabilities}} \hfill\\
+In the experiment the decks are shuffled using \emph{riffle shuffle} i.e.\ the deck is split into halves and then it is combined by interchangeably dropping cards from each half. Aforementioned fact together with observable number of shuffles lead to probability estimates of cards being at given position in the deck, which are used to estimate risk of hold and hit. This yields the game mechanism which always takes the least risky action.
+\item{\textbf{Probabilistic choice}} \hfill\\
+It combines \emph{deterministic table} and \emph{deck probabilities} by creating a probability sampling vector over all cards that can be dealt next for the player and dealer to extend action determined by the tables.
+\item{\textbf{Stand on all}} \hfill\\
+This strategy is used to create a baseline to compare and evaluate all implemented algorithms. The strategy simply never takes additional cards.
+\end{description}
 
 \begin{table}[htop]
   \tiny
@@ -154,11 +160,18 @@ Player5 - my przeczucie
 
 
 \section*{\texttt{Results}}
+AI vs AI
+noDecks
 Mendacium.
 
 
 \section*{\texttt{Conclusions}}
 Mendacium.
+
+\section*{\texttt{Appendix}---How to run the code}
+To run supplied code \texttt{SWI-Prolog}, \texttt{R} and \texttt{R..eal} have to be installed. The adjustments of the game-play can be done by specifying mentioned above parameters which are present at top of the \texttt{main.pl} file.\\
+To test, run \texttt{SWIP} in the directory with program and execute: ``\texttt{consult(main).}''~. Then execute: ``\texttt{main.}''~.\\
+Depending whether interactive or experimental mode has been chosen users interaction may be required; if one decided to play along the AI modules question whether to hit or stand at each round will be asked.\\
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  Unused pieces %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
