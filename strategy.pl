@@ -141,7 +141,7 @@ playAIDet(NPlayer, NDeck, Player, Deck, Dealer) :-
 	dealType(P, Player),
 	dealerFaceUp(D, Dealer),
 	%% write('Dealer face: '), write(D), nl,
-	score(V, Player), % cards value V
+	score(V, Player),!, % cards value V---take only first value where aces are treated as 11
 	playAIDet(Action, V, P, D),
 	% take an action
 	( Action = hit   -> hitDet(NPlayer, NDeck, Player, Deck)
@@ -151,7 +151,8 @@ playAIDet(NPlayer, NDeck, Player, Deck, Dealer) :-
 playAIDet(Action, V, hard, D) :-
 	hardAction(Action, D, V).
 playAIDet(Action, V, soft, D) :-
-	softAction(Action, D, V).
+	V1 is V - 11,
+	softAction(Action, D, V1).
 
 hitDet(NPlayer, Deck, Player, [C|Deck]) :-
 	append(Player, [C], NPlayer).

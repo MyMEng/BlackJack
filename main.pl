@@ -25,7 +25,7 @@ main :-
 	<- 'dev.off()'.
 main(0) :- !.
 main(X) :-
-	play(Gno),
+	play(X),
 	X1 is X - 1,
 	main(X1).
 
@@ -46,9 +46,22 @@ play(Gno) :-
 appendScores(FinalTable, Gno) :-
 	getScoreTable(Lis, FinalTable),
 	%% Lis = [1,2,3,4,5,6],
-	'scores[Gno, ]' <- Lis.
-getScoreTable(Lis, FinalTable) :-
-	otherwise.
+	write('Lis:'), nl, write(Lis), nl,
+	scores[Gno,*] <- Lis.
+getScoreTable(Lis, [Dealer|FinalTable]) :-
+	score(D, Dealer),
+	getScores(LisPlay, Deals, 0, [], D, FinalTable ),
+	append([Deals], LisPlay, Lis).
+getScores(Lis, Deals, Deals, Lis, _, [] ) :- !.
+getScores(Lis, Deals, DCount, Accum, D, [Curr|FinalTable] ) :-
+	score(C, Curr),
+	( (C = D, C =< 21)  -> (append(Accum, [1], AccumPlus), NDCount is 1 + DCount )
+	; (C < D, D =< 21)  -> (append(Accum, [0], AccumPlus), NDCount is 1 + DCount )
+	; (C =< 21, D > 21) -> (append(Accum, [1], AccumPlus), NDCount is DCount )
+	; (C > 21, D > 21) -> (append(Accum, [0], AccumPlus), NDCount is DCount )
+	; (C > D, C =< 21)  -> (append(Accum, [1], AccumPlus), NDCount is DCount )
+	),
+	getScores(Lis, Deals, NDCount, AccumPlus, D, FinalTable ).
 
 
 % finish the game
@@ -65,7 +78,7 @@ theGame(FinalTable, Table, Deck, Ask, Refused) :-
 
 	%% write('before Bj'), nl,
 	checkBJ(Allowence, _, Table), % check for initial BlackJack
-	write(Allowence), nl,
+	%% write(Allowence), nl,
 	aIbj(ReRefused, Allowence, Refused),
 
 	% what if there is no player
@@ -104,7 +117,13 @@ theGame(FinalTable, Table, Deck, Ask, Refused) :-
 	printGame(NNTable, cont),
 	%% \+ checkTheEnd( Allowence ), % for the moment end the game-normally shuffle and new deal
 	%% write(NRefused), nl,
-	theGame(FinalTable, NNTable, NNDeck, Ask1, NRefused).
+
+	%% if experimental mode swap
+	( U = 0     -> Ask2 is 0
+	; otherwise -> Ask2 is Ask1
+	),
+
+	theGame(FinalTable, NNTable, NNDeck, Ask2, NRefused).
 
 % check whether all players are done playing
 checkTheEnd( [ -1|Aa ] ) :-

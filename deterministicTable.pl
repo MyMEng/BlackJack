@@ -191,6 +191,7 @@ softAction(hit,   2, 6).
 softAction(stand, 2, 7).
 softAction(stand, 2, 8).
 softAction(stand, 2, 9).
+softAction(hit, 2, 11).%ace
 
 softAction(hit,   3, 2).
 softAction(hit,   3, 3).
@@ -200,6 +201,7 @@ softAction(hit,   3, 6).
 softAction(stand, 3, 7).
 softAction(stand, 3, 8).
 softAction(stand, 3, 9).
+softAction(hit, 3, 11).%ace
 
 softAction(hit,   4, 2).
 softAction(hit,   4, 3).
@@ -209,6 +211,7 @@ softAction(hit,   4, 6).
 softAction(stand, 4, 7).
 softAction(stand, 4, 8).
 softAction(stand, 4, 9).
+softAction(hit, 4, 11).%ace
 
 softAction(hit,   5, 2).
 softAction(hit,   5, 3).
@@ -218,6 +221,7 @@ softAction(hit,   5, 6).
 softAction(stand, 5, 7).
 softAction(stand, 5, 8).
 softAction(stand, 5, 9).
+softAction(hit, 5, 11).%ace
 
 softAction(hit,   6, 2).
 softAction(hit,   6, 3).
@@ -227,6 +231,7 @@ softAction(hit,   6, 6).
 softAction(stand, 6, 7).
 softAction(stand, 6, 8).
 softAction(stand, 6, 9).
+softAction(hit, 6, 11).%ace
 
 softAction(hit,   7, 2).
 softAction(hit,   7, 3).
@@ -236,6 +241,7 @@ softAction(hit,   7, 6).
 softAction(stand, 7, 7).
 softAction(stand, 7, 8).
 softAction(stand, 7, 9).
+softAction(hit, 7, 11).%ace
 
 softAction(hit,   8, 2).
 softAction(hit,   8, 3).
@@ -245,6 +251,7 @@ softAction(hit,   8, 6).
 softAction(stand, 8, 7).
 softAction(stand, 8, 8).
 softAction(stand, 8, 9).
+softAction(hit, 8, 11).%ace
 
 softAction(hit,   9, 2).
 softAction(hit,   9, 3).
@@ -254,6 +261,7 @@ softAction(hit,   9, 6).
 softAction(hit,   9, 7).
 softAction(stand, 9, 8).
 softAction(stand, 9, 9).
+softAction(hit, 9, 11).%ace
 
 softAction(hit,   10, 2).
 softAction(hit,   10, 3).
@@ -263,6 +271,7 @@ softAction(hit,   10, 6).
 softAction(hit,   10, 7).
 softAction(stand, 10, 8).
 softAction(stand, 10, 9).
+softAction(hit, 10, 11).%ace
 
 softAction(hit,   ace, 2).
 softAction(hit,   ace, 3).
@@ -272,3 +281,4 @@ softAction(hit,   ace, 6).
 softAction(hit,   ace, 7).
 softAction(stand, ace, 8).
 softAction(stand, ace, 9).
+softAction(hit,   ace, 11).%ace
