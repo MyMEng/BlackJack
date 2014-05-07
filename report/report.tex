@@ -19,6 +19,8 @@
 \usepackage{subcaption}
 \usepackage{float}
 
+\usepackage[usenames,dvipsnames]{color}
+
 % \usepackage{hyperref}
 % \usepackage{graphicx}
 % \usepackage{subfigure}
@@ -56,26 +58,89 @@
 ] % \lipsum[1]~\\[0.4cm]
 
 \begin{abstract}
-This paper reviews most common strategies used by \emph{BlackJack}\footnote{For more details see:\\http://en.wikipedia.org/wiki/Blackjack} players to decrease \emph{house edge}\footnote{A statistical advantage of the house(casino) over player.}. Algorithms such as: \emph{deterministic table}, \emph{deck probabilities}, \emph{stand on all} and combination of first two are tested.\\
-For this purpose BlackJack engine is implemented in \texttt{SWI-Prolog} programming language and \texttt{R} statistical package, where the later is accessed via \texttt{R..eal}\footnote{For more details see:\\http://www.swi-prolog.org/pack/list?p=real} interface.\\
+This paper reviews most common strategies used by \emph{BlackJack}\footnote{For more details see:\\http://en.wikipedia.org/wiki/Blackjack~.} players to decrease \emph{house edge}\footnote{A statistical advantage of the house(casino) over player.}. Algorithms such as: \emph{deterministic table}, \emph{deck probabilities}, \emph{stand on all} and combination of first two are tested.\\
+For this purpose BlackJack engine is implemented in \texttt{SWI-Prolog} programming language and \texttt{R} statistical package, where the later is accessed via \texttt{R..eal}\footnote{For more details see:\\http://www.swi-prolog.org/pack/list?p=real~.} interface.\\
 Finally, results of the experiment are presented and examined.\\
+
+\begin{small}
+\noindent
+The source code together with this report is available at:\\https://github.com/So-Cool/BlackJack~.
+\end{small}
 \end{abstract}
 
 \section*{\texttt{The experiment}}
+To examine aforementioned strategies BlackJack game was implemented with number of parameters being user configurable. There are two house strategies implemented, which are documented to be the most popular: \emph{H17} and \emph{S17}. i.e.\ dealer can... only one card is revealed to the players. Furthermore, the house plays as last in each round therefore being aware of the table situation.\\
 
+At each stage the player can either:  *HIT* or *HOLD*\\
 
+use repl to make statistical computations\\
 
-the house play last it gives advantage
-Describe strategy of dealer---H17
+code description: key choices; game theory and results for different number of decks for different strategies\\
 
+\section*{\texttt{Strategies}}
 
-use repl to make statistical computations
+\begin{description}
+\item{\textbf{Deterministic table}} \hfill\\
+Rat begin in TL or BL and run toward left junction. The movable barrier is placed there to direct the animal into the central arm.
+\item{\textbf{Deck probabilities}} \hfill\\
+The rat gets to the right junction---decision point---where it choses left or right turn.
+\item{\textbf{Stand on all}} \hfill\\
+Only the choice which leads to the point at the same height as the starting position is awarded.
+\item{\textbf{Probabilistic choice}} \hfill\\
+After reaching TR or BR the rat returns to the right junction where another movable barrier is placed to direct the rat into central arm.
+\end{description}
 
+% \colorbox{green}{H}
+\begin{table}[t]
+  \tiny
+  \begin{tabular}{|l|c|c|c|c|c|c|c|c|c|c|}
+    \hline
+    \multicolumn{1}{ |l| }{\multirow{3}{*}{Player hand} } & \multicolumn{10}{ |c| }{Dealer's face-up card}\\
+    \cline{2-11}
+     & \multicolumn{10}{ |c| }{Hard totals}\\
+    \cline{2-11}
+     & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 & A \\
+    \hline
+    17--20 & \colorbox{red}{S} & \colorbox{red}{S} & \colorbox{red}{S} & \colorbox{red}{S} & \colorbox{red}{S} & \colorbox{red}{S} & \colorbox{red}{S} & \colorbox{red}{S} & \colorbox{red}{S} & \colorbox{red}{S} \\
+    \hline
+    16 & \colorbox{red}{S} & \colorbox{red}{S} & \colorbox{red}{S} & \colorbox{red}{S} & \colorbox{red}{S} & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{red}{S} & \colorbox{red}{S} & \colorbox{red}{S} \\
+    \hline
+    15 &\colorbox{red}{S} & \colorbox{red}{S} & \colorbox{red}{S} & \colorbox{red}{S} & \colorbox{red}{S} & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{red}{S} & \colorbox{green}{H} \\
+    \hline
+    13--14 & \colorbox{red}{S} & \colorbox{red}{S} & \colorbox{red}{S} & \colorbox{red}{S} & \colorbox{red}{S} & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} \\
+    \hline
+    12 & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{red}{S} & \colorbox{red}{S} & \colorbox{red}{S} & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} \\
+    \hline
+    11 & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} \\
+    \hline
+    10 & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} \\
+    \hline
+    9 & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} \\
+    \hline
+    4--8 & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} \\
+    \hline
+    % \end{small}
+  \end{tabular}
+  % \vspace*{1cm}
+  \begin{tabular}{|l|c|c|c|c|c|c|c|c|c|c|}
+    \hline
+    \multicolumn{1}{ |l| }{Player hand } & \multicolumn{10}{ |c| }{Soft totals}\\
+    \hline
+    8--9 & \colorbox{red}{S} & \colorbox{red}{S} & \colorbox{red}{S} & \colorbox{red}{S} & \colorbox{red}{S} & \colorbox{red}{S} & \colorbox{red}{S} & \colorbox{red}{S} & \colorbox{red}{S} & \colorbox{red}{S} \\
+    \hline
+    7 & \colorbox{red}{S} & \colorbox{red}{S} & \colorbox{red}{S} & \colorbox{red}{S} & \colorbox{red}{S} & \colorbox{red}{S} & \colorbox{red}{S} & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} \\
+    \hline
+    6 & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} \\
+    \hline
+    4--5 & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} \\
+    \hline
+    2--3 & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} & \colorbox{green}{H} \\
+    \hline
+  \end{tabular}
 
-EXPLORATION STEP  -  *HIT* take a card
-EXPLoitation STEP - *HOLD* 
+  \caption{Action table underlying \emph{deterministic table} strategy. .\label{tab:det}}
+\end{table}
 
-%% The report will consist of code description: key choices; game theory and results for different number of decks for different strategies.
 
 It would be nice to mention that split is not imlemented and why and that it would be even incer o do so
 
@@ -87,12 +152,8 @@ Player1 - deterministic table
 Player2 - calculates deck probabilities
 Player3 - combines strategies of Player1\&2
 Player4 - never takes a card
-
 Player5 - my przeczucie
 
-
-
-Conducted experiment concerned path finding in the `\texttt{H}' shaped maze by a rat. The construction was divided into 4 main points top-left(TL), bottom-left(BL), top-right(TR) and bottom-right(BR). TL and BL were start points and TR, BR were destination points, where correct destination(awarded with snack) was placed at the same height(top or bottom) as the chosen start point: \emph{T}L---\emph{T}R and \emph{B}L---\emph{B}R.\\
 % \let\thefootnote\relax\footnote{Theta Rhythms Coordinate\\Hippocampal–--Prefrontal Interactions\\in a Spatial Memory Task\\Matthew W. Jones, Matthew A. Wilson}
 
 % \begin{figure}[htbp]
@@ -104,25 +165,7 @@ Conducted experiment concerned path finding in the `\texttt{H}' shaped maze by a
 % \vspace{0.2cm}
 % \end{figure}
 
-We can divide the experiment into a number of stages:
-\begin{description}
-\item{\emph{Stage 1}} \hfill\\
-Rat begin in TL or BL and run toward left junction. The movable barrier is placed there to direct the animal into the central arm.
-\item{\emph{Stage 2}} \hfill\\
-The rat gets to the right junction---decision point---where it choses left or right turn.
-\item{\emph{Stage 3}} \hfill\\
-Only the choice which leads to the point at the same height as the starting position is awarded.
-\item{\emph{Stage 4}} \hfill\\
-After reaching TR or BR the rat returns to the right junction where another movable barrier is placed to direct the rat into central arm.
-\item{\emph{Stage 5}} \hfill\\
-The rat reaches left junction.
-\item{\emph{Stage 6}} \hfill\\
-The animal is directed to TL or BL randomly by moving barrier.
-\end{description}
-
-
 \section*{\texttt{Decision making}}
-It is considered that Stages 1 \& 2 requires \emph{spatial working-memory}---the rat memorized starting position. By Stage 3 the decision which direction to follow on the right junction should be made. Stages 4--6 did not require working-memory as all turns were forced with barriers.\\
 
 % \begin{figure}[htbp]
 %   \begin{subfigure}{.49\linewidth}\centering
@@ -147,7 +190,6 @@ It is considered that Stages 1 \& 2 requires \emph{spatial working-memory}---the
 % \end{figure}
 
 \section*{\texttt{Analysis}}
-I performed analysis of firing rate based on rat's position for all 4 neurons. To smooth-out the movement I first performed discretization(see figure~\ref{fig:maze}) of X-Y space and match firing times to particular position on the plane.\\
 
 % \begin{figure}[h]
 %   \begin{subfigure}{.99\linewidth}\centering
@@ -162,28 +204,15 @@ I performed analysis of firing rate based on rat's position for all 4 neurons. T
 %   \caption{Neuron 1---spatial activity.\label{fig:3d_n1}}
 % \end{figure}
 
-Figure~\ref{fig:FiringPosition_ALL} shows firing rate after each move for all 4 neurons. Sub-plot~\ref{fig:FiringPosition_N1} contains characteristic regular spikes---possibly place at the maze where a rat makes the call to its memory.\\
-Figure~\ref{fig:FiringPosition_N2} is characterized by a high activity at the beginning of the experiment---while new places are visited---and average number of spikes later on---when the parts of maze are re-visited. I guess that it corresponds to learning in the new environment; once the rat has adjusted to surrounding the neural activity lowers.\\
-Neuron~3(graph~\ref{fig:FiringPosition_N3}) behaves similarly to neuron~2(figure~\ref{fig:FiringPosition_N2})---it shows similar spacial learning behavior.\\
-Finally, graph~\ref{fig:FiringPosition_N4} presenting neuron~4, shows high activity at the beginning and just after the midpoint. I think that it is caused by change in the maze setting---like different starting position.\\
-
-After projecting neurons activity on the maze plot we can make more informative guesses regarding the role of each neuron and partially deduce its functionality.\\
-
-Figure~\ref{fig:3d_n1} can be interpreted as use of memory(first neuron). Once rat reaches right junction and is forced to make a turn it makes a call to memory to choose between TR and BR to get the reward.\\
-
-Neuron 2 which activity is plotted in the figure~\ref{fig:3d_n2} corresponds to memorizing initial turn at the left junction forced by a removable barrier. Once the turn is made the rat memorizes the ``choice'' to make a rewarded decision at the right junction.\\
-
-Figure~\ref{fig:3d_n3}, presenting neuron 3 activity, shows high spiking rates at the reward points---TR and BR. These neuron spikes triggered by reward seems to reinforce learning effect probably by linking choices at left and right junctions.\\
-
-Figure~\ref{fig:3d_n4}, which plots the activity of neuron 4, seems to be active in a similar place as neuron 2. This means that it is also responsible for forced, left junction turn needed to make rewarded choice later in the experiment.\\
-
 
 \section*{\texttt{Conclusions}}
-Neurons 2 \& 4 seem to correspond to memorizing the turn made(forced by a barrier) at left junction. Neuron 1 is responsible for decision making at right junction based on previously memorized left junction choice. Neuron 3 acts like a factor which reinforces learning by spiking at the reward points.\\
-All in all, system based on 4 aforementioned neurons allow rat to memorize initial turn and match---by means of the reward---corresponding direction choice at the next junction. Rat seems to move across designed maze as intended by authors of the experiment.\\
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  Unused pieces %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Concept of failure driven loops
+%%     EXPLORATION STEP  -  *HIT* take a card
+%%     EXPLoitation STEP - *HOLD* 
+%% back here
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \end{document}
