@@ -81,7 +81,7 @@ code description: key choices; game theory and results for different number of d
 
 \begin{description}
 \item{\textbf{Deterministic table}} \hfill\\
-Rat begin in TL or BL and run toward left junction. The movable barrier is placed there to direct the animal into the central arm.
+Rat begin in TL or BL and run toward left junction. The movable barrier is placed there to direct the animal into the central arm. See table~\ref{tab:det}.
 \item{\textbf{Deck probabilities}} \hfill\\
 The rat gets to the right junction---decision point---where it choses left or right turn.
 \item{\textbf{Stand on all}} \hfill\\
@@ -90,8 +90,19 @@ Only the choice which leads to the point at the same height as the starting posi
 After reaching TR or BR the rat returns to the right junction where another movable barrier is placed to direct the rat into central arm.
 \end{description}
 
-% \colorbox{green}{H}
-\begin{table}[t]
+It would be nice to mention that split is not imlemented and why and that it would be even incer o do so
+
+sovf vs. hard dealer
+AI vs AI
+noDecks
+
+Player1 - deterministic table
+Player2 - calculates deck probabilities
+Player3 - combines strategies of Player1\&2
+Player4 - never takes a card
+Player5 - my przeczucie
+
+\begin{table}[htop]
   \tiny
   \begin{tabular}{|l|c|c|c|c|c|c|c|c|c|c|}
     \hline
@@ -138,23 +149,24 @@ After reaching TR or BR the rat returns to the right junction where another mova
     \hline
   \end{tabular}
 
-  \caption{Action table underlying \emph{deterministic table} strategy. .\label{tab:det}}
+  \caption{Action table underlying \emph{deterministic table} strategy.\label{tab:det}}
 \end{table}
 
 
-It would be nice to mention that split is not imlemented and why and that it would be even incer o do so
+\section*{\texttt{Results}}
+Mendacium.
 
-sovf vs. hard dealer
-AI vs AI
-noDecks
 
-Player1 - deterministic table
-Player2 - calculates deck probabilities
-Player3 - combines strategies of Player1\&2
-Player4 - never takes a card
-Player5 - my przeczucie
+\section*{\texttt{Conclusions}}
+Mendacium.
 
-% \let\thefootnote\relax\footnote{Theta Rhythms Coordinate\\Hippocampal–--Prefrontal Interactions\\in a Spatial Memory Task\\Matthew W. Jones, Matthew A. Wilson}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  Unused pieces %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Concept of failure driven loops
+%%     EXPLORATION STEP  -  *HIT* take a card
+%%     EXPLoitation STEP - *HOLD* 
+%% \let\thefootnote\relax\footnote{No number}
+
 
 % \begin{figure}[htbp]
 % \centering
@@ -164,8 +176,6 @@ Player5 - my przeczucie
 % % \end{tiny}
 % \vspace{0.2cm}
 % \end{figure}
-
-\section*{\texttt{Decision making}}
 
 % \begin{figure}[htbp]
 %   \begin{subfigure}{.49\linewidth}\centering
@@ -189,8 +199,6 @@ Player5 - my przeczucie
 %   \caption{Neurons firing rates based on position change of a rat.\label{fig:FiringPosition_ALL}}
 % \end{figure}
 
-\section*{\texttt{Analysis}}
-
 % \begin{figure}[h]
 %   \begin{subfigure}{.99\linewidth}\centering
 %     \includegraphics[width=1.1\textwidth]{figure6_a.png}
@@ -205,14 +213,5 @@ Player5 - my przeczucie
 % \end{figure}
 
 
-\section*{\texttt{Conclusions}}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  Unused pieces %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Concept of failure driven loops
-%%     EXPLORATION STEP  -  *HIT* take a card
-%%     EXPLoitation STEP - *HOLD* 
-%% back here
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \end{document}
