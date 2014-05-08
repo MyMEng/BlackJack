@@ -180,7 +180,10 @@ initDeckProbabilities(Deck, Quantity, random) :-
 	deck(DeckL), % generate deck
 	initShuffles(Quantity),
 	% generate x randm vectors 0/1 each corresponding to 1 shuffle
-	Size is 27 * Quantity,
+	decks(Dno),
+	( Dno=1     -> Size is 27 * Quantity
+	; otherwise -> (Mp is Dno-1, SizeA is 26*Mp, SizeB is 27+SizeA, Size is SizeB*Quantity)
+	),
 	Sl <- sample(0:1, Size, replace=1),
 	shuffleMock(Deck, DeckL, Quantity, Sl).
 initDeckProbabilities(Deck, Quantity, deterministic) :- % first from the top pile is top/././.
