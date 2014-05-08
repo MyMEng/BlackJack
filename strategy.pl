@@ -170,7 +170,8 @@ playAIDeck( PlayerA, ChDeck, PlayerB, NDeck, Table) :- % do the AI magic
 % prepare deck probability table for initial number for shuffles
 initDeckProbabilities(Deck, Quantity, random) :-
 	% generate x randm vectors 0/1 each corresponding to 1 shuffle
-	lol.
+	Size is 27 * Quantity,
+	Sl <- sample(0:1, Size, replace=TRUE).
 initDeckProbabilities(Deck, Quantity, deterministic) :- % first from the top pile is top/././.
 	deck(DeckL), % generate deck
 	initShuffles(Quantity),
@@ -218,18 +219,21 @@ rifleDetMock(Out, Out, [], []) :-
 rifleRanMock(Out, A, B) :-
 	%% random(0, 2, Rand), % decide whether left pile goes on top or bottom
 	( Rand = 0 ; Rand = 1 ),
+	%% write(Rand),
 	rifleRanMock(Out, [], A, B, Rand).
 rifleRanMock(Out, Em, [A1|A2], [B1|B2], 0) :-
 	append(Em, [A1], O1),
 	append(O1, [B1], O2),
 	%% random(0, 2, Rand),
 	( Rand = 0 ; Rand = 1 ),
+	%% write(Rand),
 	rifleRanMock(Out, O2, A2, B2, Rand).
 rifleRanMock(Out, Em, [A1|A2], [B1|B2], 1) :-
 	append(Em, [B1], O1),
 	append(O1, [A1], O2),
 	%% random(0, 2, Rand),
 	( Rand = 0 ; Rand = 1 ),
+	%% write(Rand),
 	rifleRanMock(Out, O2, A2, B2, Rand).
 rifleRanMock(Out, Em, [], [B1|B2], Rand) :-
 	append(Em, [B1], O),
