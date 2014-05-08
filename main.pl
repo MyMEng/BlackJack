@@ -20,7 +20,7 @@ playerMode(experimental).
 %% shuffleMode(deterministic). % deterministic
 shuffleMode(random). % random
 %% define number of shuffles before game starts
-initShuffles(1).
+initShuffles(10).
 %% define number of shuffles after each game
 shuffles(2).
 %% define dealer's strategy --- S17 is better for the player
@@ -30,7 +30,7 @@ dealer(h17). % hit soft 17
 
 
 main :-
-	<- library(Matrix), % load R Matrix library
+	<- 'library(Matrix)', % load R Matrix library
 	plays(Gno), %Get nubmer of games
 	getNoPlayers(Pno),
 	scores <- matrix(data=0, nrow=Gno, ncol=Pno), % initialise score mx
@@ -102,7 +102,10 @@ getTop(Sc, Current, [H|Rest]) :-
 % finish the game
 theGame(Table, Table, _, 0, Refused) :-
 	players(X),
-	refusal(Refused, X, 1),
+	%% write('players: '), write(X), nl,
+	%% write('refused: '), write(Refused), nl,
+	refusal(RefusedOriginal, X, 1),
+	RefusedOriginal = Refused,
 	write('The End'), nl,
 	write('================================================================================'), nl,
 	%% printGame(Table, cont),
