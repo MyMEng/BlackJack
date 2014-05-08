@@ -8,7 +8,7 @@
 
 % define constants
 %% define number of plays
-plays(100).
+plays(500).
 %% define number of decks
 decks(1).
 %% define number of players

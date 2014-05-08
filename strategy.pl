@@ -193,7 +193,7 @@ initDeckProbabilities(Deck, Quantity, deterministic) :- % first from the top pil
 	elementN(Deck, Y, El). % initial deck shuffle.
 
 
-shuffleMock(Shf, Shf, 0, _) :- !.
+shuffleMock(Shf, Shf, 0, []) :- !.
 shuffleMock(Shuffled, Deck, N, Sampling) :-
 	shuffleMode(Mode),
 	proper_length(Deck, Len),
@@ -228,19 +228,19 @@ rifleDetMock(Out, Out, [], []) :-
 	!.
 
 %% rifle shuffle two piles randomly
-rifleRanMock(Out, A, B, NSampling, [Rand, Sampling]) :-
+rifleRanMock(Out, A, B, NSampling, [Rand| Sampling]) :-
 	%% random(0, 2, Rand), % decide whether left pile goes on top or bottom
 	%% ( Rand = 0 ; Rand = 1 ),
 	%% write(Rand),
 	rifleRanMock(Out, [], A, B, Rand, NSampling, Sampling).
-rifleRanMock(Out, Em, [A1|A2], [B1|B2], 0, NSampling, [Rand, Sampling]) :-
+rifleRanMock(Out, Em, [A1|A2], [B1|B2], 0, NSampling, [Rand| Sampling]) :-
 	append(Em, [A1], O1),
 	append(O1, [B1], O2),
 	%% random(0, 2, Rand),
 	%% ( Rand = 0 ; Rand = 1 ),
 	%% write(Rand),
 	rifleRanMock(Out, O2, A2, B2, Rand, NSampling, Sampling).
-rifleRanMock(Out, Em, [A1|A2], [B1|B2], 1, NSampling, [Rand, Sampling]) :-
+rifleRanMock(Out, Em, [A1|A2], [B1|B2], 1, NSampling, [Rand| Sampling]) :-
 	append(Em, [B1], O1),
 	append(O1, [A1], O2),
 	%% random(0, 2, Rand),
