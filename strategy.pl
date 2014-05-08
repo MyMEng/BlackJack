@@ -111,7 +111,7 @@ playAISequence(NewTable, NNDeck, NRefuse, Table, NDeck, Dealer, Counter, X, Refu
 	( Status = 0 ->
 		( Counter = 1 -> ( playAIDet( PlayerA, ChDeck, PlayerB, NDeck, Dealer ),
 						   replace( NewRefuse, Refuse, 1, Counter) )
-		; Counter = 2 -> ( PlayerA = PlayerB, ChDeck = NDeck, replace( NewRefuse, Refuse, 1, Counter) )
+		; Counter = 2 -> ( playAIDeck( PlayerA, ChDeck, PlayerB, NDeck, Table), NewRefuse = Refuse )
 		; Counter = 3 -> ( PlayerA = PlayerB, ChDeck = NDeck, replace( NewRefuse, Refuse, 1, Counter) )
 		; Counter = 4 -> ( PlayerA = PlayerB, ChDeck = NDeck, replace( NewRefuse, Refuse, 1, Counter) )
 		; otherwise   -> ( playAIDet( PlayerA, ChDeck, PlayerB, NDeck, Dealer ),
@@ -122,10 +122,10 @@ playAISequence(NewTable, NNDeck, NRefuse, Table, NDeck, Dealer, Counter, X, Refu
 	),
 
 	% if AI once refused do not allow any more
-	%% ( PlayerA = PlayerB -> replace( NewNewRefuse, NewRefuse, 1, Counter) % refusal
-	%% ; otherwise         -> NewNewRefuse = NewRefuse % action taken
-	%% ),
-	NewNewRefuse = NewRefuse,
+	( ( PlayerA = PlayerB, Counter = 2) -> replace( NewNewRefuse, NewRefuse, 1, Counter) % refusal
+	; otherwise                         -> NewNewRefuse = NewRefuse % action taken
+	),
+	%% NewNewRefuse = NewRefuse,
 
 	% attach back player A.
 	replace( ChTable, Table, PlayerA, Counter),
@@ -158,12 +158,87 @@ standDet(Player, Deck, Player, Deck).
 
 %% 2. Shuffle tracking --- Deck Probabilities --- we assume deck has started being in ordered
 % get probabilities of each card occurring and decide based on the one with highest probabilitys
-playAIDet( PlayerA, ChDeck, PlayerB, NDeck, Dealer).
-%% playAI(NTable, NDeck, NewTable, NewDeck) :- % do the AI magic
-	%% i <- [1,2,3,4],
-	%% <- i,
-	%% I <- i,
-	%% write( i(I) ), nl.
+playAIDeck( PlayerA, ChDeck, PlayerB, NDeck, Table) :- % do the AI magic
+	decks(D),
+	Size is 52 * D,
+	deckMx <- 'Diagonal(Size, x=1)', % initialize Deck matrix
+	% figure out pobabilities after shuffling given number of times
+	initShuffles(Quantity),
+	shuffleMode(Type),
+	initDeckProbabilities(Deck, Quantity, Type).
+
+% prepare deck probability table for initial number for shuffles
+initDeckProbabilities(Deck, Quantity, random) :-
+	% generate x randm vectors 0/1 each corresponding to 1 shuffle
+	lol.
+initDeckProbabilities(Deck, Quantity, deterministic) :- % first from the top pile is top/././.
+	deck(DeckL), % generate deck
+	initShuffles(Quantity),
+	findall(Shuffled, shuffleMock(Shuffled, DeckL, Quantity), Y),
+	length(Y, Len),
+	El <- sample(1:Len, 1),
+	elementN(Deck, Y, El). % initial deck shuffle.
+
+
+shuffleMock(Shf, Shf, 0) :- !.
+shuffleMock(Shuffled, Deck, N) :-
+	shuffleMode(Mode),
+	proper_length(Deck, Len),
+	Half is Len / 2,
+	getPiles(A, _, Half),
+	A1 is A + 1,
+	split(P1, P2, Deck, A1), % get two piles
+	% random or deterministic
+	( Mode = random        -> rifleRanMock(Forward, P1, P2)
+	; Mode = deterministic -> rifleDetMock(Forward, P1, P2)
+	),
+	N1 is N - 1,
+	shuffleMock( Shuffled, Forward, N1 ).
+%% rifle shuffle two piles deterministically
+rifleDetMock(Out, A, B) :-
+	%% random(0, 2, Rand), % decide whether left pile goes on top or bottom,
+	( Rand = 0 ; Rand = 1 ),
+	( Rand = 0 -> rifleDetMock(Out, [], A, B)
+	; Rand = 1 -> rifleDetMock(Out, [], B, A)
+	).
+rifleDetMock(Out, Em, [A1|A2], [B1|B2]) :-
+	append(Em, [A1], O1),
+	append(O1, [B1], O2),
+	rifleDetMock(Out, O2, A2, B2).
+rifleDetMock(Out, Em, [], [B1|B2]) :-
+	append(Em, [B1], O),
+	rifleDetMock(Out, O, [], B2).
+rifleDetMock(Out, Em, [A1|A2], []) :-
+	append(Em, [A1], O),
+	rifleDetMock(Out, O, A2, []).
+rifleDetMock(Out, Out, [], []) :-
+	!.
+
+%% rifle shuffle two piles randomly
+rifleRanMock(Out, A, B) :-
+	%% random(0, 2, Rand), % decide whether left pile goes on top or bottom
+	( Rand = 0 ; Rand = 1 ),
+	rifleRanMock(Out, [], A, B, Rand).
+rifleRanMock(Out, Em, [A1|A2], [B1|B2], 0) :-
+	append(Em, [A1], O1),
+	append(O1, [B1], O2),
+	%% random(0, 2, Rand),
+	( Rand = 0 ; Rand = 1 ),
+	rifleRanMock(Out, O2, A2, B2, Rand).
+rifleRanMock(Out, Em, [A1|A2], [B1|B2], 1) :-
+	append(Em, [B1], O1),
+	append(O1, [A1], O2),
+	%% random(0, 2, Rand),
+	( Rand = 0 ; Rand = 1 ),
+	rifleRanMock(Out, O2, A2, B2, Rand).
+rifleRanMock(Out, Em, [], [B1|B2], Rand) :-
+	append(Em, [B1], O),
+	rifleRanMock(Out, O, [], B2, Rand).
+rifleRanMock(Out, Em, [A1|A2], [], Rand) :-
+	append(Em, [A1], O),
+	rifleRanMock(Out, O, A2, [], Rand).
+rifleRanMock(Out, Out, [], [], _) :-
+	!.
 
 %% 3. 50% contribution deterministic | 50% contribution deck memory
 % create a sampling distribution over all possible cards that can be drawn and sample a card
