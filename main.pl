@@ -5,10 +5,11 @@
 :- consult(player).
 :- consult(strategy).
 :- consult(deterministicTable).
+:- set_prolog_stack(local,  limit(4 000 000 000)).
 
 % define constants
 %% define number of plays
-plays(500).
+plays(300).
 %% define number of decks
 decks(1).
 %% define number of players

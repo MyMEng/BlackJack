@@ -39,7 +39,6 @@ hit(NNTable, NNDeck, [E|RTable], [C|NDeck]) :-
 	),
 	append( [NewHand], RTable, NNTable ),
 	append( NewC, NDeck, NNDeck ).
-	%% write(NNTable), nl, write(NNDeck), nl.
 
 aceDillemaHit(Decision, Type, Aces, [S|Score]) :-
 	( Aces = 0  -> (Type = hard, Decision = S)
@@ -111,8 +110,9 @@ playAISequence(NewTable, NNDeck, NRefuse, Table, NDeck, Dealer, Counter, X, Refu
 	( Status = 0 ->
 		( Counter = 1 -> ( playAIDet( PlayerA, ChDeck, PlayerB, NDeck, Dealer ),
 						   replace( NewRefuse, Refuse, 1, Counter) )
-		; Counter = 2 -> ( playAIDeck( PlayerA, ChDeck, PlayerB, NDeck, Table), NewRefuse = Refuse ) %( PlayerA = PlayerB, ChDeck = NDeck, replace( NewRefuse, Refuse, 1, Counter) )%
-		; Counter = 3 -> ( PlayerA = PlayerB, ChDeck = NDeck, replace( NewRefuse, Refuse, 1, Counter) )
+		; Counter = 2 -> ( playAIDeck( PlayerA, ChDeck, PlayerB, NDeck, Table), NewRefuse = Refuse )
+		; Counter = 3 -> ( playMix( PlayerA, ChDeck, PlayerB, NDeck, Dealer, Table ),
+		                   replace( NewRefuse, Refuse, 1, Counter) )
 		; Counter = 4 -> ( PlayerA = PlayerB, ChDeck = NDeck, replace( NewRefuse, Refuse, 1, Counter) )
 		; otherwise   -> ( playAIDet( PlayerA, ChDeck, PlayerB, NDeck, Dealer ),
 						   replace( NewRefuse, Refuse, 1, Counter) )
@@ -125,7 +125,6 @@ playAISequence(NewTable, NNDeck, NRefuse, Table, NDeck, Dealer, Counter, X, Refu
 	( ( PlayerA = PlayerB, Counter = 2) -> replace( NewNewRefuse, NewRefuse, 1, Counter) % refusal
 	; otherwise                         -> NewNewRefuse = NewRefuse % action taken
 	),
-	%% NewNewRefuse = NewRefuse,
 
 	% attach back player A.
 	replace( ChTable, Table, PlayerA, Counter),
@@ -265,7 +264,14 @@ cardsOnTable(N, Accum, [T|Table]) :-
 	A1 is Accum + L,
 	cardsOnTable(N, A1, Table).
 
-
 %% 3. 50% contribution deterministic | 50% contribution deck memory
+playMix( PlayerA, ChDeck, PlayerB, NDeck, Dealer, Table ) :-
+	playAIDet( PlayerAa, ChDeckA, PlayerB, NDeck, Dealer ),
+	playAIDeck( PlayerAb, ChDeckB, PlayerB, NDeck, Table),
+	random(0, 2, Rand),
+	( (PlayerAa=PlayerAb, ChDeckA=ChDeckB) -> (PlayerA=PlayerAa, ChDeck=ChDeckA)
+	; Rand=0                               -> (PlayerA=PlayerAa, ChDeck=ChDeckA)
+	; Rand=1                               -> (PlayerA=PlayerAb, ChDeck=ChDeckB)
+	).
 % create a sampling distribution over all possible cards that can be drawn and sample a card
 % based on that card predict according to table whether it is worth taking it or not
