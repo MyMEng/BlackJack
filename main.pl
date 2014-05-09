@@ -15,8 +15,8 @@ decks(1).
 %% define number of players
 players(4).
 %% activate interactive player or experiment mode
- %% playerMode(interactive).
-playerMode(experimental).
+playerMode(interactive).
+%% playerMode(experimental).
 %% decide whether shuffle is made with coin toss or it is deterministic
 %% shuffleMode(deterministic). % deterministic
 shuffleMode(random). % random
