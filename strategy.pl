@@ -155,7 +155,117 @@ hitDet(NPlayer, Deck, Player, [C|Deck]) :-
 standDet(Player, Deck, Player, Deck).
 
 
+%% 2. Shuffle tracking --- Deck Probabilities --- we assume deck has started being in ordered
+% get probabilities of each card occurring and decide based on the one with highest probabilitys
+playAIDeck( PlayerA, ChDeck, PlayerB, [Dc|NDeck], Table) :- % do the AI magic
+	%% decks(D),
+	%% Size is 52 * D,
+	%% deckMx <- 'Diagonal(Size, x=1)', % initialize Deck matrix
+	% figure out pobabilities after shuffling given number of times
+	initShuffles(Quantity),
+	shuffleMode(Type),
+	initDeckProbabilities(Deck, Quantity, Type),
+	% count how many card have alredy been used and what is the next one
+	cardsOnTable(N, Table),
+	N1 is N + 1,
+	elementN(Card, Deck, N1),
+	append(PlayerB, [Card], TrialHand),
+	scoreTop(Top, TrialHand),
+	( Top =< 21 -> (append(PlayerB, [Dc], PlayerA), ChDeck = NDeck)
+	; otherwise -> (PlayerB = PlayerA, append([Dc], NDeck, ChDeck))
+	).
 
+% prepare deck probability table for initial number for shuffles
+initDeckProbabilities(Deck, Quantity, random) :-
+	deck(DeckL), % generate deck
+	initShuffles(Quantity),
+	% generate x randm vectors 0/1 each corresponding to 1 shuffle
+	decks(Dno),
+	( Dno=1     -> Size is 27 * Quantity
+	; otherwise -> (Mp is Dno-1, SizeA is 26*Mp, SizeB is 27+SizeA, Size is SizeB*Quantity)
+	),
+	Sl <- sample(0:1, Size, replace=1),
+	shuffleMock(Deck, DeckL, Quantity, Sl).
+initDeckProbabilities(Deck, Quantity, deterministic) :- % first from the top pile is top/././.
+	deck(DeckL), % generate deck
+	initShuffles(Quantity),
+	findall(Shuffled, shuffleMock(Shuffled, DeckL, Quantity, []), Y),
+	length(Y, Len),
+	El <- sample(1:Len, 1),
+	elementN(Deck, Y, El). % initial deck shuffle.
+
+
+shuffleMock(Shf, Shf, 0, []) :- !.
+shuffleMock(Shuffled, Deck, N, Sampling) :-
+	shuffleMode(Mode),
+	proper_length(Deck, Len),
+	Half is Len / 2,
+	getPiles(A, _, Half),
+	A1 is A + 1,
+	split(P1, P2, Deck, A1), % get two piles
+	% random or deterministic
+	( Mode = random        -> rifleRanMock(Forward, P1, P2, NSampling, Sampling)
+	; Mode = deterministic -> (rifleDetMock(Forward, P1, P2), NSampling = Sampling )
+	),
+	N1 is N - 1,
+	shuffleMock( Shuffled, Forward, N1, NSampling ).
+%% rifle shuffle two piles deterministically
+rifleDetMock(Out, A, B) :-
+	%% random(0, 2, Rand), % decide whether left pile goes on top or bottom,
+	( Rand = 0 ; Rand = 1 ),
+	( Rand = 0 -> rifleDetMock(Out, [], A, B)
+	; Rand = 1 -> rifleDetMock(Out, [], B, A)
+	).
+rifleDetMock(Out, Em, [A1|A2], [B1|B2]) :-
+	append(Em, [A1], O1),
+	append(O1, [B1], O2),
+	rifleDetMock(Out, O2, A2, B2).
+rifleDetMock(Out, Em, [], [B1|B2]) :-
+	append(Em, [B1], O),
+	rifleDetMock(Out, O, [], B2).
+rifleDetMock(Out, Em, [A1|A2], []) :-
+	append(Em, [A1], O),
+	rifleDetMock(Out, O, A2, []).
+rifleDetMock(Out, Out, [], []) :-
+	!.
+
+%% rifle shuffle two piles randomly
+rifleRanMock(Out, A, B, NSampling, [Rand| Sampling]) :-
+	%% random(0, 2, Rand), % decide whether left pile goes on top or bottom
+	%% ( Rand = 0 ; Rand = 1 ),
+	%% write(Rand),
+	rifleRanMock(Out, [], A, B, Rand, NSampling, Sampling).
+rifleRanMock(Out, Em, [A1|A2], [B1|B2], 0, NSampling, [Rand| Sampling]) :-
+	append(Em, [A1], O1),
+	append(O1, [B1], O2),
+	%% random(0, 2, Rand),
+	%% ( Rand = 0 ; Rand = 1 ),
+	%% write(Rand),
+	rifleRanMock(Out, O2, A2, B2, Rand, NSampling, Sampling).
+rifleRanMock(Out, Em, [A1|A2], [B1|B2], 1, NSampling, [Rand| Sampling]) :-
+	append(Em, [B1], O1),
+	append(O1, [A1], O2),
+	%% random(0, 2, Rand),
+	%% ( Rand = 0 ; Rand = 1 ),
+	%% write(Rand),
+	rifleRanMock(Out, O2, A2, B2, Rand, NSampling, Sampling).
+rifleRanMock(Out, Em, [], [B1|B2], Rand, NSampling, Sampling) :-
+	append(Em, [B1], O),
+	rifleRanMock(Out, O, [], B2, Rand, NSampling, Sampling).
+rifleRanMock(Out, Em, [A1|A2], [], Rand, NSampling, Sampling) :-
+	append(Em, [A1], O),
+	rifleRanMock(Out, O, A2, [], Rand, NSampling, Sampling).
+rifleRanMock(Out, Out, [], [], _, NSampling, NSampling) :-
+	!.
+
+% count number of cards on table
+cardsOnTable(N, Table) :-
+	cardsOnTable(N, 0, Table).
+cardsOnTable(N, N, []) :- !.
+cardsOnTable(N, Accum, [T|Table]) :-
+	length(T, L),
+	A1 is Accum + L,
+	cardsOnTable(N, A1, Table).
 
 %% 3. 50% contribution deterministic | 50% contribution deck memory
 playMix( PlayerA, ChDeck, PlayerB, NDeck, Dealer, Table ) :-
