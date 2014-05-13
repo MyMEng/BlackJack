@@ -100,18 +100,25 @@ Dealer strategy to be used: \emph{H17} and \emph{S17}(as described above).
 \end{description}
 
 \subsection*{Shuffling}
-The simulation performs \emph{riffle shuffle}. .\\
+The simulation performs \emph{riffle shuffle}. First, the deck is split into two possibly equal piles. Then, we merge both piles by alternately dropping card from piles one by one---see figure~\ref{fig:shufflin}.\\
 
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.4\textwidth]{shuffle}
+\caption{Riffle shuffling. Image taken from: http://www.claycon.org/ZAR/shuffling.html.\label{fig:shufflin}}
+% \vspace{0.2cm}
+\end{figure}
 
 \section*{\texttt{Strategies}}
-The following strategies were employed:
+The following strategies are employed:
 \begin{description}
 \item{\textbf{Deterministic table}} \hfill\\
-The action taken by AI module was predetermined according to widely used BlackJack table(Table~\ref{tab:det}). The table was simplified in a way that \emph{split} is not allowed i.e\ when the player is dealt with two same valued cards he cannot split his hand into two separate hands each containing one card.
+The action taken by AI module is predetermined according to widely used BlackJack tables(Table~\ref{tab:det}). The tables are generated for card probabilities while using single deck. The table is simplified in a way that \emph{split} is not allowed i.e\ when the player is dealt with two same valued cards he cannot split his hand into two separate hands each containing one card.
 \item{\textbf{Deck probabilities}} \hfill\\
-In the experiment the decks are shuffled using \emph{riffle shuffle} i.e.\ the deck is split into halves and then it is combined by interchangeably dropping cards from each half. Aforementioned fact together with observable number of shuffles lead to probability estimates of cards being at given position in the deck, which are used to estimate risk of hold and hit. This yields the game mechanism which always takes the least risky action.
+In the experiment the decks are shuffled using \emph{riffle shuffle}. This fact together with observable number of shuffles lead to probability estimates of cards alignments in the deck, which are used to estimate risk of hold and hit actions. This yields the game mechanism which always takes the least risky action.
 \item{\textbf{Probabilistic choice}} \hfill\\
-It combines \emph{deterministic table} and \emph{deck probabilities} by creating a probability sampling vector over all cards that can be dealt next for the player and dealer to extend action determined by the tables.
+It combines \emph{deterministic table} and \emph{deck probabilities} by creating a probability sampling vector over all cards that can be dealt next for the player and dealer to extend action determined by the deterministic tables.\\
+If both strategies agree, .
 \item{\textbf{Stand on all}} \hfill\\
 This strategy is used to create a baseline to compare and evaluate all implemented algorithms. The strategy simply never takes additional cards.
 \end{description}
@@ -182,6 +189,11 @@ To test, run \texttt{SWIP} in the directory with program and execute: ``\texttt{
 Depending whether interactive or experimental mode has been chosen users interaction may be required; if one decided to play along the AI modules question whether to hit or stand at each round will be asked.\\
 
 \section*{Appendix A: Playing the game}
+Implementation of a BlackJack card game in prolog and r..eal library. The later is an interface to R statistical package within SWI code.
+
+To run the code one needs to have R, R-dev, SWI-Prolog and r..eal installed.
+
+
 To run the script:
 
  cd ~
