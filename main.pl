@@ -15,8 +15,8 @@ decks(1).
 %% define number of players
 players(4).
 %% activate interactive player or experiment mode
-playerMode(interactive).
-%% playerMode(experimental).
+%% playerMode(interactive).
+playerMode(experimental).
 %% decide whether shuffle is made with coin toss or it is deterministic
 %% shuffleMode(deterministic). % deterministic
 shuffleMode(random). % random
@@ -26,7 +26,7 @@ initShuffles(10). %max 10
 shuffles(2).
 %% define dealer's strategy --- S17 is better for the player
 %% dealer(h17). % hit soft 17
- dealer(s17). % stand on ALL 17's
+dealer(s17). % stand on ALL 17's
 
 
 
