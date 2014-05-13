@@ -9,9 +9,9 @@
 
 % define constants
 %% define number of plays
-plays(100). % random->300 | deterministic->50 | 2decks random 100
+plays(300). % random->300 | deterministic->50 | 2decks random 100
 %% define number of decks
-decks(2).
+decks(1).
 %% define number of players
 players(4).
 %% activate interactive player or experiment mode
