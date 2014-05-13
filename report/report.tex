@@ -25,7 +25,7 @@
 
 \usepackage{listings}
 
-
+\newcommand{\ts}{\textsuperscript}
 
 \begin{document}
 
@@ -187,10 +187,11 @@ This strategy is used to create a baseline to compare and evaluate all implement
 
 
 \section*{\texttt{Results}}
-Through the following experiments the house will play \emph{S17} strategy.
+Through the following experiments the house plays \emph{S17} strategy.\\
+The threshold(horizontal line) visible in all figures is the level which exceeding guarantees return from the game.
 
 \subsection*{Deterministic shuffling}
-Figure~\ref{fig:det} shows the results for deterministic shuffling.
+Figure~\ref{fig:det} shows the results for deterministic shuffling. The \emph{AI3}(4\ts{th} bar) which is mixture of deterministic table and deck probabilities performs the best in this trial. The result seems reasonable as when the deck shuffling is deterministic, the card alignments can be calculated with quite high probability. Moreover, scores for both deterministic table and pure deck probabilities are also above the threshold.\\
 
 \begin{figure}[htbp]
 \centering
@@ -199,7 +200,8 @@ Figure~\ref{fig:det} shows the results for deterministic shuffling.
 \end{figure}
 
 \subsection*{Random shuffling}
-Figure~\ref{fig:ran} shows the results for random shuffling.
+Figure~\ref{fig:ran} shows the results for random shuffling. In this scenario pure card probability \emph{AI2}(3\ts{rd} bar)  is below the threshold---for cards are shuffled at random the probability estimates become very ``noisy'' leading to worse performance.\\
+Furthermore, \emph{AI1}(2\ts{nd} bar) and \emph{AI3}(4\ts{th} bar) are above the threshold with the latter performing slightly better.
 
 \begin{figure}[htbp]
 \centering
@@ -208,7 +210,7 @@ Figure~\ref{fig:ran} shows the results for random shuffling.
 \end{figure}
 
 \subsection*{More decks}
-Figure~\ref{fig:5dec} shows the results for a game with 5 decks.
+Final experiment was performed for \emph{5 decks}---see figure~\ref{fig:5dec}. .\\
 
 \begin{figure}[htbp]
 \centering
@@ -269,7 +271,6 @@ After the game is finished there will be a score graph and score table(in the .c
 % \usepackage{graphicx}
 % \usepackage{subfigure}
 % \usepackage{indentfirst} % indent frst paragraph of section
-% \newcommand{\ts}{\textsuperscript}
 
 % \begin{figure}[htbp]
 % \centering
