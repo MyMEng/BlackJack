@@ -76,7 +76,15 @@ To sum up, each person plays \emph{only} against the dealer and the goal of each
 
 \subsection*{The house}
 There are two house strategies implemented; both are documented to be the most popular among casinos worldwide, namely: \emph{H17} and \emph{S17}.\\
-Both these strategies indicate to \emph{hit}, if current score is less than $17$ and \emph{stand}, if the score is more than $17$. The difference is that \emph{H17} dictates dealer to \emph{hit} on \emph{soft} $17$ and stand on hard $17$, while \emph{S17} defines to \emph{stand} on all types of $17$. In general, \emph{S17} is regarded as more beneficial for players.\\
+Both these strategies indicate to \emph{hit}, if current score is less than $17$ and \emph{stand}, if the score is more than $17$. The difference is that \emph{H17} dictates dealer to \emph{hit} on \emph{soft} $17$ and stand on hard $17$, while \emph{S17} defines to \emph{stand} on all types of $17$. In general, \emph{S17} is regarded as more beneficial for players---see figures~\ref{fig:s17} and~\ref{fig:h17}.\\
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.5\textwidth]{s17}
+\caption{Scores for default settings wit house playing \emph{S17}.\label{fig:s17}}
+\includegraphics[width=0.5\textwidth]{h17}
+\caption{Scores for default settings wit house playing \emph{H17}.\label{fig:h17}}
+\end{figure}
 
 Moreover, the advantage of house is also built upon the fact that only one card of the dealer is \emph{face up} i.e.\ only one card is revealed to the players. Also the house plays as a last in each round therefore being aware of the table state.\\
 
@@ -187,6 +195,8 @@ Mendacium.
 \section*{\texttt{Conclusions}}
 Mendacium.
 
+\cleardoublepage
+\newpage
 \section*{Appendix A: Playing the game}
 To run supplied code \texttt{SWI-Prolog}, \texttt{R} and \texttt{R..eal} have to be installed. The adjustments of the gameplay can be done by specifying mentioned above parameters which are present at top of the \texttt{main.pl} file.\\
 
