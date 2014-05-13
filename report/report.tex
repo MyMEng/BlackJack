@@ -81,9 +81,9 @@ Both these strategies indicate to \emph{hit}, if current score is less than $17$
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.5\textwidth]{s17}
-\caption{Scores for default settings wit house playing \emph{S17}.\label{fig:s17}}
+\caption{Scores for default settings with house playing \emph{S17}.\label{fig:s17}}
 \includegraphics[width=0.5\textwidth]{h17}
-\caption{Scores for default settings wit house playing \emph{H17}.\label{fig:h17}}
+\caption{Scores for default settings with house playing \emph{H17}.\label{fig:h17}}
 \end{figure}
 
 Moreover, the advantage of house is also built upon the fact that only one card of the dealer is \emph{face up} i.e.\ only one card is revealed to the players. Also the house plays as a last in each round therefore being aware of the table state.\\
@@ -98,7 +98,7 @@ Number of games to be played.
 \item{\texttt{Decks}} \hfill\\
 Number of decks used in a single game.
 \item{\texttt{Players}} \hfill\\
-Number of AI players. AI1 plays \emph{deterministic table}, AI2 plays \emph{deck probabilities}, AI3 plays \emph{probabilistic choice}, AI4 plays \emph{stand on all}, and all other defined players play \emph{deterministic table} if not defined otherwise.
+Number of AI players. AI1 plays \emph{deterministic table}, AI2 plays \emph{deck probabilities}, AI3 plays \emph{probabilistic choice}, AI4 plays \emph{stand on all}, and all other defined players play \emph{deterministic table} if not set otherwise.
 \item{\texttt{PlayerMode}} \hfill\\
 The gameplay can be either defined to be: \emph{experimental}---no user interaction required, this mode is mainly used to test AI algorithms; or \emph{interactive}---user can play along AI algorithms.
 \item{\texttt{ShuffleMode}} \hfill\\
@@ -210,7 +210,8 @@ Furthermore, \emph{AI1}(2\ts{nd} bar) and \emph{AI3}(4\ts{th} bar) are above the
 \end{figure}
 
 \subsection*{More decks}
-Final experiment was performed for \emph{5 decks}---see figure~\ref{fig:5dec}. .\\
+The final experiment was performed for \emph{5 decks}---see figure~\ref{fig:5dec}. In this case both: deterministic table---\emph{AI1}(2\ts{nd} bar) and mixed strategy---\emph{AI3}(4\ts{th} bar) score below the threshold. The first one is not adjusted to more than one deck. The later one under-performs probably due to its deterministic table component.\\
+Pure deck probabilities strategy \emph{AI2}(3\ts{rd} bar) performs above the threshold. This indicates good probability estimates for the cards.
 
 \begin{figure}[htbp]
 \centering
@@ -220,8 +221,9 @@ Final experiment was performed for \emph{5 decks}---see figure~\ref{fig:5dec}. .
 
 
 \section*{\texttt{Conclusions}}
-Mendacium.
-
+\emph{Deterministic table} strategy seems to perform well for games with one deck. \emph{Mixed strategy} scores similarly to the table one in most of the games. \emph{Deck probabilities} under-perform in comparison to both aforementioned strategies for small number of decks.\\
+Moreover, for more than one deck, \emph{deck probabilities} exceeds the threshold, while other two, adjusted to single deck game, loose.\\
+Finally, the results prove that \emph{H17} is indeed better for the house, providing more winnings.
 
 
 \cleardoublepage
@@ -251,7 +253,7 @@ and then within SWI-Prolog:
 \begin{lstlisting}[frame=single]
 consult('main').
 main.
-\end{lstlisting}
+\end{lstlisting}~\\
 
 
 After the game is finished there will be a score graph and score table(in the .csv format) produced within the BlackJack directory. The rows in the file are scores from particular round and the columns are in order: dealer, AI1-deterministic table, AI2-deck probabilities, AI3-mixture of previous two, AI4-always stand and finally, if enabled, user's score. The same order applies to vertical bars visible in the plot.
