@@ -21,14 +21,7 @@
 
 \usepackage[usenames,dvipsnames]{color}
 
-% \usepackage{hyperref}
-% \usepackage{graphicx}
-% \usepackage{subfigure}
-% \usepackage{indentfirst} % indent frst paragraph of section
-
-% \usepackage[usenames,dvipsnames]{color}
-
-% \newcommand{\ts}{\textsuperscript}
+\usepackage[toc,page]{appendix}
 
 \begin{document}
 
@@ -58,42 +51,57 @@
 ] % \lipsum[1]~\\[0.4cm]
 
 \begin{abstract}
-This paper reviews most common strategies used by \emph{BlackJack}\footnote{For more details see:\\http://en.wikipedia.org/wiki/Blackjack~.} players to decrease \emph{house edge}\footnote{A statistical advantage of the house(casino) over player.}. Algorithms such as: \emph{deterministic table}, \emph{deck probabilities}, \emph{stand on all} and combination of first two are tested.\\
-For this purpose BlackJack engine is implemented in \texttt{SWI-Prolog} programming language and \texttt{R} statistical package, where the later is accessed via \texttt{R..eal}\footnote{For more details see:\\http://www.swi-prolog.org/pack/list?p=real~.} interface.\\
-Finally, results of the experiment are presented and examined.\\
+This paper reviews most common strategies used by \emph{BlackJack}\footnote{For more details see:\\ http://en.wikipedia.org/wiki/Blackjack ~.} players to decrease \emph{house edge}\footnote{A statistical advantage of the house(casino) over player.}. Algorithms such as: \emph{deterministic table}, \emph{deck probabilities}, \emph{stand on all} and combination of first two are tested.\\
+For this purpose BlackJack engine is implemented in \texttt{SWI-Prolog} programming language and \texttt{R} statistical package, where the later is accessed via \texttt{R..eal}\footnote{For more details see:\\ http://www.swi-prolog.org/pack/list?p=real ~.} interface.\\
+Finally, results of the experiment are presented and discussed.\\
 
 \begin{small}
 \noindent
-The source code together with this report is available at:\\https://github.com/So-Cool/BlackJack~.
+The source code together with this report is available at:\\ https://github.com/So-Cool/BlackJack ~.\\
+The website also contains short, step-by-step description how to run the program.
 \end{small}
 \end{abstract}
 
+\section*{\texttt{Rules}}
+\subsection*{Game rules}
+To begin with, we describe point counting. While calculating score of a hand we count: \emph{number cards} with their numerical value; \emph{face cards}(jack, queen, king) are treated as $10$ points and \emph{ace} is counted as $1$ or $11$, with value chosen by a player.\\
+Furthermore, we distinguish two types of a hand: \emph{soft} and \emph{hard}. The first one contains an \emph{ace} and the later one does not.\\
+Finally, during each round a player can either: \emph{hit} i.e.\ take a card from the deck or \emph{stand} i.e.\ refuse to take a card.\\
+
+To sum up, each person plays \emph{only} against the dealer and the goal of each player is to either get $21$ points or to score more than the dealer simultaneously not exceeding $21$ points.\\
+
+\subsection*{The house}
+There are two house strategies implemented; both are documented to be the most popular among casinos worldwide, namely: \emph{H17} and \emph{S17}.\\
+Both these strategies indicate to \emph{hit}, if current score is less than $17$ and \emph{stand}, if the score is more than $17$. The difference is that \emph{H17} dictates dealer to \emph{hit} on \emph{soft} $17$ and stand on hard $17$, while \emph{S17} defines to \emph{stand} on all types of $17$. In general, \emph{S17} is regarded as more beneficial for players.\\
+
+Moreover, the advantage of house is also built upon the fact that only one card of the dealer is \emph{face up} i.e.\ only one card is revealed to the players. Also the house plays as a last in each round therefore being aware of the table state.\\
+
+
 \section*{\texttt{The experiment}}
-To examine aforementioned strategies a BlackJack game was implemented with number of parameters being user configurable.\\
-There are two house strategies implemented, which are documented to be the most popular: \emph{H17} and \emph{S17}. Both these strategies indicate to \emph{hit} i.e.\ take a card, if current score is less than $17$ and \emph{stand} i.e.\ refuse to take a card, if the score is more than $17$. The difference is that \emph{H17} dictates dealer to \emph{hit} on \emph{soft} $17$ and stand on hard $17$, while \emph{S17} defines to \emph{stand} on all types of $17$. In general, \emph{S17} is regarded as more beneficial for players.\\
-To clarify, we distinguish two types of hand: \emph{soft} and \emph{hard}. The first one contains and \emph{ace} and the later one does not. Furthermore, while calculating score of a hand we count: number cards with their value, face cards(jack, queen, king) are treated as $10$ points and ace is counted as $1$ or $11$ with value chosen by player.\\
-
-The advantage of house is also built upon the fact that only one card of dealer is \emph{face up} i.e.\ only one card is revealed to the players. Furthermore, the house plays as a last in each round therefore being aware of the table situation.\\
-
-The game simulation is predefined with the following factors:
+\subsection*{Parameters}
+To examine aforementioned strategies a BlackJack game is implemented with a number of parameters being user configurable:
 \begin{description}
 \item{\texttt{Plays}} \hfill\\
 Number of games to be played.
 \item{\texttt{Decks}} \hfill\\
 Number of decks used in a single game.
 \item{\texttt{Players}} \hfill\\
-Number of AI players. AI1 plays \emph{deterministic table}, AI2 plays \emph{deck probabilities}, AI3 plays \emph{probabilistic choice}, AI4 plays \emph{stand on all} and all other defined players play \emph{deterministic table}.
+Number of AI players. AI1 plays \emph{deterministic table}, AI2 plays \emph{deck probabilities}, AI3 plays \emph{probabilistic choice}, AI4 plays \emph{stand on all}, and all other defined players play \emph{deterministic table} if not defined otherwise.
 \item{\texttt{PlayerMode}} \hfill\\
-The game-play can be either defined to be: \emph{experimental}---no user interaction required, this mode is mainly used to test AI algorithms; or \emph{interactive}---user can play along AI algorithms.
+The gameplay can be either defined to be: \emph{experimental}---no user interaction required, this mode is mainly used to test AI algorithms; or \emph{interactive}---user can play along AI algorithms.
 \item{\texttt{ShuffleMode}} \hfill\\
-The simulation performs \emph{riffle shuffle}(see below); it can be either \emph{deterministic}--- ;or \emph{random}---lol.
+The simulation performs \emph{riffle shuffle}(see below); it can be either \emph{deterministic}---there is only one (fair)coin toss to decide whether left or right pile starts the shuffle; or \emph{random}---coin is tossed for each card(from left pile) to decide whether it goes on the top or on the bottom(of the card from right pile).
 \item{\texttt{InitShuffles}} \hfill\\
-Number of deck shuffles before game starts.
+Number of deck shuffles before the game starts.
 \item{\texttt{Shuffles}} \hfill\\
-Number of deck shuffles between games.
+Number of deck shuffles in between games.
 \item{\texttt{Dealer}} \hfill\\
-Dealer strategies: \emph{H17} and \emph{S17}, described above.
+Dealer strategy to be used: \emph{H17} and \emph{S17}(as described above).
 \end{description}
+
+\subsection*{Shuffling}
+The simulation performs \emph{riffle shuffle}. .\\
+
 
 \section*{\texttt{Strategies}}
 The following strategies were employed:
@@ -173,6 +181,19 @@ To run supplied code \texttt{SWI-Prolog}, \texttt{R} and \texttt{R..eal} have to
 To test, run \texttt{SWIP} in the directory with program and execute: ``\texttt{consult(main).}''~. Then execute: ``\texttt{main.}''~.\\
 Depending whether interactive or experimental mode has been chosen users interaction may be required; if one decided to play along the AI modules question whether to hit or stand at each round will be asked.\\
 
+\section*{Appendix A: Playing the game}
+To run the script:
+
+ cd ~
+ git clone git@github.com:So-Cool/BlackJack.git
+ cd BlackJack
+ swipl
+and then within SWI-Prolog:
+
+consult('main').
+main.
+After the game is finished there will be a score graph and score table(in the .csv format) produced within the BlackJack directory. The rows in the file are scores from particular round and the columns are in order: dealer, AI1-deterministic table, AI2-deck probabilities, AI3-mixture of previous two, AI4-always hold and finally, if enabled, user's score. The same order applies to vertical bars visible in the plot.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  Unused pieces %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Concept of failure driven loops
@@ -180,6 +201,15 @@ Depending whether interactive or experimental mode has been chosen users interac
 %%     EXPLoitation STEP - *HOLD* 
 %% \let\thefootnote\relax\footnote{No number}
 
+% \begin{appendices}
+    % \section{aapendix a}
+% \end{appendices}
+
+% \usepackage{hyperref}
+% \usepackage{graphicx}
+% \usepackage{subfigure}
+% \usepackage{indentfirst} % indent frst paragraph of section
+% \newcommand{\ts}{\textsuperscript}
 
 % \begin{figure}[htbp]
 % \centering
