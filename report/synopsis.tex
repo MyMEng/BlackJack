@@ -1,0 +1,85 @@
+% Report --- ks1591
+
+\documentclass[12pt,a4paper,twocolumn]{article}
+\usepackage{times} % times font
+\usepackage{mathptmx} % times font in maths
+% \usepackage{fullpage}
+\usepackage[top=1in, bottom=1in, left=1in, right=1in]{geometry}
+\usepackage{multirow} %in tables
+\usepackage{caption} % in tables
+\pagenumbering{gobble}
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
+
+\usepackage[pdftex]{graphicx}
+\usepackage{lipsum}
+\usepackage{amsmath}
+
+% \usepackage{hyperref}
+% \usepackage{graphicx}
+% \usepackage{subfigure}
+% \usepackage{indentfirst} % indent frst paragraph of section
+
+% \usepackage[usenames,dvipsnames]{color}
+
+% \newcommand{\ts}{\textsuperscript}
+
+% \begin{figure}[htbp]
+% \centering
+% \includegraphics[width=0.5\textwidth]{figures/figure1.png}
+% % \begin{tiny}
+% \caption{Simulation of \emph{Spiking Integrate and Fire} neuron model.\label{fig:part1}}
+% % \end{tiny}
+% \vspace{0.2cm}
+% \end{figure}
+
+\begin{document}
+
+\twocolumn[
+\begin{@twocolumnfalse}
+\begin{center}
+	\begin{large}
+	{\HRule \\[0.2cm]}
+	\textsc{Boosting \texttt{Prolog} capabilities with \texttt{R} statistical package\\
+			Simple gambling strategies}
+	{\HRule \\[0.3cm]}
+	\end{large}
+
+	\begin{minipage}{ 0.44\textwidth }
+		\begin{flushleft}
+			Kacper \textbf{Sokol}\\
+			\texttt{ks1591} --- 3GGK1
+		\end{flushleft}
+	\end{minipage}
+	\begin{minipage}{ 0.44\textwidth }
+		\begin{flushright}
+			{COMS30106 $|$ Artificial Intelligence\\
+			with Logic Programming $|$ Assignment 2\\[0.3cm]}
+		\end{flushright}
+	\end{minipage}
+\end{center}
+\end{@twocolumnfalse}
+] % \lipsum[1]~\\[0.4cm]
+
+\section*{Abstract} % Succinct summary of the project and overal goals.
+Te main goal of this project is to discover possibilities of \texttt{Prolog} extended with \emph{R..eal} package~\cite{conf/padl/AngelopoulosCAWCW13}, which adds capabilities of probabilistic reasoning to logic programming. To this end, simplified gambling and game theory models will be implemented and examined including \emph{blackjack} and \emph{horse racing}.\\
+
+
+\section*{Objective} % Describe the overall project, the fundamental challenge, and your proposed solution.
+I aim to develop theory of popular gambling games like \emph{blackjack} and betting theories used for instance in \emph{horse racing}. Ideally, the project will lead to AI module for croupier in 21 card game and (sub-)optimal strategy for bookmaker in race betting.\\
+
+First of all, theoretical background will be presented. Next, processes (games) simulations and strategies will be implemented. The aim of project is to use best of both worlds: adopt one of main feature in \texttt{Prolog} --- search through information space, and employ probabilistic reasoning added by \texttt{R}. Possibly, the implementation will be extended with on-line information retrieval and database interaction --- either via \texttt{R} or other suitable packages. Furthermore, I plan on examining developed solution on real world data and compare outcomes against genuine (archival) results. Finally, possible improvements and alternatives will be discussed.\\
+
+Moreover, depending on time possible business applications will be discussed with regard to simple data retrieval and analysis~\cite{prolog/horseracing}.\\
+
+
+\section*{Deliverables} % What will be delivered? Describe source code products, documentation, example tests, regression tests. Enumerate all deliverables and describe fully, this will ensure project payments are made on time.
+Project will consist of fully documented games and strategies implementation. In addition, report covering theoretical background and motivating key choices backed by literature references will be provided. Last but not least, experiment results will be enclosed together with analysis and evaluation.\\
+
+
+\begin{thebibliography}{1}
+  \bibitem{conf/padl/AngelopoulosCAWCW13} Angelopoulos, Nicos and Costa, Vítor Santos and Azevedo, João and Wielemaker, Jan and Camacho, Rui and Wessels, Lodewyk {\em Integrative Functional Statistics in Logic Programming} Vol. 7752, 2013: Springer, Lecture Notes in Computer Science.
+
+  \bibitem{prolog/horseracing} Various {\em AI@Work, AI success stories from Amzi! Inc. and ABBYY USA, PC AI Magazine} March/April 2001: Harvard University Press.
+\end{thebibliography}
+
+\end{document}
