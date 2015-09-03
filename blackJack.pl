@@ -1,43 +1,42 @@
 %% Main function---program engine and fuel
+:- module( blackJack,
+  [players/1,
+   initShuffles/1,
+   blackJack/0,
+   blackJack/1,
+   userPlayer/1,
+   scoreTop/2,
+   split/4]
+  ).
+
 % check load
-:- ensure_loaded(library(real)).
-:- consult(deck).
-:- consult(player).
-:- consult(strategy).
-:- consult(deterministicTable).
 :- set_prolog_stack(local,  limit(4 000 000 000)).
+% modules
+:- ensure_loaded(library(real)).
+:- use_module(deck).
+:- use_module(playerStrategies).
+:- use_module(dealerStrategies).
 
 % define constants
 %% define number of plays
 plays(300). % random->300 | deterministic->50 | 2decks random 100
-%% define number of decks
-decks(1).
-%% define number of players
-players(4).
 %% activate interactive player or experiment mode
 %% playerMode(interactive).
 playerMode(experimental).
-%% decide whether shuffle is made with coin toss or it is deterministic
-%% shuffleMode(deterministic). % deterministic
-shuffleMode(random). % random
+%% define number of players
+players(4).
 %% define number of shuffles before game starts
 initShuffles(10). %max 10
-%% define number of shuffles after each game
-shuffles(2).
-%% define dealer's strategy --- S17 is better for the player
-%% dealer(h17). % hit soft 17
-dealer(s17). % stand on ALL 17's
 
 
-
-main :-
+blackJack :-
 	<- 'library(Matrix)', % load R Matrix library
 	plays(Gno), %Get nubmer of games
 	getNoPlayers(Pno),
 	scores <- matrix(data=0, nrow=Gno, ncol=Pno), % initialise score mx
 	write('scores:'), nl,
 	<- scores,
-	main(Gno),
+	blackJack(Gno),
 	% save matrix and plot and save graph---histogram
 	<- 'write.csv(scores, file = "./scores.csv", sep=",")',
 	sums <- 'colSums(scores, na.rm = FALSE, dims = 1)',
@@ -49,11 +48,11 @@ main :-
 	<- barplot(sums),
 	<- abline(h=Bar),
 	<- 'dev.off()'.
-main(0) :- !.
-main(X) :-
+blackJack(0) :- !.
+blackJack(X) :-
 	play(X),
 	X1 is X - 1,
-	main(X1).
+	blackJack(X1).
 
 
 % play the game
@@ -126,7 +125,7 @@ theGame(FinalTable, Table, Deck, Ask, Refused) :-
 	% what if there is no player
 	((	U = 1,
 		getNoPlayers(R), % get player ID
-		elementN(Elem, Allowence, R),
+		nth1(R, Allowence, Elem),
 		( (\+ (Elem = -1), Ask = 1)  -> askCard(Answer) % ask if player has not already lost
 		; otherwise                  -> Answer = 0
 		),
@@ -150,7 +149,7 @@ theGame(FinalTable, Table, Deck, Ask, Refused) :-
 
 	%% write('before Croup'), nl,
 	% if BJ do not allow`
-	elementN(Cru, Allowence, 1),
+	nth1(1, Allowence, Cru),
 	( Cru =  1 -> (NNTable = NTable, NNDeck = NDeck)
 	; Cru = -1 -> (NNTable = NTable, NNDeck = NDeck)
 	; Cru =  0 -> croupierAI(NNTable, NNDeck, NTable, NDeck) % do the AI magic
@@ -181,3 +180,149 @@ aIbj(Refused, Collector, [A|Allowence], [R|RRefused]) :-
 	; otherwise -> append( Collector, [R], NewCollector )
 	),
 	aIbj(Refused, NewCollector, Allowence, RRefused).
+
+
+%%%%%%%%
+
+
+
+%% check for user player
+userPlayer(N) :-
+	playerMode(M),
+	userPlayer(N, M).
+userPlayer(N, interactive) :-
+	N is 1.
+userPlayer(N, experimental) :-
+	N is 0.
+
+
+%% get number of players
+getNoPlayers(R) :-
+	players(P),
+	userPlayer(Q),
+	R is P + 1 + Q.
+
+
+
+%% generate list with N 0's
+refusal([], 0, _) :- !.
+refusal([Content], 1, Content) :- !.
+refusal(Ls, X, Content) :-
+	L = [Content],
+	refusal(Ls, L, 1, X, Content).
+
+refusal(L, L, X, X, _) :- !.
+refusal(Ls, L, C, X, Content) :-
+	C1 is C + 1,
+	append(L, [Content], L1),
+	refusal(Ls, L1, C1, X, Content).
+
+
+
+
+
+
+%% check win and end game
+checkBJ( ScoreTable, Values, Table ) :-
+	checkBJ( ScoreTable, Values, [], [], Table ).
+checkBJ( ScoreTable, Values, Accum1, Accum2, [H|Table] ) :-
+	findall( S, score(S, H), Scores ),
+	append( Accum2, [Scores], V1 ),
+	findMinBJ( Smin, Scores ),
+	( Smin = 21 -> append( Accum1, [1 ], Ulated )
+	; Smin < 21 -> append( Accum1, [0 ], Ulated )
+	; Smin > 21 -> append( Accum1, [-1], Ulated )
+	),
+	checkBJ(ScoreTable, Values, Ulated, V1, Table).
+checkBJ(Score, Values, Score, Values, []).
+
+findMinBJ( Smin, Scores ) :-
+	member(21, Scores), !,
+	Smin is 21.
+findMinBJ( Smin, Scores ) :-
+	findMin(Smin, Scores).
+
+%% find minimum of a list
+findMin( Smin, [S|Scores] ) :-
+	Min is S,
+	findMin(Smin, Min, Scores).
+findMin(Smin, Min, [S|Scores]) :-
+	( Min >= S  -> NewMin is S
+	; otherwise -> NewMin is Min
+	),
+	findMin(Smin, NewMin, Scores).
+findMin(S, S, []).
+
+
+
+
+
+%% Split a list into Pre-element-Post
+split(A, B, List, Num) :-
+	split_(A, [], List, Num),
+	append(A, B, List).
+split_(A, A, _, 1) :- !.
+split_(A, A, _, 1.0) :- !.
+split_(A, Acum, [H|T], Num) :-
+	NumN is Num - 1,
+	append(Acum, [H], Sup),
+	split_(A, Sup, T, NumN).
+
+
+
+
+%%%%%%%% game printing
+
+% interactive player---interface
+
+%% display state of game
+printGame(Table, Type) :-
+	players(X), userPlayer(Y),
+	Total is X + Y + 1,
+	write('Table:'), nl,
+	printHands(Table, Total, 1, Type).
+
+% Restrict <- Casino shows only on card
+printHands([H|T], Total, N, Type) :-
+	userPlayer(U),
+	( N = 1                -> ( write('Casino'), Restrict is 1 )
+	; ( N = Total, U = 1 ) -> ( write('My'), Restrict is 0 )
+	; otherwise            -> ( write('AI'), No is N - 1, write(No), Restrict is 0 )
+	),
+	write(':	'),
+	printHand(H, Restrict, Type), nl,
+	N =< Total,
+	N1 is N + 1,
+	printHands(T, Total, N1, Type).
+printHands([], N, N1, _) :-
+	N1 is N + 1.
+printHands([], _).
+
+printHand([card( _, _ )|T], 1, init) :-
+	write('_'),
+	write('_'),
+	write(' '),
+	printHand(T, 0, init).
+printHand( D, 1, cont) :-
+	printHand( D, 0, cont).
+printHand([card( Suit, Rank )|T], 0, _) :-
+	write(Suit),
+	( Rank = ace    -> write('A')
+	; Rank = jack   -> write('J')
+	; Rank = queen  -> write('Q')
+	; Rank = king   -> write('K')
+	; integer(Rank) -> write(Rank)
+	),
+	write(' '),
+	printHand(T, 0, _).
+printHand([], _, _).
+
+
+%% ask whether user want to grab a card
+askCard(Answer) :-
+	write('Do you want to draw a card? [y/n]'), nl, % [121] / [110]
+	read_line_to_codes(user_input, Input),
+	( Input = [121] -> Answer is 1
+	; Input = [110] -> Answer is 0
+	; otherwise     -> askCard(Answer)
+	).
