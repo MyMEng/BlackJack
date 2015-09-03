@@ -1,4 +1,21 @@
 % Deck class %
+:- module( deck,
+  [decks/1,
+   shuffleMode/1,
+   deck/1,
+   shuffle/3,
+   initDeal/3,
+   score/2,
+   getPiles/3]
+  ).
+
+:- use_module(blackJack). % players
+
+%% define number of decks
+decks(1).
+%% decide whether shuffle is made with coin toss or it is deterministic
+%% shuffleMode(deterministic). % deterministic
+shuffleMode(random). % random
 
 %% define suits
 %% clubs (♣), diamonds (♦), hearts (♥) and spades (♠) 
@@ -56,37 +73,6 @@ score( Score, [Card|Hand], V ) :-
 score( Score, [], V ) :-
 	Score is V.
 
-%% check win and end game
-checkBJ( ScoreTable, Values, Table ) :-
-	checkBJ( ScoreTable, Values, [], [], Table ).
-checkBJ( ScoreTable, Values, Accum1, Accum2, [H|Table] ) :-
-	findall( S, score(S, H), Scores ),
-	append( Accum2, [Scores], V1 ),
-	findMinBJ( Smin, Scores ),
-	( Smin = 21 -> append( Accum1, [1 ], Ulated )
-	; Smin < 21 -> append( Accum1, [0 ], Ulated )
-	; Smin > 21 -> append( Accum1, [-1], Ulated )
-	),
-	checkBJ(ScoreTable, Values, Ulated, V1, Table).
-checkBJ(Score, Values, Score, Values, []).
-
-findMinBJ( Smin, Scores ) :-
-	member(21, Scores), !,
-	Smin is 21.
-findMinBJ( Smin, Scores ) :-
-	findMin(Smin, Scores).
-
-%% find minimum of a list
-findMin( Smin, [S|Scores] ) :-
-	Min is S,
-	findMin(Smin, Min, Scores).
-findMin(Smin, Min, [S|Scores]) :-
-	( Min >= S  -> NewMin is S
-	; otherwise -> NewMin is Min
-	),
-	findMin(Smin, NewMin, Scores).
-findMin(S, S, []).
-
 %% generate predefined number deck---return a list with all cards
 deck(Deck) :-
 	decks(No),
@@ -100,30 +86,9 @@ deck(Deck, Holder, No) :-
 	append(Holder, New, NewHolder),
 	deck(Deck, NewHolder, Np).
 
-%% check for user player
-userPlayer(N) :-
-	playerMode(M),
-	userPlayer(N, M).
-userPlayer(N, interactive) :-
-	N is 1.
-userPlayer(N, experimental) :-
-	N is 0.
-
-%% extract N-th element from a list
-elementN(H, [H|_], 1) :- !.
-elementN(Element, [_|T], N) :-
-	NN is N - 1,
-	elementN(Element, T, NN).
-
 %% Return list without element E
 woN(Out, E, In) :-
 	select(E, In, Out), !.
-
-%% get number of players
-getNoPlayers(R) :-
-	players(P),
-	userPlayer(Q),
-	R is P + 1 + Q.
 
 %% deal the cards to N players---we begin with two cards each + shuffler
 %%  + player(/no-player mode)
@@ -138,9 +103,9 @@ initDeal(Table, NewDeck, Deck) :-
 initDeal(Table, Deck, Table, Deck, _, AtTable, Current) :-
 	AtTable is Current - 1, !.
 initDeal(Table, NewDeck, TemporaryTable, DissortingD, Deck, AtTable, Current) :-
-	elementN(C1, Deck, Current), % draw element N
+	nth1(Current, Deck, C1), % draw element N
 	Current1 is Current + AtTable, % get new index
-	elementN(C2, Deck, Current1), % draw next card
+	nth1(Current1, Deck, C2), % draw next card
 	woN(Deck1, C1, DissortingD), % delete first card
 	woN(Deck2, C2, Deck1), % delete first card
 	Next is Current + 1, % new current player
@@ -221,33 +186,9 @@ getPiles(A, B, Half) :-
 getPiles(Half, Half, Half) :-
 	integer(Half).
 
-%% Split a list into Pre-element-Post
-split(A, B, List, Num) :-
-	split_(A, [], List, Num),
-	append(A, B, List).
-split_(A, A, _, 1) :- !.
-split_(A, A, _, 1.0) :- !.
-split_(A, Acum, [H|T], Num) :-
-	NumN is Num - 1,
-	append(Acum, [H], Sup),
-	split_(A, Sup, T, NumN).
-
 %% Deal additional card to player *i*
 addCard(NewDeal, NewDeck, [Card|NewDeck], OldDeal, PlayerNo) :-
 	split(A, [X|C], OldDeal, PlayerNo), % get sublist
 	append(X, [Card], Y), % extend sublist
 	append(A, [Y], Alpha), % put at the same place new list
 	append(Alpha, C, NewDeal). % put at the same place new list
-
-%% generate list with N 0's
-refusal([], 0, _) :- !.
-refusal([Content], 1, Content) :- !.
-refusal(Ls, X, Content) :-
-	L = [Content],
-	refusal(Ls, L, 1, X, Content).
-
-refusal(L, L, X, X, _) :- !.
-refusal(Ls, L, C, X, Content) :-
-	C1 is C + 1,
-	append(L, [Content], L1),
-	refusal(Ls, L1, C1, X, Content).
