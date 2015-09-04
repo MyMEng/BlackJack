@@ -38,7 +38,7 @@ blackJack :-
 	<- scores,
 	blackJack(Gno),
 	% save matrix and plot and save graph---histogram
-	<- 'write.csv(scores, file = "./scores.csv", sep=",")',
+	<- 'write.csv'(scores, file = +"./scores.csv"),
 	sums <- 'colSums(scores, na.rm = FALSE, dims = 1)',
 	sums[1] <- sums[1] / (Pno-1),
 	<- barplot(sums),
