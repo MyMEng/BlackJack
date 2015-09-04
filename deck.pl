@@ -6,7 +6,8 @@
    shuffle/3,
    initDeal/3,
    score/2,
-   getPiles/3]
+   getPiles/3,
+   addCard/5]
   ).
 
 :- use_module(blackJack). % players
