@@ -6,6 +6,8 @@ Implementation of a *BlackJack* card game in `prolog` and `r..eal` library. The 
 
 To run the code one needs to have `R`, `R-dev`, `SWI-Prolog` and `r..eal` installed.  
 
+The `pldoc` generated documentation of the code is available [here](http://so-cool.github.io/BlackJack).
+
 ## Pre-configuration
 There are number of parameters available, to customize the program. They are listed at the top of each package file.
 
@@ -63,6 +65,7 @@ The scores are win/lose based; the player score is only compared against the dea
 
 ## ToDo
 - [ ] Possibility to **split** on pairs.
+- [ ] Strategy idea: create a sampling distribution over all possible cards that can be drawn and sample a card ,based on that card predict according to table whether it is worth taking it or not.
 - [ ] Preserve the deck after each game and shuffle it instead of discarding (adds more variability):
 
  ```
