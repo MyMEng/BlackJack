@@ -300,7 +300,6 @@ shuffleMock(Shuffled, Deck, N, Sampling) :-
 	( Mode = random        -> rifleRanMock(Forward, P1, P2, NSampling, Sampling)
 	; Mode = deterministic -> (rifleDetMock(Forward, P1, P2), NSampling = Sampling )
 	),
-	write('=====\n'),write(Sampling),write('====='),write(NSampling),write('\n'),
 	N1 is N - 1,
 	shuffleMock( Shuffled, Forward, N1, NSampling ).
 
