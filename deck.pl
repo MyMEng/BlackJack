@@ -89,13 +89,13 @@ ranks( king).
 card( Suit, Rank ) :-
 	suits( Suit ), ranks( Rank ).
 
-%% value(Value, +card(+S, +R)) is det.
+%% value(-Value, :Card) is det.
 %
-% Converts card predicate to its value.
+% Converts card predicate to its value. The `Card` variable is given by 
+% `card(+S, +R)` predicate with: `S` - Suit of card; `R` - Rank of card.
 %
 % @param Value  Value of given card.
-% @param S      Suit of card.
-% @param R      Rank of card.
+% @param Card   The card.
 %
 value( Value, card( S, R ) ) :-
 	( S = ♣; S = ♦; S = ♥; S = ♠ ), !,
