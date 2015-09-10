@@ -1,34 +1,73 @@
-%% Main function---program engine and fuel
+/** <module> Blackjack game simulator
+
+This module contains Blackjack game simulator: predicates and configuration. It 
+is responsible for running the game and I/O interactions.
+
+@author Kacper Sokol
+@license GPL
+*/
+
 :- module( blackJack,
   [players/1,
    initShuffles/1,
    blackJack/0,
-   blackJack/1,
    userPlayer/1,
    scoreTop/2,
    split/4]
   ).
 
-% check load
 :- set_prolog_stack(local,  limit(4 000 000 000)).
-% modules
 :- ensure_loaded(library(real)).
 :- use_module(deck).
 :- use_module(playerStrategies).
 :- use_module(dealerStrategies).
 
-% define constants
-%% define number of plays
-plays(300). % random->300 | deterministic->50 | 2decks random 100
-%% activate interactive player or experiment mode
-%% playerMode(interactive).
+%% plays(-N) is det.
+%
+% Defines number of plays. Proposed values:
+%  * random shuffling - 300,
+%  * deterministic shuffling - 50,
+%  * two decks with random shuffling 100.
+% Otherwise you may run into *out of global stack* troubles.
+%
+% @param N  Number of plays.
+%
+plays(300).
+
+%% playerMode(-Mode) is det.
+%
+% Defines type of play:
+%  * `interactive`   - a player controlled by the user is added,
+%  * `experimental`  - all players are controlled by AI algorithms as defined 
+%                    in `playAISequence` predicate in `playerStrategies` module.
+%
+% @param Mode  Mode of play-through.
+%
 playerMode(experimental).
-%% define number of players
+
+%% players(-PlayersNo) is det.
+%
+% Defines number of AI controlled players; the AI algorithms are assigned in 
+% `playAISequence` predicate in `playerStrategies` module.
+%
+% @param PlayersNo  Number of AI controlled players.
+%
 players(4).
-%% define number of shuffles before game starts
-initShuffles(10). %max 10
 
+%% initShuffles(-N) is det.
+%
+% Defines number of initial shuffles: the shuffles before cards are dealt and 
+% the game starts. The upper limit on this value is 10.
+%
+% @param N  Number of initial shuffles.
+%
+initShuffles(10).
 
+%% blackJack is det.
+%
+% The game's main loop. The game is initialised and run based on global 
+% parameters defined in header of each module.
+%
 blackJack :-
 	<- 'library(Matrix)', % load R Matrix library
 	plays(Gno), %Get nubmer of games
@@ -48,14 +87,19 @@ blackJack :-
 	<- barplot(sums),
 	<- abline(h=Bar),
 	<- 'dev.off()'.
+%
 blackJack(0) :- !.
 blackJack(X) :-
 	play(X),
 	X1 is X - 1,
 	blackJack(X1).
 
-
-% play the game
+%% play(+Gno) is det.
+%
+% Initialises and tun a single game.
+%
+% @param Gno  Number of games to be run.
+%
 play(Gno) :-
 	deck(Deck), % generate deck
 	initShuffles(N),
@@ -67,16 +111,26 @@ play(Gno) :-
 	theGame(FinalTable, Table, NewDeck, 1, Refused),
 	appendScores(FinalTable, Gno).
 
-% put everything into R variable plots etc. and play again
+%% appendScores(+FinalTable, +Gno) is det.
+%
+% Calculates the scores and puts them into R variables for graph plotting and 
+% CSV exporting.
+%
+% @param FinalTable  The final card allocation on the table (list of lists of 
+%                    `card` predicates).
+% @param Gno         Game id.
+%
 appendScores(FinalTable, Gno) :-
 	getScoreTable(Lis, FinalTable), % <- this failed <- resolved
 	%% Lis = [1,2,3,4,5,6],
 	write('Lis:'), nl, write(Lis), nl,
 	scores[Gno,*] <- Lis.
+%
 getScoreTable(Lis, [Dealer|FinalTable]) :-
 	scoreTop(D, Dealer),
 	getScores(LisPlay, Deals, 0, [], D, FinalTable ),
 	append([Deals], LisPlay, Lis).
+%
 getScores(Lis, Deals, Deals, Lis, _, [] ) :- !.
 getScores(Lis, Deals, DCount, Accum, D, [Curr|FinalTable] ) :-
 	scoreTop(C, Curr),
@@ -89,10 +143,18 @@ getScores(Lis, Deals, DCount, Accum, D, [Curr|FinalTable] ) :-
 	),
 	getScores(Lis, Deals, NDCount, AccumPlus, D, FinalTable ).
 
-% get highest score closest to 21
+%% scoreTop(-Sc, +Hand) is det.
+%
+% Gets the highest score closest to 21 but not exceeding it if possible (ace 
+% handling).
+%
+% @param Sc    The optimal score of the input hand.
+% @param Hand  A list of player's cards (`card` predicates).
+%
 scoreTop(Sc, Hand) :-
 	findall( S, score(S, Hand), Scores ),
 	getTop(Sc, Scores).
+%
 getTop(Sc, [H|Scores]) :-
 	getTop(Sc, H, Scores).
 getTop(Sc, Sc, []).
@@ -102,7 +164,18 @@ getTop(Sc, Current, [H|Rest]) :-
 	; otherwise                    -> getTop(Sc, Current, Rest)
 	).
 
-% finish the game
+%% theGame(-FinalTable, +Table, +Deck, +Ask, +Refused) is det.
+%
+% A predicate collection for a single game - the game engine.
+%
+% @param FinalTable  The table after the whole round.
+% @param Table       The initial table - initial deal.
+% @param Deck        The deck of cards to draw additional cards.
+% @param Ask         Player interaction parameter: 1 - ask player for card 
+%                    drawing (interactive mode only); 0 - do not ask the player.
+% @param Refused     A vector of 0's (allow) and 1's (do not allow) indicating 
+%                    which player is allowed to draw additional card.
+%
 theGame(Table, Table, _, 0, Refused) :-
 	players(X),
 	%% write('players: '), write(X), nl,
@@ -166,12 +239,21 @@ theGame(FinalTable, Table, Deck, Ask, Refused) :-
 
 	theGame(FinalTable, NNTable, NNDeck, Ask2, NRefused).
 
-% check whether all players are done playing
-checkTheEnd( [ -1|Aa ] ) :-
-	checkTheEnd( Aa ).
-checkTheEnd( [] ).
-
-% if BJ copy to the vector
+%% aIbj(-ReRefused, +Allowance, +Refused) is det.
+%
+% Updates the player refusal vector - a vector which indicates which player 
+% has refused a card hence is no allowed to take one any more - based on 
+% player's score: if a player hits or exceeds 21 it is no more allowed to take 
+% a card.
+%
+% @param ReRefused  Updated player refusal vector based on scores.
+% @param Allowance  A vector of the current player's status in the game: -1 - 
+%                   more than 21 points; 0 - less than 21 points; 1 - exactly 
+%                   21 points.
+% @param Refused    Players refused to take the card hence are not allowed to 
+%                   play any more - a vector of 1's (refused) and 0's (not yet 
+%	                  refused).
+%
 aIbj(ReRefused, [_|Allowence], Refused) :-
 	aIbj(ReRefused, [], Allowence, Refused).
 aIbj(Refused, Refused, _, []) :- !.
@@ -181,48 +263,75 @@ aIbj(Refused, Collector, [A|Allowence], [R|RRefused]) :-
 	),
 	aIbj(Refused, NewCollector, Allowence, RRefused).
 
+%% checkTheEnd(+Aa) is det.
+%
+% Checks whether all players are done playing.
+%
+% @param Aa  The players status (list of player states); see checkBJ:ScoreTabel 
+%            for details.
+%
+checkTheEnd( [ -1|Aa ] ) :-
+	checkTheEnd( Aa ).
+checkTheEnd( [] ).
 
-%%%%%%%%
-
-
-
-%% check for user player
+%% userPlayer(-N) is det.
+%
+% Checks whether interactive player is activated and returns 1 if so.
+%
+% @param N  Number of interactive players in the game: 1 or 0.
+%
 userPlayer(N) :-
 	playerMode(M),
 	userPlayer(N, M).
+%
 userPlayer(N, interactive) :-
 	N is 1.
 userPlayer(N, experimental) :-
 	N is 0.
 
-
-%% get number of players
+%% getNoPlayers(-R) is det.
+%
+% Calculates the total number of players in the game including dealer, AIs and 
+% interactive player.
+%
+% @param R  Number of players in the game.
+%
 getNoPlayers(R) :-
 	players(P),
 	userPlayer(Q),
 	R is P + 1 + Q.
 
-
-
-%% generate list with N 0's
+%% refusal(-Ls, +X, +Content) is det.
+%
+% Generates a list with `X` elements `Content`.
+%
+% @param Ls       List populated with `X` occurrences of `Content`.
+% @param X        Number of elements to be populated.
+% @param Content  Element to be populated.
+%
 refusal([], 0, _) :- !.
 refusal([Content], 1, Content) :- !.
 refusal(Ls, X, Content) :-
 	L = [Content],
 	refusal(Ls, L, 1, X, Content).
-
+%
 refusal(L, L, X, X, _) :- !.
 refusal(Ls, L, C, X, Content) :-
 	C1 is C + 1,
 	append(L, [Content], L1),
 	refusal(Ls, L1, C1, X, Content).
 
-
-
-
-
-
-%% check win and end game
+%% checkBJ(-ScoreTable, -Values, +Table) is det.
+%
+% Checks the status of the game - instant win/loose; returns all possible 
+% scores of each hand no the table.
+%
+% @param ScoreTable  The current player's status in the game: -1 - more than 
+%                    21 points; 0 - less than 21 points; 1 - exactly 21 points.
+% @param Values      The list of player's scores; each player can have more 
+%                    than one score in case he has an ace in his hand.
+% @param Table       List of cards held by all player (list of lists).
+%
 checkBJ( ScoreTable, Values, Table ) :-
 	checkBJ( ScoreTable, Values, [], [], Table ).
 checkBJ( ScoreTable, Values, Accum1, Accum2, [H|Table] ) :-
@@ -236,16 +345,32 @@ checkBJ( ScoreTable, Values, Accum1, Accum2, [H|Table] ) :-
 	checkBJ(ScoreTable, Values, Ulated, V1, Table).
 checkBJ(Score, Values, Score, Values, []).
 
+%% findMinBJ(-Smin, +Scores) is det.
+%
+% If 21 is in the list it is returned otherwise, the minimum of the input list 
+% is returned.
+%
+% @param Smin    The minimum in the input list **or** 21 if a member of the 
+%                list.
+% @param Scores  The list of (unsorted) numbers.
+%
 findMinBJ( Smin, Scores ) :-
 	member(21, Scores), !,
 	Smin is 21.
 findMinBJ( Smin, Scores ) :-
 	findMin(Smin, Scores).
 
-%% find minimum of a list
+%% findMin(-Smin, +Scores) is det.
+%
+% Finds the minimum of the input list.
+%
+% @param Smin    The minimum in the input list.
+% @param Scores  The list of (unsorted) numbers.
+%
 findMin( Smin, [S|Scores] ) :-
 	Min is S,
 	findMin(Smin, Min, Scores).
+%
 findMin(Smin, Min, [S|Scores]) :-
 	( Min >= S  -> NewMin is S
 	; otherwise -> NewMin is Min
@@ -253,11 +378,17 @@ findMin(Smin, Min, [S|Scores]) :-
 	findMin(Smin, NewMin, Scores).
 findMin(S, S, []).
 
-
-
-
-
-%% Split a list into Pre-element-Post
+%% split(-A, -B, +List, +Num) is det.
+%
+% Split a list into two sub-lists at given index. Index can be 1:# of elements 
+% in the input list. The indexing starts at 1. The specified index and all of 
+% the following elements will be placed in the second list.
+%
+% @param A     Pre-index sub-list.
+% @param B     Post-index sub-list.
+% @param List  The list to be split.
+% @param Num   The list to be split.
+%
 split(A, B, List, Num) :-
 	split_(A, [], List, Num),
 	append(A, B, List).
@@ -268,21 +399,32 @@ split_(A, Acum, [H|T], Num) :-
 	append(Acum, [H], Sup),
 	split_(A, Sup, T, NumN).
 
-
-
-
-%%%%%%%% game printing
-
-% interactive player---interface
-
-%% display state of game
+%% printGame(+Table, +Type) is det.
+%
+% Nicely prints out a game state. It assumes that the first player on the 
+% table is the dealer.
+%
+% @param Table  List of cards held by all player (list of lists).
+% @param Type   Type of a line(s) to be printed `initial`: the first one or `cont`: 
+%               any other.
+%
 printGame(Table, Type) :-
 	players(X), userPlayer(Y),
 	Total is X + Y + 1,
 	write('Table:'), nl,
 	printHands(Table, Total, 1, Type).
 
-% Restrict <- Casino shows only on card
+%% printHands(+Table, +Total, +N, +Type) is det.
+%
+% Nicely prints out a table of cards. It assumes that the first player on the 
+% table is the dealer.
+%
+% @param Table  List of cards held by all player (list of lists).
+% @param Total  Total number of players including dealer, AIs and interactive.
+% @param N      Player counter: 1-#ofPlayers.
+% @param Type   Type of a line(s) to be printed `initial`: the first one or `cont`: 
+%               any other.
+%
 printHands([H|T], Total, N, Type) :-
 	userPlayer(U),
 	( N = 1                -> ( write('Casino'), Restrict is 1 )
@@ -298,6 +440,17 @@ printHands([], N, N1, _) :-
 	N1 is N + 1.
 printHands([], _).
 
+%% printHand(+Hand, +N, +Type) is det.
+%
+% Nicely prints out a hand of cards. Can be used for both dealer by hiding the 
+% first card or by players by showing all of the cards - see the parameters for 
+% details.
+%
+% @param Hand  A hand of player to be printed (list of `card` predicates).
+% @param N     0: hides the first card; 1: shows all the cards.
+% @param Type  Type of a line to be printed `initial`: the first one or `cont`: 
+%              any other.
+%
 printHand([card( _, _ )|T], 1, init) :-
 	write('_'),
 	write('_'),
@@ -317,8 +470,12 @@ printHand([card( Suit, Rank )|T], 0, _) :-
 	printHand(T, 0, _).
 printHand([], _, _).
 
-
-%% ask whether user want to grab a card
+%% askCard(-Answer) is det.
+%
+% Asks whether the user wants to get a new card.
+%
+% @param Answer  Boolean valued decision variable: 1 (yes) or 0 (no).
+%
 askCard(Answer) :-
 	write('Do you want to draw a card? [y/n]'), nl, % [121] / [110]
 	read_line_to_codes(user_input, Input),
