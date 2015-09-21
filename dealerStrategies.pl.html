@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>dealerStrategies.pl -- Dealer strategies for the Blackjack game simulator</title>
+
+<script type="text/javascript" src="res/jquery.js">
+
+</script>
+<script type="text/javascript" src="res/pldoc.js">
+
+</script>
+<link rel="stylesheet" type="text/css" href="res/pldoc.css">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+</head>
+<body>
+
+<h1 class="file"><span style="float:right"><a href="dealerStrategies.pl-public_only=false.html"><img class="action" alt="Public" title="Click to include private" src="res/public.png"></a><a href="dealerStrategies.pl-show=src.html"><img class="action" alt="Show source" title="Show source" src="res/source.png"></a></span>dealerStrategies.pl -- Dealer strategies for the Blackjack game simulator</h1>
+
+<p>
+This module contains dealer strategies configuration and predicates.</p>
+
+<dl class="tags">
+<dt class="keyword-author">author</dt><dd class="keyword-author">- Kacper Sokol</dd>
+<dt class="keyword-license">license</dt><dd class="keyword-license">- GPL</dd>
+</dl>
+
+<dl>
+<dt class="pubdef"><span style="float:right"></span><a name="croupierAI/4"><b class="pred">croupierAI</b><var class="arglist">(-NNTable, -NNDeck, +NTable, +NDeck)</var></a> is <b class="det">det</b></dt><dd class="defbody">Plays defined dealer strategy based on <code>dealer</code> predicate. The dealer is
+always last in the queue to draw a new card.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>NNTable</var></td><td class="argdescr">- A list of all player's cards (list of lists containing
+predicates <code>card</code>) <b>after</b> dealer's decision.</td></tr>
+<tr><td><var>NNDeck</var></td><td class="argdescr">- A list of cards in the deck (list of predicates <code>card</code>)
+<b>after</b> dealer's decision.</td></tr>
+<tr><td><var>NTable</var></td><td class="argdescr">- A list of all player's cards (list of lists containing
+predicates <code>card</code>) <b>before</b> dealer's decision.</td></tr>
+<tr><td><var>NDeck</var></td><td class="argdescr">- A list of cards in the deck (list of predicates <code>card</code>)
+<b>before</b> dealer's decision.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd>
+</dl>
+
+</body>
+</html>

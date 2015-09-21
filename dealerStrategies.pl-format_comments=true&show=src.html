@@ -1,0 +1,200 @@
+<!DOCTYPE html<html>
+  <head>
+    <title>dealerStrategies.pl</title>
+    <link rel="stylesheet" type="text/css" href="res/pllisting.css">
+    <link rel="stylesheet" type="text/css" href="res/pldoc.css">
+  </head>
+<body>
+
+<div class="src_formats">View source with <a href="dealerStrategies.pl-format_comments=false&amp;show=src.html">raw comments</a> or as <a href="dealerStrategies.pl-format_comments=true&amp;show=raw">raw</a></div>
+<pre class="listing">
+</pre>
+<div class="comment">
+
+<h1 class="module">Dealer strategies for the Blackjack game simulator</h1>
+
+<p>
+This module contains dealer strategies configuration and predicates.</p>
+
+<dl class="tags">
+<dt class="keyword-author">author</dt><dd class="keyword-author">- Kacper Sokol</dd>
+<dt class="keyword-license">license</dt><dd class="keyword-license">- GPL
+*/</dd>
+</dl>
+
+</div>
+<pre class="listing">
+<span class="directive"><span class="neck"><span class="line-no">   9</span>:- <span class="goal-built_in">module</span><span class="body">( <span class="identifier">dealerStrategies</span>,
+<span class="line-no">  10</span>  <span class="list">[<span class="goal-local">croupierAI</span><span class="predicate_indicator"><span class="predicate_indicator">/</span><span class="arity">4</span></span>]</span>
+<span class="line-no">  11</span>  )</span></span>.</span><span class="fullstop"></span><span class="line-no">  12</span>
+<span class="directive"><span class="neck"><span class="line-no">  13</span>:- <span class="goal-built_in">ensure_loaded</span><span class="body">(<span class="file">library(aggregate)</span>)</span></span>.</span><span class="fullstop"></span><span class="directive"><span class="neck"><span class="line-no">  14</span>:- <span class="goal-built_in">use_module</span><span class="body">(<span class="file">deck</span>)</span></span>.</span><span class="fullstop"></span></pre><dl class="comment">
+
+<dt class="pubdef"><span style="float:right"></span><a name="dealer/1"><b class="pred">dealer</b><var class="arglist">(-Strategy)</var></a> is <b class="det">det</b></dt><dd class="defbody">Defines the strategy played by the dealer (s17 is better for the player),
+either:
+<ul>
+<li><code>h17</code> - hit soft 17;</li>
+<li><code>s17</code> - stand on ALL 17's.</li>
+</ul>
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>Strategy</var></td><td class="argdescr">- <var>Strategy</var> of the dealer: <code>h17</code> or <code>s17</code> as explained above.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd></dl>
+<pre class="listing">
+<span class="head"><span class="line-no">  25</span>dealer</span><span class="clause">(s17)</span>.<span class="fullstop">
+</span></pre><dl class="comment">
+
+<dt class="pubdef"><span style="float:right"></span><a name="croupierAI/4"><b class="pred">croupierAI</b><var class="arglist">(-NNTable, -NNDeck, +NTable, +NDeck)</var></a> is <b class="det">det</b></dt><dd class="defbody">Plays defined dealer strategy based on <code>dealer</code> predicate. The dealer is
+always last in the queue to draw a new card.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>NNTable</var></td><td class="argdescr">- A list of all player's cards (list of lists containing
+predicates <code>card</code>) <b>after</b> dealer's decision.</td></tr>
+<tr><td><var>NNDeck</var></td><td class="argdescr">- A list of cards in the deck (list of predicates <code>card</code>)
+<b>after</b> dealer's decision.</td></tr>
+<tr><td><var>NTable</var></td><td class="argdescr">- A list of all player's cards (list of lists containing
+predicates <code>card</code>) <b>before</b> dealer's decision.</td></tr>
+<tr><td><var>NDeck</var></td><td class="argdescr">- A list of cards in the deck (list of predicates <code>card</code>)
+<b>before</b> dealer's decision.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd></dl>
+<pre class="listing">
+<span class="head-exported"><span class="line-no">  41</span>croupierAI</span><span class="clause">(<span class="var">NNTable</span>, <span class="var">NNDeck</span>, <span class="var">NTable</span>, <span class="var">NDeck</span>) <span class="neck">:-</span>
+<span class="line-no">  42</span>  <span class="goal-local">dealer</span><span class="body">(<span class="var">X</span>)<span class="control">,</span>
+<span class="line-no">  43</span>  ( <span class="var">X</span> <span class="goal-built_in">=</span> s17 <span class="control">-&gt;</span> <span class="goal-local">stand</span>(<span class="var">NNTable</span>, <span class="var">NNDeck</span>, <span class="var">NTable</span>, <span class="var">NDeck</span>)
+<span class="line-no">  44</span>  <span class="control">;</span> <span class="var">X</span> <span class="goal-built_in">=</span> h17 <span class="control">-&gt;</span> <span class="goal-local">hit</span>(<span class="var">NNTable</span>, <span class="var">NNDeck</span>, <span class="var">NTable</span>, <span class="var">NDeck</span>)</span></span>
+<span class="fullstop"><span class="line-no">  45</span> </span> ).</pre><dl class="comment">
+
+<dt class="pubdef"><span style="float:right"></span><a name="stand/4"><b class="pred">stand</b><var class="arglist">(-NNTable, -NNDeck, +NTable, +NDeck)</var></a> is <b class="det">det</b></dt><dd class="defbody">Plays <code>h17</code>: <b>hit soft 17</b>, strategy. The dealer is always last in the queue
+to draw a new card.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>NNTable</var></td><td class="argdescr">- A list of all player's cards (list of lists containing
+predicates <code>card</code>) <b>after</b> dealer's decision.</td></tr>
+<tr><td><var>NNDeck</var></td><td class="argdescr">- A list of cards in the deck (list of predicates <code>card</code>)
+<b>after</b> dealer's decision.</td></tr>
+<tr><td><var>NTable</var></td><td class="argdescr">- A list of all player's cards (list of lists containing
+predicates <code>card</code>) <b>before</b> dealer's decision.</td></tr>
+<tr><td><var>NDeck</var></td><td class="argdescr">- A list of cards in the deck (list of predicates <code>card</code>)
+<b>before</b> dealer's decision.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd></dl>
+<pre class="listing">
+<span class="head"><span class="line-no">  61</span>stand</span><span class="clause">(<span class="var">NNTable</span>, <span class="var">NNDeck</span>, <span class="list">[<span class="var">E</span>|<span class="var">RTable</span>]</span>, <span class="list">[<span class="var">C</span>|<span class="var">NDeck</span>]</span>) <span class="neck">:-</span>
+<span class="line-no">  62</span>  <span class="goal-built_in">findall</span><span class="body">( <span class="var">S</span> , <span class="goal-imported">score</span>( <span class="var">S</span>, <span class="var">E</span> ), <span class="var">Score</span> )<span class="control">,</span>
+<span class="line-no">  63</span>  <span class="goal-local">aceDillemaStand</span>(<span class="var">Decision</span>, <span class="var">Score</span>)<span class="control">,</span>
+<span class="line-no">  64</span>  ( <span class="var">Decision</span> <span class="goal-built_in">=&lt;</span> <span class="int">16</span> <span class="control">-&gt;</span> ( <span class="goal-autoload">append</span>(<span class="var">E</span>, <span class="list">[<span class="var">C</span>]</span>, <span class="var">NewHand</span>)<span class="control">,</span> <span class="var">NewC</span> <span class="goal-built_in">=</span> <span class="empty_list">[]</span> ) <span class="comment">% hit
+</span><span class="line-no">  65</span>  <span class="control">;</span> <span class="var">Decision</span> <span class="goal-built_in">&gt;=</span> <span class="int">17</span> <span class="control">-&gt;</span> ( <span class="var">NewHand</span> <span class="goal-built_in">=</span> <span class="var">E</span><span class="control">,</span> <span class="var">NewC</span> <span class="goal-built_in">=</span> <span class="list">[<span class="var">C</span>]</span> )
+<span class="line-no">  66</span>  )<span class="control">,</span>
+<span class="line-no">  67</span>  <span class="goal-autoload">append</span>( <span class="list">[<span class="var">NewHand</span>]</span>, <span class="var">RTable</span>, <span class="var">NNTable</span> )<span class="control">,</span>
+<span class="line-no">  68</span>  <span class="goal-autoload">append</span>( <span class="var">NewC</span>, <span class="var">NDeck</span>, <span class="var">NNDeck</span> )</span></span>.<span class="fullstop">
+</span></pre><dl class="comment">
+
+<dt class="pubdef"><span style="float:right"></span><a name="aceDillemaStand/2"><b class="pred">aceDillemaStand</b><var class="arglist">(-Decision, +Scores)</var></a> is <b class="det">det</b></dt><dd class="defbody">Decide vale of hand - can be more than one with Ace (1 or 11 points) - based
+on current strategy and score. <var>Decision</var> based on <strong>stand</strong> strategy.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>Decision</var></td><td class="argdescr">- A score of a player chose based on current strategy.</td></tr>
+<tr><td><var>Score</var></td><td class="argdescr">- A list of possible score interpretation: there can be more
+than one if a player has Ace in his hand.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd></dl>
+<pre class="listing">
+<span class="head"><span class="line-no">  79</span>aceDillemaStand</span><span class="clause">(<span class="var">Decision</span>, <span class="list">[<span class="var">S</span>|<span class="var">Score</span>]</span>) <span class="neck">:-</span>
+<span class="line-no">  80</span>  <span class="goal-local">aceDillemaStand</span><span class="body">(<span class="var">Decision</span>, <span class="var">S</span>, <span class="var">Score</span>)</span></span>.<span class="fullstop">
+</span><span id="aceDillemaStand/3" class="head"><span class="line-no">  81</span>aceDillemaStand</span><span class="clause">(<span class="var">Decision</span>, <span class="var">S</span>, <span class="list">[<span class="var">Sin</span>|<span class="var">Score</span>]</span>) <span class="neck">:-</span>
+<span class="line-no">  82</span>  ( <span class="var">S</span><span class="body"> <span class="goal-built_in">=&lt;</span> <span class="int">16</span>   <span class="control">-&gt;</span> <span class="var">Decision</span> <span class="goal-built_in">=</span> <span class="var">S</span>
+<span class="line-no">  83</span>  <span class="control">;</span> <span class="var">S</span> <span class="goal-built_in">&gt;=</span> <span class="int">17</span>   <span class="control">-&gt;</span> <span class="goal-recursion">aceDillemaStand</span>(<span class="var">Decision</span>, <span class="var">Sin</span>, <span class="var">Score</span>)</span></span>
+<span class="fullstop"><span class="line-no">  84</span> </span> ).
+<span class="head"><span class="line-no">  85</span>aceDillemaStand</span><span class="clause">(<span class="var">S</span>, <span class="var">S</span>, <span class="empty_list">[]</span>)</span>.<span class="fullstop">
+</span></pre><dl class="comment">
+
+<dt class="pubdef"><span style="float:right"></span><a name="hit/4"><b class="pred">hit</b><var class="arglist">(-NNTable, -NNDeck, +NTable, +NDeck)</var></a> is <b class="det">det</b></dt><dd class="defbody">Plays <code>s17</code>: <b>stand on ALL 17's</b>, strategy. The dealer is always last in the
+queue to draw a new card. If Ace &amp; score &lt;17 treat Ace as 11; otherwise if
+score &gt;17 swap value of Ace to 1.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>NNTable</var></td><td class="argdescr">- A list of all player's cards (list of lists containing
+predicates <code>card</code>) <b>after</b> dealer's decision.</td></tr>
+<tr><td><var>NNDeck</var></td><td class="argdescr">- A list of cards in the deck (list of predicates <code>card</code>)
+<b>after</b> dealer's decision.</td></tr>
+<tr><td><var>NTable</var></td><td class="argdescr">- A list of all player's cards (list of lists containing
+predicates <code>card</code>) <b>before</b> dealer's decision.</td></tr>
+<tr><td><var>NDeck</var></td><td class="argdescr">- A list of cards in the deck (list of predicates <code>card</code>)
+<b>before</b> dealer's decision.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd></dl>
+<pre class="listing">
+<span class="head"><span class="line-no"> 102</span>hit</span><span class="clause">(<span class="var">NNTable</span>, <span class="var">NNDeck</span>, <span class="list">[<span class="var">E</span>|<span class="var">RTable</span>]</span>, <span class="list">[<span class="var">C</span>|<span class="var">NDeck</span>]</span>) <span class="neck">:-</span>
+<span class="line-no"> 103</span>  <span class="goal-built_in">findall</span><span class="body">( <span class="var">S</span> , <span class="goal-imported">score</span>( <span class="var">S</span>, <span class="var">E</span> ), <span class="var">Solutions</span> )<span class="control">,</span>
+<span class="line-no"> 104</span>  <span class="goal-imported">aggregate_all</span>(count, <span class="goal-autoload">member</span>(<span class="functor">card</span>(<span class="var">_</span>,ace),<span class="var">E</span>), <span class="var">Aces</span>)<span class="control">,</span> <span class="comment">% count number of positives
+</span><span class="line-no"> 105</span>  <span class="goal-local">aceDillemaHit</span>(<span class="var">Score</span>, <span class="var">Type</span>, <span class="var">Aces</span>, <span class="var">Solutions</span>)<span class="control">,</span>
+<span class="line-no"> 106</span>  ( <span class="var">Score</span> <span class="goal-built_in">=&lt;</span> <span class="int">16</span>                  <span class="control">-&gt;</span> ( <span class="goal-autoload">append</span>(<span class="var">E</span>, <span class="list">[<span class="var">C</span>]</span>, <span class="var">NewHand</span>)<span class="control">,</span> <span class="var">NewC</span> <span class="goal-built_in">=</span> <span class="empty_list">[]</span> ) <span class="comment">% hit
+</span><span class="line-no"> 107</span>  <span class="control">;</span> ( <span class="var">Score</span> <span class="goal-built_in">=</span>  <span class="int">17</span><span class="control">,</span> <span class="var">Type</span> <span class="goal-built_in">=</span> soft ) <span class="control">-&gt;</span> ( <span class="goal-autoload">append</span>(<span class="var">E</span>, <span class="list">[<span class="var">C</span>]</span>, <span class="var">NewHand</span>)<span class="control">,</span> <span class="var">NewC</span> <span class="goal-built_in">=</span> <span class="empty_list">[]</span> ) <span class="comment">% check for softness
+</span><span class="line-no"> 108</span>  <span class="control">;</span> ( <span class="var">Score</span> <span class="goal-built_in">=</span>  <span class="int">17</span><span class="control">,</span> <span class="var">Type</span> <span class="goal-built_in">=</span> hard ) <span class="control">-&gt;</span> ( <span class="var">NewHand</span> <span class="goal-built_in">=</span> <span class="var">E</span><span class="control">,</span> <span class="var">NewC</span> <span class="goal-built_in">=</span> <span class="list">[<span class="var">C</span>]</span> ) <span class="comment">% check for hardness
+</span><span class="line-no"> 109</span>  <span class="control">;</span> <span class="var">Score</span> <span class="goal-built_in">&gt;</span>  <span class="int">17</span>                  <span class="control">-&gt;</span> ( <span class="var">NewHand</span> <span class="goal-built_in">=</span> <span class="var">E</span><span class="control">,</span> <span class="var">NewC</span> <span class="goal-built_in">=</span> <span class="list">[<span class="var">C</span>]</span> )
+<span class="line-no"> 110</span>  )<span class="control">,</span>
+<span class="line-no"> 111</span>  <span class="goal-autoload">append</span>( <span class="list">[<span class="var">NewHand</span>]</span>, <span class="var">RTable</span>, <span class="var">NNTable</span> )<span class="control">,</span>
+<span class="line-no"> 112</span>  <span class="goal-autoload">append</span>( <span class="var">NewC</span>, <span class="var">NDeck</span>, <span class="var">NNDeck</span> )</span></span>.<span class="fullstop">
+</span></pre><dl class="comment">
+
+<dt class="pubdef"><span style="float:right"></span><a name="aceDillemaHit/4"><b class="pred">aceDillemaHit</b><var class="arglist">(-Decision, -Type, +Aces, +Scores)</var></a> is <b class="det">det</b></dt><dd class="defbody">Decide vale and type of hand - can be more than one with Ace (1 or 11 points)
+<ul>
+<li>based on current strategy, number of <var>Aces</var> in the hand and score. <var>Decision</var>
+based on <strong>hit</strong> strategy.
+
+<center>
+@param <var>Decision</var> A score of a player chose based on current strategy.
+@param <var>Type</var> A type of played hand.
+@param <var>Aces</var> A number of aces in the hand.
+@param Score A list of possible score interpretation: there can be more
+than one if a player has Ace in his hand.
+</center>
+
+</li>
+</ul>
+</dd></dl>
+<pre class="listing">
+<span class="head"><span class="line-no"> 126</span>aceDillemaHit</span><span class="clause">(<span class="var">Decision</span>, <span class="var">Type</span>, <span class="var">Aces</span>, <span class="list">[<span class="var">S</span>|<span class="var">Score</span>]</span>) <span class="neck">:-</span>
+<span class="line-no"> 127</span>  ( <span class="var">Aces</span><span class="body"> <span class="goal-built_in">=</span> <span class="int">0</span>  <span class="control">-&gt;</span> (<span class="var">Type</span> <span class="goal-built_in">=</span> hard<span class="control">,</span> <span class="var">Decision</span> <span class="goal-built_in">=</span> <span class="var">S</span>)
+<span class="line-no"> 128</span>  <span class="control">;</span> (<span class="var">Aces</span> <span class="goal-built_in">=</span> <span class="int">1</span><span class="control">,</span> <span class="var">S</span><span class="goal-built_in">&gt;</span><span class="int">17</span>)  <span class="control">-&gt;</span> (<span class="var">Type</span> <span class="goal-built_in">=</span> hard<span class="control">,</span> <span class="goal-autoload">nth1</span>(<span class="int">1</span>, <span class="var">Score</span>, <span class="var">Decision</span>)) <span class="comment">% one ace more than 3 cards
+</span><span class="line-no"> 129</span>  <span class="control">;</span> <span class="var">Aces</span> <span class="goal-built_in">=</span> <span class="int">1</span>  <span class="control">-&gt;</span> (<span class="var">Type</span> <span class="goal-built_in">=</span> soft<span class="control">,</span> <span class="var">Decision</span> <span class="goal-built_in">=</span> <span class="var">S</span>)
+<span class="line-no"> 130</span>  <span class="control">;</span> <span class="goal-autoload">otherwise</span> <span class="control">-&gt;</span> (<span class="var">Type</span> <span class="goal-built_in">=</span> hard<span class="control">,</span> <span class="goal-local">aceDillemaStand</span>(<span class="var">Decision</span>, <span class="list">[<span class="var">S</span>|<span class="var">Score</span>]</span>)</span></span>)<span class="fullstop">
+</span></pre>
+</body>
+</html>

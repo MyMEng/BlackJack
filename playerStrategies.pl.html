@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>playerStrategies.pl -- Player strategies for the Blackjack game simulator</title>
+
+<script type="text/javascript" src="res/jquery.js">
+
+</script>
+<script type="text/javascript" src="res/pldoc.js">
+
+</script>
+<link rel="stylesheet" type="text/css" href="res/pldoc.css">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+</head>
+<body>
+
+<h1 class="file"><span style="float:right"><a href="playerStrategies.pl-public_only=false.html"><img class="action" alt="Public" title="Click to include private" src="res/public.png"></a><a href="playerStrategies.pl-show=src.html"><img class="action" alt="Show source" title="Show source" src="res/source.png"></a></span>playerStrategies.pl -- Player strategies for the Blackjack game simulator</h1>
+
+<p>
+This module contains player strategies configuration and predicates.</p>
+
+<dl class="tags">
+<dt class="keyword-author">author</dt><dd class="keyword-author">- Kacper Sokol</dd>
+<dt class="keyword-license">license</dt><dd class="keyword-license">- GPL</dd>
+</dl>
+
+<dl>
+<dt class="pubdef"><span style="float:right"></span><a name="playAI/6"><b class="pred">playAI</b><var class="arglist">(-NTable, -NNDeck, -NRefuse, +Table, +NDeck, +Refuse)</var></a> is <b class="det">det</b></dt><dd class="defbody">Assigns strategy to each player via <code>playAISequence</code> predicate and return
+resulting: table, deck, refusal list.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>NTable</var></td><td class="argdescr">- <b>New</b> list of cards held by all player after current round.</td></tr>
+<tr><td><var>NNDeck</var></td><td class="argdescr">- <b>New</b> list of cards remaining in the deck after current round.</td></tr>
+<tr><td><var>NRefuse</var></td><td class="argdescr">- <b>New</b> list of players not allowed to draw a card after
+current round.</td></tr>
+<tr><td><var>Table</var></td><td class="argdescr">- List of cards held by all player before current round.</td></tr>
+<tr><td><var>NDeck</var></td><td class="argdescr">- List of cards remaining in the deck before current round.</td></tr>
+<tr><td><var>Refuse</var></td><td class="argdescr">- List of players not allowed to draw a card before current
+round.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd>
+</dl>
+
+</body>
+</html>

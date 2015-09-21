@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>deck.pl -- Predicates for handling a deck of card</title>
+
+<script type="text/javascript" src="res/jquery.js">
+
+</script>
+<script type="text/javascript" src="res/pldoc.js">
+
+</script>
+<link rel="stylesheet" type="text/css" href="res/pldoc.css">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+</head>
+<body>
+
+<h1 class="file"><span style="float:right"><a href="deck.pl.html"><img class="action" alt="All predicates" title="Click to show exports only" src="res/private.png"></a><a href="deck.pl-show=src.html"><img class="action" alt="Show source" title="Show source" src="res/source.png"></a></span>deck.pl -- Predicates for handling a deck of card</h1>
+
+<p>
+This module contains configuration and predicates responsible for handling
+<code>deck(s)</code> of cards through the game.</p>
+
+<dl class="tags">
+<dt class="keyword-author">author</dt><dd class="keyword-author">- Kacper Sokol</dd>
+<dt class="keyword-license">license</dt><dd class="keyword-license">- GPL</dd>
+</dl>
+
+<dl>
+<dt class="pubdef"><span style="float:right"></span><a name="decks/1"><b class="pred">decks</b><var class="arglist">(-N)</var></a> is <b class="det">det</b></dt><dd class="defbody">Defines the number of decks used in the game.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>N</var></td><td class="argdescr">- Number of decks used in the game.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd>
+<dt class="pubdef"><span style="float:right"></span><a name="shuffleMode/1"><b class="pred">shuffleMode</b><var class="arglist">(-Type)</var></a> is <b class="det">det</b></dt><dd class="defbody">Defines the type of deck shuffling used in the game; can be either:
+<ul>
+<li>deterministic, or</li>
+<li>random.</li>
+</ul>
+
+<p>
+The deterministic shuffling splits the pile in half randomly selects the half
+and merge halves interchangeably. The random shuffling also splits the deck
+but then tosses a coin on each card merge which card should go first.</p>
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>Type</var></td><td class="argdescr">- <var>Type</var> of shuffling used in the game.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd>
+<dt class="privdef"><span style="float:right"></span><a name="suits/1"><b class="pred">suits</b><var class="arglist">(-Type)</var></a> is <b class="det">det</b><span class="anot" style="float:right">[private]</span></dt><dd class="defbody">Defines suits of cards:
+<ul>
+<li><code>clubs(♣)</code>,</li>
+<li><code>diamonds(♦)</code>,</li>
+<li><code>hearts(♥)</code> and</li>
+<li><code>spades(♠)</code>.</li>
+</ul>
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>Type</var></td><td class="argdescr">- <var>Type</var> of card's suit.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd>
+<dt class="privdef"><span style="float:right"></span><a name="ranks/1"><b class="pred">ranks</b><var class="arglist">(-Rank)</var></a> is <b class="det">det</b><span class="anot" style="float:right">[private]</span></dt><dd class="defbody">Defines the possible ranks of card: ace, 2, 3, 4, 5, 6, 7, 8, 9, 10, jack,
+queen, king.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>Rank</var></td><td class="argdescr">- <var>Rank</var> of card.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd>
+<dt class="privdef"><span style="float:right"></span><a name="card/2"><b class="pred">card</b><var class="arglist">(+Suit, +Rank)</var></a> is <b class="det">det</b><span class="anot" style="float:right">[private]</span></dt>
+<dt class="privdef"><b class="pred">card</b><var class="arglist">(-Suit, -Rank)</var> is <b class="det">nondet</b><span class="anot" style="float:right">[private]</span></dt><dd class="defbody">Represents a card.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>Suit</var></td><td class="argdescr">- <var>Suit</var> of card.</td></tr>
+<tr><td><var>Rank</var></td><td class="argdescr">- <var>Rank</var> of card.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd>
+<dt class="privdef"><span style="float:right"></span><a name="value/2"><b class="pred">value</b><var class="arglist">(-Value, :Card)</var></a> is <b class="det">det</b><span class="anot" style="float:right">[private]</span></dt><dd class="defbody">Converts card predicate to its value. The <var>Card</var> variable is given by
+<code>card(+S, +R)</code> predicate with: <var>S</var> - Suit of card; <var>R</var> - Rank of card.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>Value</var></td><td class="argdescr">- <var>Value</var> of given card.</td></tr>
+<tr><td><var>Card</var></td><td class="argdescr">- The card.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd>
+<dt class="pubdef"><span style="float:right"></span><a name="score/2"><b class="pred">score</b><var class="arglist">(-Score, +Hand)</var></a> is <b class="det">det</b></dt><dd class="defbody">Calculates value of player's hand.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>Score</var></td><td class="argdescr">- Value of given hand.</td></tr>
+<tr><td><var>Hand</var></td><td class="argdescr">- A list of <code>card</code> predicates.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd>
+<dt class="pubdef"><span style="float:right"></span><a name="deck/1"><b class="pred">deck</b><var class="arglist">(-Deck)</var></a> is <b class="det">det</b></dt><dd class="defbody">
+
+<blockquote>
+Generates <code>deck(s)</code> based on their predefined number (<code>decks</code> parameter in
+<code>deck</code> module).
+</blockquote>
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>Deck</var></td><td class="argdescr">- <var>Deck</var>(s) generated based on system parameters.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd>
+<dt class="privdef"><span style="float:right"></span><a name="woN/3"><b class="pred">woN</b><var class="arglist">(-Out, +E, +In)</var></a> is <b class="det">det</b><span class="anot" style="float:right">[private]</span></dt><dd class="defbody">Returns the <var>In</var> list without element <var>E</var>.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>Out</var></td><td class="argdescr">- The list with specified element removed.</td></tr>
+<tr><td><var>E</var></td><td class="argdescr">- An element ot be removed from the input list.</td></tr>
+<tr><td><var>In</var></td><td class="argdescr">- List with the element to be removed.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd>
+<dt class="pubdef"><span style="float:right"></span><a name="initDeal/3"><b class="pred">initDeal</b><var class="arglist">(-Table, -NewDeck, +Deck)</var></a> is <b class="det">det</b></dt><dd class="defbody">Deals the cards from the <var>Deck</var> to all players defined by <code>players</code> predicate
+defined in <code>blackJack</code> module. The initial deal consists of two cards given
+to each player &amp; two cards for the house. This predicate returns the new deck
+without just dealt cards and the table i.e. list of lists containing cards of
+each player.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>Table</var></td><td class="argdescr">- List of cards held by all player (list of lists).</td></tr>
+<tr><td><var>NewDeck</var></td><td class="argdescr">- <var>Deck</var>(s) of card with removed cards that were used for initial
+deal.</td></tr>
+<tr><td><var>Deck</var></td><td class="argdescr">- <var>Deck</var>(s) of cards used for initial deal.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd>
+<dt class="pubdef"><span style="float:right"></span><a name="shuffle/3"><b class="pred">shuffle</b><var class="arglist">(-Shuffled, +Deck, +N)</var></a> is <b class="det">det</b></dt><dd class="defbody">Manages shuffling: decides which shuffling algorithm to use based on type
+defined by <code>shuffleMode</code> predicate defined in <code>deck</code> package.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>Shuffled</var></td><td class="argdescr">- The shuffled deck (list of <code>card</code> predicate).</td></tr>
+<tr><td><var>Deck</var></td><td class="argdescr">- The deck to be shuffled (list of <code>card</code> predicate).</td></tr>
+<tr><td><var>N</var></td><td class="argdescr">- Number of shuffles.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd>
+<dt class="privdef"><span style="float:right"></span><a name="rifleDet/3"><b class="pred">rifleDet</b><var class="arglist">(-Out, +A, +B)</var></a> is <b class="det">det</b><span class="anot" style="float:right">[private]</span></dt><dd class="defbody">Rifle-shuffle two piles of cards deterministically: split the deck into two
+parts and merge them one by one. The only random bit here is whether the
+shuffle starts with pile <var>A</var> or pile <var>B</var>.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>Out</var></td><td class="argdescr">- Merged deck (list of predicates <code>card</code>).</td></tr>
+<tr><td><var>A</var></td><td class="argdescr">- 1st part of deck to be merged (list of predicates <code>card</code>).</td></tr>
+<tr><td><var>B</var></td><td class="argdescr">- 2nd part of deck to be merged (list of predicates <code>card</code>).</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd>
+<dt class="privdef"><span style="float:right"></span><a name="rifleRan/3"><b class="pred">rifleRan</b><var class="arglist">(-Out, +A, +B)</var></a> is <b class="det">det</b><span class="anot" style="float:right">[private]</span></dt><dd class="defbody">Rifle-shuffle two piles of cards with <b>random</b> card selection i.e. split the
+deck into two parts and merge them by tossing a coin for each card to decide
+whether it goes on the top or bottom of the merged pile.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>Out</var></td><td class="argdescr">- Merged deck (list of predicates <code>card</code>).</td></tr>
+<tr><td><var>A</var></td><td class="argdescr">- 1st part of deck to be merged (list of predicates <code>card</code>).</td></tr>
+<tr><td><var>B</var></td><td class="argdescr">- 2nd part of deck to be merged (list of predicates <code>card</code>).</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd>
+<dt class="pubdef"><span style="float:right"></span><a name="getPiles/3"><b class="pred">getPiles</b><var class="arglist">(-A, -B, +Half)</var></a> is <b class="det">det</b></dt><dd class="defbody">Generates two piles counters: if the number of cards in the deck is <strong>odd</strong>
+then it is impossible to split it equally. This predicate takes a float
+number and outputs two numbers one a half bigger and one a half smaller to
+create two integers. In general 2*<var>Half</var>=<var>A</var>+<var>B</var>.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>A</var></td><td class="argdescr">- Number rounded to an integer based on above rule.</td></tr>
+<tr><td><var>B</var></td><td class="argdescr">- Number rounded to an integer based on above rule.</td></tr>
+<tr><td><var>Half</var></td><td class="argdescr">- <var>A</var> number to be rounded based on above rule.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd>
+<dt class="pubdef"><span style="float:right"></span><a name="addCard/5"><b class="pred">addCard</b><var class="arglist">(-NewDeal, -NewDeck, +OldDeck, +OldDeal, +PlayerNo)</var></a> is <b class="det">det</b></dt><dd class="defbody">Deals additional card to player with sequential number <var>PlayerNo</var>. After the
+deal it returns new deck and new hand of given player.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>NewDeal</var></td><td class="argdescr">- List of cards held by all player (list of lists) <strong>after</strong>
+adding a new card.</td></tr>
+<tr><td><var>NewDeck</var></td><td class="argdescr">- <strong>New</strong> list of cards remaining in the deck after current
+round.</td></tr>
+<tr><td><var>OldDeck</var></td><td class="argdescr">- Current list of cards in the deck after.</td></tr>
+<tr><td><var>OldDeal</var></td><td class="argdescr">- List of cards held by all player (list of lists) <strong>before</strong>
+adding a new card.</td></tr>
+<tr><td><var>PlayerNo</var></td><td class="argdescr">- An id of the player counting from 1 which is to be dealt a
+new card.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd>
+</dl>
+
+</body>
+</html>

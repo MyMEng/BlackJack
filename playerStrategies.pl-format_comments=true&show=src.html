@@ -1,0 +1,887 @@
+<!DOCTYPE html<html>
+  <head>
+    <title>playerStrategies.pl</title>
+    <link rel="stylesheet" type="text/css" href="res/pllisting.css">
+    <link rel="stylesheet" type="text/css" href="res/pldoc.css">
+  </head>
+<body>
+
+<div class="src_formats">View source with <a href="playerStrategies.pl-format_comments=false&amp;show=src.html">raw comments</a> or as <a href="playerStrategies.pl-format_comments=true&amp;show=raw">raw</a></div>
+<pre class="listing">
+</pre>
+<div class="comment">
+
+<h1 class="module">Player strategies for the Blackjack game simulator</h1>
+
+<p>
+This module contains player strategies configuration and predicates.</p>
+
+<dl class="tags">
+<dt class="keyword-author">author</dt><dd class="keyword-author">- Kacper Sokol</dd>
+<dt class="keyword-license">license</dt><dd class="keyword-license">- GPL
+*/</dd>
+</dl>
+
+</div>
+<pre class="listing">
+<span class="directive"><span class="neck"><span class="line-no">   9</span>:- <span class="goal-built_in">module</span><span class="body">( <span class="identifier">playerStrategies</span>,
+<span class="line-no">  10</span>  <span class="list">[<span class="goal-local">playAI</span><span class="predicate_indicator"><span class="predicate_indicator">/</span><span class="arity">6</span></span>]</span>
+<span class="line-no">  11</span>  )</span></span>.</span><span class="fullstop"></span><span class="line-no">  12</span>
+<span class="directive"><span class="neck"><span class="line-no">  13</span>:- <span class="goal-built_in">ensure_loaded</span><span class="body">(<span class="file">library(aggregate)</span>)</span></span>.</span><span class="fullstop"></span><span class="directive"><span class="neck"><span class="line-no">  14</span>:- <span class="goal-built_in">ensure_loaded</span><span class="body">(<span class="file">library(real)</span>)</span></span>.</span><span class="fullstop"></span><span class="directive"><span class="neck"><span class="line-no">  15</span>:- <span class="goal-built_in">use_module</span><span class="body">(<span class="file">blackJack</span>)</span></span>.</span><span class="fullstop"></span><span class="directive"><span class="neck"><span class="line-no">  16</span>:- <span class="goal-built_in">use_module</span><span class="body">(<span class="file">deck</span>)</span></span>.</span><span class="fullstop"></span></pre><dl class="comment">
+
+<dt class="pubdef"><span style="float:right"></span><a name="dealType/2"><b class="pred">dealType</b><var class="arglist">(-Type, +Player)</var></a> is <b class="det">det</b></dt><dd class="defbody">Check the hand type of given player:
+<ul>
+<li><b>hard</b> - if it does not contain any ace;</li>
+<li><b>soft</b> - if it contains at least one ace.</li>
+</ul>
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>Type</var></td><td class="argdescr">- The type of the player's hand: <code>hard</code> or <code>soft</code>.</td></tr>
+<tr><td><var>Player</var></td><td class="argdescr">- <var>Player</var>'s cards: a list of <code>card</code> predicates.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd></dl>
+<pre class="listing">
+<span class="head"><span class="line-no">  27</span>dealType</span><span class="clause">(<span class="var">Type</span>, <span class="var">Player</span>) <span class="neck">:-</span>
+<span class="line-no">  28</span>	<span class="comment">% count the number of aces
+</span><span class="line-no">  29</span>	<span class="goal-imported">aggregate_all</span><span class="body">(count, <span class="goal-autoload">member</span>(<span class="functor">card</span>(<span class="var">_</span>,ace), <span class="var">Player</span>), <span class="var">Aces</span>)<span class="control">,</span>
+<span class="line-no">  30</span>	( <span class="var">Aces</span> <span class="goal-built_in">=</span> <span class="int">0</span>  <span class="control">-&gt;</span> <span class="var">Type</span> <span class="goal-built_in">=</span> hard 
+<span class="line-no">  31</span>	<span class="control">;</span> <span class="goal-autoload">otherwise</span> <span class="control">-&gt;</span> <span class="var">Type</span> <span class="goal-built_in">=</span> soft</span></span>
+<span class="fullstop"><span class="line-no">  32</span>	</span>).</pre><dl class="comment">
+
+<dt class="pubdef"><span style="float:right"></span><a name="dealerFaceUp/2"><b class="pred">dealerFaceUp</b><var class="arglist">(-ValueR, +Hand)</var></a> is <b class="det">det</b></dt><dd class="defbody">Checks value of face-up card (2nd card) - used mainly with dealer's hand.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>ValueR</var></td><td class="argdescr">- The value of face-up card (2nd card).</td></tr>
+<tr><td><var>Hand</var></td><td class="argdescr">- Player's cards: a list of <code>card</code> predicates.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd></dl>
+<pre class="listing">
+<span class="head"><span class="line-no">  41</span>dealerFaceUp</span><span class="clause">( <span class="var">ValueR</span>, <span class="list">[ <span class="var">_</span>, <span class="functor">card</span>(<span class="var">_</span>, <span class="var">Value</span>)| <span class="empty_list">[]</span> ]</span> ) <span class="neck">:-</span>
+<span class="line-no">  42</span>	( <span class="var">Value</span><span class="body"> <span class="goal-built_in">=</span> jack  <span class="control">-&gt;</span> <span class="var">ValueR</span> <span class="goal-built_in">is</span> <span class="int">10</span>
+<span class="line-no">  43</span>	<span class="control">;</span> <span class="var">Value</span> <span class="goal-built_in">=</span> queen <span class="control">-&gt;</span> <span class="var">ValueR</span> <span class="goal-built_in">is</span> <span class="int">10</span>
+<span class="line-no">  44</span>	<span class="control">;</span> <span class="var">Value</span> <span class="goal-built_in">=</span> king  <span class="control">-&gt;</span> <span class="var">ValueR</span> <span class="goal-built_in">is</span> <span class="int">10</span>
+<span class="line-no">  45</span>	<span class="control">;</span> <span class="goal-autoload">otherwise</span>     <span class="control">-&gt;</span> <span class="var">ValueR</span> <span class="goal-built_in">=</span> <span class="var">Value</span></span></span>
+<span class="fullstop"><span class="line-no">  46</span>	</span>).</pre><dl class="comment">
+
+<dt class="pubdef"><span style="float:right"></span><a name="cardsOnTable/2"><b class="pred">cardsOnTable</b><var class="arglist">(-N, +Table)</var></a> is <b class="det">det</b></dt><dd class="defbody">Counts the number of cards on the table.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>N</var></td><td class="argdescr">- The number of all cards on the table.</td></tr>
+<tr><td><var>Table</var></td><td class="argdescr">- List of cards held by all player (list of lists).</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd></dl>
+<pre class="listing">
+<span class="head"><span class="line-no">  55</span>cardsOnTable</span><span class="clause">(<span class="var">N</span>, <span class="var">Table</span>) <span class="neck">:-</span>
+<span class="line-no">  56</span>	<span class="goal-local">cardsOnTable</span><span class="body">(<span class="var">N</span>, <span class="int">0</span>, <span class="var">Table</span>)</span></span>.<span class="fullstop">
+</span><span class="comment"><span class="line-no">  57</span>%
+</span><span id="cardsOnTable/3" class="head"><span class="line-no">  58</span>cardsOnTable</span><span class="clause">(<span class="var">N</span>, <span class="var">N</span>, <span class="empty_list">[]</span>) <span class="neck">:-</span> <span class="body"><span class="goal-built_in">!</span></span></span>.<span class="fullstop">
+</span><span class="head"><span class="line-no">  59</span>cardsOnTable</span><span class="clause">(<span class="var">N</span>, <span class="var">Accum</span>, <span class="list">[<span class="var">T</span>|<span class="var">Table</span>]</span>) <span class="neck">:-</span>
+<span class="line-no">  60</span>	<span class="goal-built_in">length</span><span class="body">(<span class="var">T</span>, <span class="var">L</span>)<span class="control">,</span>
+<span class="line-no">  61</span>	<span class="var">A1</span> <span class="goal-built_in">is</span> <span class="var">Accum</span> <span class="functor">+</span> <span class="var">L</span><span class="control">,</span>
+<span class="line-no">  62</span>	<span class="goal-recursion">cardsOnTable</span>(<span class="var">N</span>, <span class="var">A1</span>, <span class="var">Table</span>)</span></span>.<span class="fullstop">
+</span></pre><dl class="comment">
+
+<dt class="pubdef"><span style="float:right"></span><a name="attach/4"><b class="pred">attach</b><var class="arglist">(-NLs, +Ls, +Elem, +X)</var></a> is <b class="det">det</b></dt><dd class="defbody">Attaches element <var>Elem</var> to list <var>Ls</var> at position <var>X</var>; where the position is
+an index counted from 1.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>NLs</var></td><td class="argdescr">- The output list with attached element.</td></tr>
+<tr><td><var>Ls</var></td><td class="argdescr">- The input list to which the new element should be attached.</td></tr>
+<tr><td><var>Elem</var></td><td class="argdescr">- The element to be attached.</td></tr>
+<tr><td><var>X</var></td><td class="argdescr">- The position's index (starting at 1) at which the element is
+attached.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd></dl>
+<pre class="listing">
+<span class="head-unreferenced"><span class="line-no">  75</span>attach</span><span class="clause">( <span class="list">[<span class="var">Elem</span>|<span class="var">Ls</span>]</span>, <span class="var">Ls</span>, <span class="var">Elem</span>, <span class="int">1</span>) <span class="neck">:-</span> <span class="body"><span class="goal-built_in">!</span></span></span>.<span class="fullstop">
+</span><span class="head-unreferenced"><span class="line-no">  76</span>attach</span><span class="clause">( <span class="list">[<span class="var">Elem</span>]</span>, <span class="empty_list">[]</span>, <span class="var">Elem</span>, <span class="var">_</span>) <span class="neck">:-</span> <span class="body"><span class="goal-built_in">!</span></span></span>.<span class="fullstop">
+</span><span class="head-unreferenced"><span class="line-no">  77</span>attach</span><span class="clause">( <span class="var">NLs</span>, <span class="list">[<span class="var">First</span>|<span class="var">Ls</span>]</span>, <span class="var">Elem</span>, <span class="var">X</span>) <span class="neck">:-</span>
+<span class="line-no">  78</span>	<span class="goal-local">attach</span><span class="body">(<span class="var">NLs</span>, <span class="list">[<span class="var">First</span>]</span>, <span class="var">Ls</span>, <span class="var">Elem</span>, <span class="var">X</span>, <span class="int">2</span>)</span></span>.<span class="fullstop">
+</span><span class="comment"><span class="line-no">  79</span>%
+</span><span id="attach/6" class="head"><span class="line-no">  80</span>attach</span><span class="clause">(<span class="var">NLs</span>, <span class="var">Head</span>, <span class="var">Tail</span>, <span class="var">Elem</span>, <span class="var">X</span>, <span class="var">X</span>) <span class="neck">:-</span>
+<span class="line-no">  81</span>	<span class="goal-autoload">append</span><span class="body">(<span class="var">Head</span>, <span class="list">[<span class="var">Elem</span>|<span class="var">Tail</span>]</span> , <span class="var">NLs</span>)<span class="control">,</span> <span class="goal-built_in">!</span></span></span>.<span class="fullstop">
+</span><span class="head"><span class="line-no">  82</span>attach</span><span class="clause">(<span class="var">NLs</span>, <span class="var">Head</span>, <span class="list">[<span class="var">Bg</span>|<span class="var">Tail</span>]</span>, <span class="var">Elem</span>, <span class="var">X</span>, <span class="var">Current</span>) <span class="neck">:-</span>
+<span class="line-no">  83</span>	<span class="var">Current1</span><span class="body"> <span class="goal-built_in">is</span> <span class="var">Current</span> <span class="functor">+</span> <span class="int">1</span><span class="control">,</span>
+<span class="line-no">  84</span>	<span class="goal-autoload">append</span>(<span class="var">Head</span>, <span class="list">[<span class="var">Bg</span>]</span> , <span class="var">NewHead</span>)<span class="control">,</span>
+<span class="line-no">  85</span>	<span class="goal-recursion">attach</span>(<span class="var">NLs</span>, <span class="var">NewHead</span>, <span class="var">Tail</span>, <span class="var">Elem</span>, <span class="var">X</span>, <span class="var">Current1</span>)</span></span>.<span class="fullstop">
+</span></pre><dl class="comment">
+
+<dt class="pubdef"><span style="float:right"></span><a name="replace/4"><b class="pred">replace</b><var class="arglist">(-NLs, +Ls, +Elem, +X)</var></a> is <b class="det">det</b></dt><dd class="defbody">Replaces the element with index <var>X</var> (counting from 1) in the list <var>Ls</var> with
+new element <var>Elem</var>. The original element is disregarded.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>NLs</var></td><td class="argdescr">- The output list with replaced element.</td></tr>
+<tr><td><var>Ls</var></td><td class="argdescr">- The input list in which the old element is replaced with the new
+one.</td></tr>
+<tr><td><var>Elem</var></td><td class="argdescr">- The new element that is placed in the list.</td></tr>
+<tr><td><var>X</var></td><td class="argdescr">- The position's index (starting at 1) at which the element is
+replaced.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd></dl>
+<pre class="listing">
+<span class="head"><span class="line-no">  99</span>replace</span><span class="clause">( <span class="list">[<span class="var">Elem</span>|<span class="var">Ls</span>]</span>, <span class="list">[<span class="var">_</span>|<span class="var">Ls</span>]</span>, <span class="var">Elem</span>, <span class="int">1</span>) <span class="neck">:-</span> <span class="body"><span class="goal-built_in">!</span></span></span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 100</span>replace</span><span class="clause">( <span class="list">[<span class="var">Elem</span>]</span>, <span class="empty_list">[]</span>, <span class="var">Elem</span>, <span class="var">_</span>) <span class="neck">:-</span> <span class="body"><span class="goal-built_in">!</span></span></span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 101</span>replace</span><span class="clause">( <span class="var">NLs</span>, <span class="list">[<span class="var">First</span>|<span class="var">Ls</span>]</span>, <span class="var">Elem</span>, <span class="var">X</span>) <span class="neck">:-</span>
+<span class="line-no"> 102</span>	<span class="goal-local">replace</span><span class="body">(<span class="var">NLs</span>, <span class="list">[<span class="var">First</span>]</span>, <span class="var">Ls</span>, <span class="var">Elem</span>, <span class="var">X</span>, <span class="int">2</span>)</span></span>.<span class="fullstop">
+</span><span class="comment"><span class="line-no"> 103</span>%
+</span><span id="replace/6" class="head"><span class="line-no"> 104</span>replace</span><span class="clause">(<span class="var">NLs</span>, <span class="var">Head</span>, <span class="list">[<span class="var">_</span>|<span class="var">Tail</span>]</span>, <span class="var">Elem</span>, <span class="var">X</span>, <span class="var">X</span>) <span class="neck">:-</span>
+<span class="line-no"> 105</span>	<span class="goal-autoload">append</span><span class="body">(<span class="var">Head</span>, <span class="list">[<span class="var">Elem</span>|<span class="var">Tail</span>]</span>, <span class="var">NLs</span>)<span class="control">,</span> <span class="goal-built_in">!</span></span></span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 106</span>replace</span><span class="clause">(<span class="var">NLs</span>, <span class="var">Head</span>, <span class="list">[<span class="var">Bg</span>|<span class="var">Tail</span>]</span>, <span class="var">Elem</span>, <span class="var">X</span>, <span class="var">Current</span>) <span class="neck">:-</span>
+<span class="line-no"> 107</span>	<span class="var">Current1</span><span class="body"> <span class="goal-built_in">is</span> <span class="var">Current</span> <span class="functor">+</span> <span class="int">1</span><span class="control">,</span>
+<span class="line-no"> 108</span>	<span class="goal-autoload">append</span>(<span class="var">Head</span>, <span class="list">[<span class="var">Bg</span>]</span> , <span class="var">NewHead</span>)<span class="control">,</span>
+<span class="line-no"> 109</span>	<span class="goal-recursion">replace</span>(<span class="var">NLs</span>, <span class="var">NewHead</span>, <span class="var">Tail</span>, <span class="var">Elem</span>, <span class="var">X</span>, <span class="var">Current1</span>)</span></span>.<span class="fullstop">
+</span></pre><dl class="comment">
+
+<dt class="pubdef"><span style="float:right"></span><a name="playAI/6"><b class="pred">playAI</b><var class="arglist">(-NTable, -NNDeck, -NRefuse, +Table, +NDeck, +Refuse)</var></a> is <b class="det">det</b></dt><dd class="defbody">Assigns strategy to each player via <code>playAISequence</code> predicate and return
+resulting: table, deck, refusal list.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>NTable</var></td><td class="argdescr">- <b>New</b> list of cards held by all player after current round.</td></tr>
+<tr><td><var>NNDeck</var></td><td class="argdescr">- <b>New</b> list of cards remaining in the deck after current round.</td></tr>
+<tr><td><var>NRefuse</var></td><td class="argdescr">- <b>New</b> list of players not allowed to draw a card after
+current round.</td></tr>
+<tr><td><var>Table</var></td><td class="argdescr">- List of cards held by all player before current round.</td></tr>
+<tr><td><var>NDeck</var></td><td class="argdescr">- List of cards remaining in the deck before current round.</td></tr>
+<tr><td><var>Refuse</var></td><td class="argdescr">- List of players not allowed to draw a card before current
+round.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd></dl>
+<pre class="listing">
+<span class="head-exported"><span class="line-no"> 125</span>playAI</span><span class="clause">(<span class="list">[<span class="var">Dealer</span>|<span class="var">NTable1</span>]</span>, <span class="var">NNDeck</span>, <span class="var">NRefuse</span>, <span class="list">[<span class="var">Dealer</span>|<span class="var">NTable</span>]</span>, <span class="var">NDeck</span>, <span class="var">Refuse</span>) <span class="neck">:-</span>
+<span class="line-no"> 126</span>	<span class="goal-imported">players</span><span class="body">(<span class="var">X</span>)<span class="control">,</span>
+<span class="line-no"> 127</span>	<span class="goal-local">playAISequence</span>(<span class="var">NTable1</span>, <span class="var">NNDeck</span>, <span class="var">NRefuse</span>, <span class="var">NTable</span>, <span class="var">NDeck</span>, <span class="var">Dealer</span>, <span class="int">1</span>, <span class="var">X</span>, <span class="var">Refuse</span>)</span></span>.<span class="fullstop">
+</span></pre><dl class="comment">
+
+<dt class="pubdef"><span style="float:right"></span><a name="playAISequence/9"><b class="pred">playAISequence</b><var class="arglist">(-NewTable, -NNDeck, -NRefuse, +Table, +NDeck, +Dealer, +Counter, +X, +Refuse)</var></a> is <b class="det">det</b></dt><dd class="defbody">Assigns strategy to each player and simulates then; then returns resulting:
+table, deck, refusal list. The first player in the list plays <code>playAIDet</code>,
+the second <code>playAIDeck</code>, the third <code>playAIMix</code>, the fourth <b>always holds</b>,
+finally the rest of the players are playing <code>playAIDet</code> strategy.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>NewTable</var></td><td class="argdescr">- <b>New</b> list of cards held by all players <strong>excluding dealer</strong>
+after current round.</td></tr>
+<tr><td><var>NNDeck</var></td><td class="argdescr">- <b>New</b> list of cards remaining in the deck after current round.</td></tr>
+<tr><td><var>NRefuse</var></td><td class="argdescr">- <b>New</b> list of players not allowed to draw a card after
+current round.</td></tr>
+<tr><td><var>Table</var></td><td class="argdescr">- List of cards held by all players <b>excluding dealer</b>* before
+current round.</td></tr>
+<tr><td><var>NDeck</var></td><td class="argdescr">- List of cards remaining in the deck before current round.</td></tr>
+<tr><td><var>Dealer</var></td><td class="argdescr">- <var>Dealer</var>'s cards: a list of <code>card</code> predicates.</td></tr>
+<tr><td><var>Counter</var></td><td class="argdescr">- The loop counter.</td></tr>
+<tr><td><var>X</var></td><td class="argdescr">- The total number of AI driven players.</td></tr>
+<tr><td><var>Refuse</var></td><td class="argdescr">- List of players not allowed to draw a card before current
+round.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd></dl>
+<pre class="listing">
+<span class="head"><span class="line-no"> 150</span>playAISequence</span><span class="clause">(<span class="var">Table</span>, <span class="var">Deck</span>, <span class="var">Refuse</span>, <span class="var">Table</span>, <span class="var">Deck</span>, <span class="var">_</span>, <span class="var">X1</span>, <span class="var">X</span>, <span class="var">Refuse</span>) <span class="neck">:-</span>
+<span class="line-no"> 151</span>	<span class="var">X1</span><span class="body"> <span class="goal-built_in">is</span> <span class="var">X</span> <span class="functor">+</span><span class="int">1</span><span class="control">,</span>
+<span class="line-no"> 152</span>	<span class="goal-built_in">!</span></span></span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 153</span>playAISequence</span><span class="clause">(<span class="var">NewTable</span>, <span class="var">NNDeck</span>, <span class="var">NRefuse</span>, <span class="var">Table</span>, <span class="var">NDeck</span>, <span class="var">Dealer</span>, <span class="var">Counter</span>, <span class="var">X</span>, <span class="var">Refuse</span>) <span class="neck">:-</span>
+<span class="line-no"> 154</span>	<span class="comment">% player B is,
+</span><span class="line-no"> 155</span>	<span class="goal-autoload">nth1</span><span class="body">(<span class="var">Counter</span>, <span class="var">Table</span>, <span class="var">PlayerB</span>)<span class="control">,</span>
+<span class="line-no"> 156</span>
+<span class="line-no"> 157</span>	<span class="comment">% do different strategy for each player
+</span><span class="line-no"> 158</span>	<span class="goal-autoload">nth1</span>(<span class="var">Counter</span>, <span class="var">Refuse</span>, <span class="var">Status</span>)<span class="control">,</span>
+<span class="line-no"> 159</span>	( <span class="var">Status</span> <span class="goal-built_in">=</span> <span class="int">0</span> <span class="control">-&gt;</span>
+<span class="line-no"> 160</span>		( <span class="var">Counter</span> <span class="goal-built_in">=</span> <span class="int">1</span> <span class="control">-&gt;</span> ( <span class="goal-local">playAIDet</span>( <span class="var">PlayerA</span>, <span class="var">ChDeck</span>, <span class="var">PlayerB</span>, <span class="var">NDeck</span>, <span class="var">Dealer</span> )<span class="control">,</span>
+<span class="line-no"> 161</span>						   <span class="goal-local">replace</span>( <span class="var">NewRefuse</span>, <span class="var">Refuse</span>, <span class="int">1</span>, <span class="var">Counter</span>) )
+<span class="line-no"> 162</span>		<span class="control">;</span> <span class="var">Counter</span> <span class="goal-built_in">=</span> <span class="int">2</span> <span class="control">-&gt;</span> ( <span class="goal-local">playAIDeck</span>( <span class="var">PlayerA</span>, <span class="var">ChDeck</span>, <span class="var">PlayerB</span>, <span class="var">NDeck</span>, <span class="var">Table</span>)<span class="control">,</span> <span class="var">NewRefuse</span> <span class="goal-built_in">=</span> <span class="var">Refuse</span> )
+<span class="line-no"> 163</span>		<span class="control">;</span> <span class="var">Counter</span> <span class="goal-built_in">=</span> <span class="int">3</span> <span class="control">-&gt;</span> ( <span class="goal-local">playMix</span>( <span class="var">PlayerA</span>, <span class="var">ChDeck</span>, <span class="var">PlayerB</span>, <span class="var">NDeck</span>, <span class="var">Dealer</span>, <span class="var">Table</span> )<span class="control">,</span>
+<span class="line-no"> 164</span>		                   <span class="goal-local">replace</span>( <span class="var">NewRefuse</span>, <span class="var">Refuse</span>, <span class="int">1</span>, <span class="var">Counter</span>) )
+<span class="line-no"> 165</span>		<span class="control">;</span> <span class="var">Counter</span> <span class="goal-built_in">=</span> <span class="int">4</span> <span class="control">-&gt;</span> ( <span class="var">PlayerA</span> <span class="goal-built_in">=</span> <span class="var">PlayerB</span><span class="control">,</span> <span class="var">ChDeck</span> <span class="goal-built_in">=</span> <span class="var">NDeck</span><span class="control">,</span> <span class="goal-local">replace</span>( <span class="var">NewRefuse</span>, <span class="var">Refuse</span>, <span class="int">1</span>, <span class="var">Counter</span>) )
+<span class="line-no"> 166</span>		<span class="control">;</span> <span class="goal-autoload">otherwise</span>   <span class="control">-&gt;</span> ( <span class="goal-local">playAIDet</span>( <span class="var">PlayerA</span>, <span class="var">ChDeck</span>, <span class="var">PlayerB</span>, <span class="var">NDeck</span>, <span class="var">Dealer</span> )<span class="control">,</span>
+<span class="line-no"> 167</span>						   <span class="goal-local">replace</span>( <span class="var">NewRefuse</span>, <span class="var">Refuse</span>, <span class="int">1</span>, <span class="var">Counter</span>) )
+<span class="line-no"> 168</span>		)
+<span class="line-no"> 169</span>	<span class="control">;</span> <span class="goal-autoload">otherwise</span> <span class="control">-&gt;</span>
+<span class="line-no"> 170</span>		( <span class="var">PlayerA</span> <span class="goal-built_in">=</span> <span class="var">PlayerB</span><span class="control">,</span> <span class="var">ChDeck</span> <span class="goal-built_in">=</span> <span class="var">NDeck</span><span class="control">,</span> <span class="var">NewRefuse</span> <span class="goal-built_in">=</span> <span class="var">Refuse</span> )
+<span class="line-no"> 171</span>	)<span class="control">,</span>
+<span class="line-no"> 172</span>
+<span class="line-no"> 173</span>	<span class="comment">% if AI once refused do not allow any more
+</span><span class="line-no"> 174</span>	( ( <span class="var">PlayerA</span> <span class="goal-built_in">=</span> <span class="var">PlayerB</span><span class="control">,</span> <span class="var">Counter</span> <span class="goal-built_in">=</span> <span class="int">2</span>) <span class="control">-&gt;</span> <span class="goal-local">replace</span>( <span class="var">NewNewRefuse</span>, <span class="var">NewRefuse</span>, <span class="int">1</span>, <span class="var">Counter</span>) <span class="comment">% refusal
+</span><span class="line-no"> 175</span>	<span class="control">;</span> <span class="goal-autoload">otherwise</span>                         <span class="control">-&gt;</span> <span class="var">NewNewRefuse</span> <span class="goal-built_in">=</span> <span class="var">NewRefuse</span> <span class="comment">% action taken
+</span><span class="line-no"> 176</span>	)<span class="control">,</span>
+<span class="line-no"> 177</span>
+<span class="line-no"> 178</span>	<span class="comment">% attach back player A.
+</span><span class="line-no"> 179</span>	<span class="goal-local">replace</span>( <span class="var">ChTable</span>, <span class="var">Table</span>, <span class="var">PlayerA</span>, <span class="var">Counter</span>)<span class="control">,</span>
+<span class="line-no"> 180</span>
+<span class="line-no"> 181</span>	<span class="var">Counter1</span> <span class="goal-built_in">is</span> <span class="var">Counter</span> <span class="functor">+</span> <span class="int">1</span><span class="control">,</span>
+<span class="line-no"> 182</span>	<span class="goal-recursion">playAISequence</span>(<span class="var">NewTable</span>, <span class="var">NNDeck</span>, <span class="var">NRefuse</span>, <span class="var">ChTable</span>, <span class="var">ChDeck</span>, <span class="var">Dealer</span>, <span class="var">Counter1</span>, <span class="var">X</span>, <span class="var">NewNewRefuse</span>)</span></span>.<span class="fullstop">
+</span></pre><dl class="comment">
+
+<dt class="pubdef"><span style="float:right"></span><a name="playAIDet/5"><b class="pred">playAIDet</b><var class="arglist">(-NPlayer, -NDeck, +Player, +Deck, +Dealer)</var></a> is <b class="det">det</b></dt><dd class="defbody">1st strategy <code>playAIDet</code>: Deterministic strategy which can only <b>hit</b> in the
+first round.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>NPlayer</var></td><td class="argdescr">- <var>Player</var>'s hand <strong>after</strong> player's action.</td></tr>
+<tr><td><var>NDeck</var></td><td class="argdescr">- List of cards in the deck <strong>after</strong> player's action.</td></tr>
+<tr><td><var>Player</var></td><td class="argdescr">- <var>Player</var>'s hand <strong>before</strong> player's action.</td></tr>
+<tr><td><var>Deck</var></td><td class="argdescr">- List of cards in the deck <strong>before</strong> player's action.</td></tr>
+<tr><td><var>Dealer</var></td><td class="argdescr">- <var>Dealer</var>'s cards: a list of <code>card</code> predicates.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd></dl>
+<pre class="listing">
+<span class="head"><span class="line-no"> 195</span>playAIDet</span><span class="clause">(<span class="var">NPlayer</span>, <span class="var">NDeck</span>, <span class="var">Player</span>, <span class="var">Deck</span>, <span class="var">Dealer</span>) <span class="neck">:-</span>
+<span class="line-no"> 196</span>	<span class="goal-local">dealType</span><span class="body">(<span class="var">P</span>, <span class="var">Player</span>)<span class="control">,</span>
+<span class="line-no"> 197</span>	<span class="goal-local">dealerFaceUp</span>(<span class="var">D</span>, <span class="var">Dealer</span>)<span class="control">,</span></span></span></pre><dl class="comment">
+<dd class="defbody"></dd></dl>
+<pre class="listing">
+<span class="line-no"> 199</span>	<span class="goal-imported">score</span>(<span class="var">V</span>, <span class="var">Player</span>)<span class="control">,</span><span class="goal-built_in">!</span><span class="control">,</span> <span class="comment">% cards value V---take only first value where aces are treated as 11
+</span><span class="line-no"> 200</span>	<span class="goal-local">playAIDet</span>(<span class="var">Action</span>, <span class="var">V</span>, <span class="var">P</span>, <span class="var">D</span>)<span class="control">,</span>
+<span class="line-no"> 201</span>	<span class="comment">% take an action
+</span><span class="line-no"> 202</span>	( <span class="var">Action</span> <span class="goal-built_in">=</span> hit   <span class="control">-&gt;</span> <span class="goal-local">hitDet</span>(<span class="var">NPlayer</span>, <span class="var">NDeck</span>, <span class="var">Player</span>, <span class="var">Deck</span>)
+<span class="line-no"> 203</span>	<span class="control">;</span> <span class="var">Action</span> <span class="goal-built_in">=</span> stand <span class="control">-&gt;</span> <span class="goal-local">standDet</span>(<span class="var">NPlayer</span>, <span class="var">NDeck</span>, <span class="var">Player</span>, <span class="var">Deck</span>)</pre><pre class="listing">
+</pre><pre class="listing">
+<span class="fullstop"><span class="line-no"> 204</span>	</span>).
+<span class="comment"><span class="line-no"> 205</span>%
+</span><span id="playAIDet/4" class="head"><span class="line-no"> 206</span>playAIDet</span><span class="clause">(<span class="var">Action</span>, <span class="var">V</span>, hard, <span class="var">D</span>) <span class="neck">:-</span>
+<span class="line-no"> 207</span>	<span class="goal-local">hardAction</span><span class="body">(<span class="var">Action</span>, <span class="var">D</span>, <span class="var">V</span>)</span></span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 208</span>playAIDet</span><span class="clause">(<span class="var">Action</span>, <span class="var">V</span>, soft, <span class="var">D</span>) <span class="neck">:-</span>
+<span class="line-no"> 209</span>	<span class="var">V1</span><span class="body"> <span class="goal-built_in">is</span> <span class="var">V</span> <span class="functor">-</span> <span class="int">11</span><span class="control">,</span>
+<span class="line-no"> 210</span>	<span class="goal-local">softAction</span>(<span class="var">Action</span>, <span class="var">D</span>, <span class="var">V1</span>)</span></span>.<span class="fullstop">
+</span><span class="comment"><span class="line-no"> 211</span>%
+</span><span id="hitDet/4" class="head"><span class="line-no"> 212</span>hitDet</span><span class="clause">(<span class="var">NPlayer</span>, <span class="var">Deck</span>, <span class="var">Player</span>, <span class="list">[<span class="var">C</span>|<span class="var">Deck</span>]</span>) <span class="neck">:-</span>
+<span class="line-no"> 213</span>	<span class="goal-autoload">append</span><span class="body">(<span class="var">Player</span>, <span class="list">[<span class="var">C</span>]</span>, <span class="var">NPlayer</span>)</span></span>.<span class="fullstop">
+</span><span class="comment"><span class="line-no"> 214</span>%
+</span><span id="standDet/4" class="head"><span class="line-no"> 215</span>standDet</span><span class="clause">(<span class="var">Player</span>, <span class="var">Deck</span>, <span class="var">Player</span>, <span class="var">Deck</span>)</span>.<span class="fullstop">
+</span></pre><dl class="comment">
+
+<dt class="pubdef"><span style="float:right"></span><a name="playAIDeck/5"><b class="pred">playAIDeck</b><var class="arglist">(-PlayerA, -ChDeck, +PlayerB, +Deck, +Table)</var></a> is <b class="det">det</b></dt><dd class="defbody">2nd strategy <code>playAIDeck</code>: Shuffle tracking strategy which estimates <b>deck
+probabilities</b>. It assumes that the deck has started being in ordered; then
+it calculates probabilities of each card occurring at given position and
+decides to hit or stand based on the cards with highest probabilities.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>PlayerA</var></td><td class="argdescr">- Player's hand <strong>after</strong> player's action.</td></tr>
+<tr><td><var>ChDeck</var></td><td class="argdescr">- List of cards in the deck <strong>after</strong> player's action.</td></tr>
+<tr><td><var>PlayerB</var></td><td class="argdescr">- Player's hand <strong>before</strong> player's action.</td></tr>
+<tr><td><var>Deck</var></td><td class="argdescr">- List of cards in the deck <strong>before</strong> player's action.</td></tr>
+<tr><td><var>Table</var></td><td class="argdescr">- List of cards held by all players <b>excluding dealer</b>* before
+current round (list of lists).</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd></dl>
+<pre class="listing">
+<span class="head"><span class="line-no"> 231</span>playAIDeck</span><span class="clause">( <span class="var">PlayerA</span>, <span class="var">ChDeck</span>, <span class="var">PlayerB</span>, <span class="list">[<span class="var">Dc</span>|<span class="var">NDeck</span>]</span>, <span class="var">Table</span>) <span class="neck">:-</span> <span class="comment">% do the AI magic
+</span></span></pre><dl class="comment">
+<dd class="defbody"></dd></dl>
+<pre class="listing">
+<span class="line-no"> 233</span>	</pre><dl class="comment">
+<dd class="defbody"></dd></dl>
+<pre class="listing">
+<span class="line-no"> 234</span>	</pre><dl class="comment">
+<dd class="defbody"></dd></dl>
+<pre class="listing">
+<span class="line-no"> 235</span>	<span class="comment">% figure out pobabilities after shuffling given number of times
+</span><span class="line-no"> 236</span>	<span class="goal-imported">initShuffles</span><span class="body">(<span class="var">Quantity</span>)<span class="control">,</span>
+<span class="line-no"> 237</span>	<span class="goal-imported">shuffleMode</span>(<span class="var">Type</span>)<span class="control">,</span>
+<span class="line-no"> 238</span>	<span class="goal-local">initDeckProbabilities</span>(<span class="var">Deck</span>, <span class="var">Quantity</span>, <span class="var">Type</span>)<span class="control">,</span>
+<span class="line-no"> 239</span>	<span class="comment">% count how many card have alredy been used and what is the next one
+</span><span class="line-no"> 240</span>	<span class="goal-local">cardsOnTable</span>(<span class="var">N</span>, <span class="var">Table</span>)<span class="control">,</span>
+<span class="line-no"> 241</span>	<span class="var">N1</span> <span class="goal-built_in">is</span> <span class="var">N</span> <span class="functor">+</span> <span class="int">1</span><span class="control">,</span>
+<span class="line-no"> 242</span>	<span class="goal-autoload">nth1</span>(<span class="var">N1</span>, <span class="var">Deck</span>, <span class="var">Card</span>)<span class="control">,</span>
+<span class="line-no"> 243</span>	<span class="goal-autoload">append</span>(<span class="var">PlayerB</span>, <span class="list">[<span class="var">Card</span>]</span>, <span class="var">TrialHand</span>)<span class="control">,</span>
+<span class="line-no"> 244</span>	<span class="goal-imported">scoreTop</span>(<span class="var">Top</span>, <span class="var">TrialHand</span>)<span class="control">,</span>
+<span class="line-no"> 245</span>	( <span class="var">Top</span> <span class="goal-built_in">=&lt;</span> <span class="int">21</span> <span class="control">-&gt;</span> (<span class="goal-autoload">append</span>(<span class="var">PlayerB</span>, <span class="list">[<span class="var">Dc</span>]</span>, <span class="var">PlayerA</span>)<span class="control">,</span> <span class="var">ChDeck</span> <span class="goal-built_in">=</span> <span class="var">NDeck</span>)
+<span class="line-no"> 246</span>	<span class="control">;</span> <span class="goal-autoload">otherwise</span> <span class="control">-&gt;</span> (<span class="var">PlayerB</span> <span class="goal-built_in">=</span> <span class="var">PlayerA</span><span class="control">,</span> <span class="goal-autoload">append</span>(<span class="list">[<span class="var">Dc</span>]</span>, <span class="var">NDeck</span>, <span class="var">ChDeck</span>)</span></pre><pre class="listing">
+<span class="line-no"> 246</span>)<span class="fullstop">
+</span><span class="line-no"> 247</span>	).</pre><dl class="comment">
+
+<dt class="pubdef"><span style="float:right"></span><a name="initDeckProbabilities/3"><b class="pred">initDeckProbabilities</b><var class="arglist">(-Deck, +Quantity, +Type)</var></a> is <b class="det">det</b></dt><dd class="defbody">Simulate card shuffle by preparing deck probability table for initial number
+of shuffles. The type of shuffle can be one of those defined by <code>shuffleMode</code>
+parameter in <code>deck</code> package. The binary vector (list of 0's and 1's) that
+decides probability of given card position in shuffle is estimated based on
+shuffle type.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>Deck</var></td><td class="argdescr">- A shuffled initial deck of cards (list of predicates <code>card</code>).</td></tr>
+<tr><td><var>Quantity</var></td><td class="argdescr">- Total umber of shuffles to do.</td></tr>
+<tr><td><var>Type</var></td><td class="argdescr">- <var>Type</var> of card shuffle to simulate.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd></dl>
+<pre class="listing">
+<span class="head"><span class="line-no"> 261</span>initDeckProbabilities</span><span class="clause">(<span class="var">Deck</span>, <span class="var">Quantity</span>, random) <span class="neck">:-</span>
+<span class="line-no"> 262</span>	<span class="goal-imported">deck</span><span class="body">(<span class="var">DeckL</span>)<span class="control">,</span> <span class="comment">% generate deck
+</span><span class="line-no"> 263</span>	<span class="goal-imported">initShuffles</span>(<span class="var">Quantity</span>)<span class="control">,</span>
+<span class="line-no"> 264</span>	<span class="comment">% generate x randm vectors 0/1 each corresponding to 1 shuffle
+</span><span class="line-no"> 265</span>	<span class="goal-imported">decks</span>(<span class="var">Dno</span>)<span class="control">,</span>
+<span class="line-no"> 266</span>	( <span class="var">Dno</span><span class="goal-built_in">=</span><span class="int">1</span>     <span class="control">-&gt;</span> <span class="var">Size</span> <span class="goal-built_in">is</span> <span class="int">27</span> <span class="functor">*</span> <span class="var">Quantity</span>
+<span class="line-no"> 267</span>	<span class="control">;</span> <span class="goal-autoload">otherwise</span> <span class="control">-&gt;</span> (<span class="var">Mp</span> <span class="goal-built_in">is</span> <span class="var">Dno</span><span class="functor">-</span><span class="int">1</span><span class="control">,</span> <span class="var">SizeA</span> <span class="goal-built_in">is</span> <span class="int">26</span><span class="functor">*</span><span class="var">Mp</span><span class="control">,</span> <span class="var">SizeB</span> <span class="goal-built_in">is</span> <span class="int">27</span><span class="functor">+</span><span class="var">SizeA</span><span class="control">,</span> <span class="var">Size</span> <span class="goal-built_in">is</span> <span class="var">SizeB</span><span class="functor">*</span><span class="var">Quantity</span>)
+<span class="line-no"> 268</span>	)<span class="control">,</span>
+<span class="line-no"> 269</span>	<span class="var">Sl</span> <span class="goal-imported">&lt;-</span> <span class="functor">sample</span>(<span class="int">0</span><span class="functor">:</span><span class="int">1</span>, <span class="var">Size</span>, replace<span class="functor">=</span><span class="int">1</span>)<span class="control">,</span>
+<span class="line-no"> 270</span>	<span class="goal-local">shuffleMock</span>(<span class="var">Deck</span>, <span class="var">DeckL</span>, <span class="var">Quantity</span>, <span class="var">Sl</span>)</span></span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 271</span>initDeckProbabilities</span><span class="clause">(<span class="var">Deck</span>, <span class="var">Quantity</span>, deterministic) <span class="neck">:-</span> <span class="comment">% first from the top pile is top/././.
+</span><span class="line-no"> 272</span>	<span class="goal-imported">deck</span><span class="body">(<span class="var">DeckL</span>)<span class="control">,</span> <span class="comment">% generate deck
+</span><span class="line-no"> 273</span>	<span class="goal-imported">initShuffles</span>(<span class="var">Quantity</span>)<span class="control">,</span>
+<span class="line-no"> 274</span>	<span class="goal-built_in">findall</span>(<span class="var">Shuffled</span>, <span class="goal-local">shuffleMock</span>(<span class="var">Shuffled</span>, <span class="var">DeckL</span>, <span class="var">Quantity</span>, <span class="empty_list">[]</span>), <span class="var">Y</span>)<span class="control">,</span>
+<span class="line-no"> 275</span>	<span class="goal-built_in">length</span>(<span class="var">Y</span>, <span class="var">Len</span>)<span class="control">,</span>
+<span class="line-no"> 276</span>	<span class="var">El</span> <span class="goal-imported">&lt;-</span> <span class="functor">sample</span>(<span class="int">1</span><span class="functor">:</span><span class="var">Len</span>, <span class="int">1</span>)<span class="control">,</span>
+<span class="line-no"> 277</span>	<span class="goal-autoload">nth1</span>(<span class="var">El</span>, <span class="var">Y</span>, <span class="var">Deck</span>)</span></span>.<span class="fullstop"> </span><span class="comment">% initial deck shuffle.
+</span></pre><dl class="comment">
+
+<dt class="pubdef"><span style="float:right"></span><a name="shuffleMock/4"><b class="pred">shuffleMock</b><var class="arglist">(-Shuffled, +Deck, +N, +Sampling)</var></a> is <b class="det">det</b></dt><dd class="defbody">Simulate card shuffle; the type of shuffle to simulate is taken from system
+settings: see <code>shuffleMode</code> parameter in <code>deck</code> package.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>Shuffled</var></td><td class="argdescr">- <var>Shuffled</var> deck of cards (list of predicates <code>card</code>).</td></tr>
+<tr><td><var>Deck</var></td><td class="argdescr">- A deck of cards to be shuffled (list of predicates <code>card</code>).</td></tr>
+<tr><td><var>N</var></td><td class="argdescr">- Shuffling counter - number of shuffles to do.</td></tr>
+<tr><td><var>Sampling</var></td><td class="argdescr">- A binary vector (list of 0's and 1's) that decides whether
+card from given pile (pile A) should be placed on top or
+bottom of the card from other pile (pile B).</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd></dl>
+<pre class="listing">
+<span class="head"><span class="line-no"> 291</span>shuffleMock</span><span class="clause">(<span class="var">Shf</span>, <span class="var">Shf</span>, <span class="int">0</span>, <span class="empty_list">[]</span>) <span class="neck">:-</span> <span class="body"><span class="goal-built_in">!</span></span></span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 292</span>shuffleMock</span><span class="clause">(<span class="var">Shuffled</span>, <span class="var">Deck</span>, <span class="var">N</span>, <span class="var">Sampling</span>) <span class="neck">:-</span>
+<span class="line-no"> 293</span>	<span class="goal-imported">shuffleMode</span><span class="body">(<span class="var">Mode</span>)<span class="control">,</span>
+<span class="line-no"> 294</span>	<span class="goal-autoload">proper_length</span>(<span class="var">Deck</span>, <span class="var">Len</span>)<span class="control">,</span>
+<span class="line-no"> 295</span>	<span class="var">Half</span> <span class="goal-built_in">is</span> <span class="var">Len</span> <span class="functor">/</span> <span class="int">2</span><span class="control">,</span>
+<span class="line-no"> 296</span>	<span class="goal-imported">getPiles</span>(<span class="var">A</span>, <span class="var">_</span>, <span class="var">Half</span>)<span class="control">,</span>
+<span class="line-no"> 297</span>	<span class="var">A1</span> <span class="goal-built_in">is</span> <span class="var">A</span> <span class="functor">+</span> <span class="int">1</span><span class="control">,</span>
+<span class="line-no"> 298</span>	<span class="goal-imported">split</span>(<span class="var">P1</span>, <span class="var">P2</span>, <span class="var">Deck</span>, <span class="var">A1</span>)<span class="control">,</span> <span class="comment">% get two piles
+</span><span class="line-no"> 299</span>	<span class="comment">% random or deterministic
+</span><span class="line-no"> 300</span>	( <span class="var">Mode</span> <span class="goal-built_in">=</span> random        <span class="control">-&gt;</span> <span class="goal-local">rifleRanMock</span>(<span class="var">Forward</span>, <span class="var">P1</span>, <span class="var">P2</span>, <span class="var">NSampling</span>, <span class="var">Sampling</span>)
+<span class="line-no"> 301</span>	<span class="control">;</span> <span class="var">Mode</span> <span class="goal-built_in">=</span> deterministic <span class="control">-&gt;</span> (<span class="goal-local">rifleDetMock</span>(<span class="var">Forward</span>, <span class="var">P1</span>, <span class="var">P2</span>)<span class="control">,</span> <span class="var">NSampling</span> <span class="goal-built_in">=</span> <span class="var">Sampling</span> )
+<span class="line-no"> 302</span>	)<span class="control">,</span>
+<span class="line-no"> 303</span>	<span class="var">N1</span> <span class="goal-built_in">is</span> <span class="var">N</span> <span class="functor">-</span> <span class="int">1</span><span class="control">,</span>
+<span class="line-no"> 304</span>	<span class="goal-recursion">shuffleMock</span>( <span class="var">Shuffled</span>, <span class="var">Forward</span>, <span class="var">N1</span>, <span class="var">NSampling</span> )</span></span>.<span class="fullstop">
+</span></pre><dl class="comment">
+
+<dt class="pubdef"><span style="float:right"></span><a name="rifleDetMock/3"><b class="pred">rifleDetMock</b><var class="arglist">(-Out, +A, +B)</var></a> is <b class="det">det</b></dt><dd class="defbody">Rifle-shuffle two piles of cards deterministically. The only random bit here
+is whether the shuffle starts with pile <var>A</var> or pile <var>B</var>.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>Out</var></td><td class="argdescr">- Merged deck (list of predicates <code>card</code>).</td></tr>
+<tr><td><var>A</var></td><td class="argdescr">- 1st part of deck to be merged (list of predicates <code>card</code>).</td></tr>
+<tr><td><var>B</var></td><td class="argdescr">- 2nd part of deck to be merged (list of predicates <code>card</code>).</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd></dl>
+<pre class="listing">
+<span class="head"><span class="line-no"> 315</span>rifleDetMock</span><span class="clause">(<span class="var">Out</span>, <span class="var">A</span>, <span class="var">B</span>) <span class="neck">:-</span></span></pre><dl class="comment">
+<dd class="defbody"></dd></dl>
+<pre class="listing">
+<span class="line-no"> 317</span>	( <span class="var">Rand</span><span class="body"> <span class="goal-built_in">=</span> <span class="int">0</span> <span class="control">;</span> <span class="var">Rand</span> <span class="goal-built_in">=</span> <span class="int">1</span> )<span class="control">,</span>
+<span class="line-no"> 318</span>	( <span class="var">Rand</span> <span class="goal-built_in">=</span> <span class="int">0</span> <span class="control">-&gt;</span> <span class="goal-local">rifleDetMock</span>(<span class="var">Out</span>, <span class="empty_list">[]</span>, <span class="var">A</span>, <span class="var">B</span>)
+<span class="line-no"> 319</span>	<span class="control">;</span> <span class="var">Rand</span> <span class="goal-built_in">=</span> <span class="int">1</span> <span class="control">-&gt;</span> <span class="goal-local">rifleDetMock</span>(<span class="var">Out</span>, <span class="empty_list">[]</span>, <span class="var">B</span>, <span class="var">A</span>)</span></pre><pre class="listing">
+<span class="fullstop"><span class="line-no"> 320</span>	</span>).
+<span class="comment"><span class="line-no"> 321</span>%
+</span><span id="rifleDetMock/4" class="head"><span class="line-no"> 322</span>rifleDetMock</span><span class="clause">(<span class="var">Out</span>, <span class="var">Em</span>, <span class="list">[<span class="var">A1</span>|<span class="var">A2</span>]</span>, <span class="list">[<span class="var">B1</span>|<span class="var">B2</span>]</span>) <span class="neck">:-</span>
+<span class="line-no"> 323</span>	<span class="goal-autoload">append</span><span class="body">(<span class="var">Em</span>, <span class="list">[<span class="var">A1</span>]</span>, <span class="var">O1</span>)<span class="control">,</span>
+<span class="line-no"> 324</span>	<span class="goal-autoload">append</span>(<span class="var">O1</span>, <span class="list">[<span class="var">B1</span>]</span>, <span class="var">O2</span>)<span class="control">,</span>
+<span class="line-no"> 325</span>	<span class="goal-recursion">rifleDetMock</span>(<span class="var">Out</span>, <span class="var">O2</span>, <span class="var">A2</span>, <span class="var">B2</span>)</span></span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 326</span>rifleDetMock</span><span class="clause">(<span class="var">Out</span>, <span class="var">Em</span>, <span class="empty_list">[]</span>, <span class="list">[<span class="var">B1</span>|<span class="var">B2</span>]</span>) <span class="neck">:-</span>
+<span class="line-no"> 327</span>	<span class="goal-autoload">append</span><span class="body">(<span class="var">Em</span>, <span class="list">[<span class="var">B1</span>]</span>, <span class="var">O</span>)<span class="control">,</span>
+<span class="line-no"> 328</span>	<span class="goal-recursion">rifleDetMock</span>(<span class="var">Out</span>, <span class="var">O</span>, <span class="empty_list">[]</span>, <span class="var">B2</span>)</span></span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 329</span>rifleDetMock</span><span class="clause">(<span class="var">Out</span>, <span class="var">Em</span>, <span class="list">[<span class="var">A1</span>|<span class="var">A2</span>]</span>, <span class="empty_list">[]</span>) <span class="neck">:-</span>
+<span class="line-no"> 330</span>	<span class="goal-autoload">append</span><span class="body">(<span class="var">Em</span>, <span class="list">[<span class="var">A1</span>]</span>, <span class="var">O</span>)<span class="control">,</span>
+<span class="line-no"> 331</span>	<span class="goal-recursion">rifleDetMock</span>(<span class="var">Out</span>, <span class="var">O</span>, <span class="var">A2</span>, <span class="empty_list">[]</span>)</span></span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 332</span>rifleDetMock</span><span class="clause">(<span class="var">Out</span>, <span class="var">Out</span>, <span class="empty_list">[]</span>, <span class="empty_list">[]</span>) <span class="neck">:-</span>
+<span class="line-no"> 333</span>	<span class="body"><span class="goal-built_in">!</span></span></span>.<span class="fullstop">
+</span></pre><dl class="comment">
+
+<dt class="pubdef"><span style="float:right"></span><a name="rifleRanMock/5"><b class="pred">rifleRanMock</b><var class="arglist">(-Out, +A, +B, -NSampling, +Sampling)</var></a> is <b class="det">det</b></dt><dd class="defbody">Rifle-shuffle two piles of cards with <b>random</b> card selection.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>Out</var></td><td class="argdescr">- Merged deck (list of predicates <code>card</code>).</td></tr>
+<tr><td><var>A</var></td><td class="argdescr">- 1st part of deck to be merged (list of predicates <code>card</code>).</td></tr>
+<tr><td><var>B</var></td><td class="argdescr">- 2nd part of deck to be merged (list of predicates <code>card</code>).</td></tr>
+<tr><td><var>NSampling</var></td><td class="argdescr">- See <var>Sampling</var> parameter; the leftovers needed for next
+round of shuffling.</td></tr>
+<tr><td><var>Sampling</var></td><td class="argdescr">- <var>A</var> binary vector (list of 0's and 1's) that decides whether
+card from given pile (pile <var>A</var>) should be placed on top or
+bottom of the card from other pile (pile <var>B</var>).</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd></dl>
+<pre class="listing">
+<span class="head"><span class="line-no"> 348</span>rifleRanMock</span><span class="clause">(<span class="var">Out</span>, <span class="var">A</span>, <span class="var">B</span>, <span class="var">NSampling</span>, <span class="list">[<span class="var">Rand</span>| <span class="var">Sampling</span>]</span>) <span class="neck">:-</span></span></pre><dl class="comment">
+<dd class="defbody"></dd></dl>
+<pre class="listing">
+<span class="line-no"> 350</span>	</pre><dl class="comment">
+<dd class="defbody"></dd></dl>
+<pre class="listing">
+<span class="line-no"> 351</span>	</pre><dl class="comment">
+<dd class="defbody"></dd></dl>
+<pre class="listing">
+<span class="line-no"> 352</span>	<span class="goal-local">rifleRanMock</span><span class="body">(<span class="var">Out</span>, <span class="empty_list">[]</span>, <span class="var">A</span>, <span class="var">B</span>, <span class="var">Rand</span>, <span class="var">NSampling</span>, <span class="var">Sampling</span>)</span></pre><pre class="listing">
+<span class="line-no"> 352</span>.<span class="fullstop">
+</span><span class="comment"><span class="line-no"> 353</span>%
+</span><span id="rifleRanMock/7" class="head"><span class="line-no"> 354</span>rifleRanMock</span><span class="clause">(<span class="var">Out</span>, <span class="var">Em</span>, <span class="list">[<span class="var">A1</span>|<span class="var">A2</span>]</span>, <span class="list">[<span class="var">B1</span>|<span class="var">B2</span>]</span>, <span class="int">0</span>, <span class="var">NSampling</span>, <span class="list">[<span class="var">Rand</span>| <span class="var">Sampling</span>]</span>) <span class="neck">:-</span>
+<span class="line-no"> 355</span>	<span class="goal-autoload">append</span><span class="body">(<span class="var">Em</span>, <span class="list">[<span class="var">A1</span>]</span>, <span class="var">O1</span>)<span class="control">,</span>
+<span class="line-no"> 356</span>	<span class="goal-autoload">append</span>(<span class="var">O1</span>, <span class="list">[<span class="var">B1</span>]</span>, <span class="var">O2</span>)<span class="control">,</span></span></span></pre><dl class="comment">
+<dd class="defbody"></dd></dl>
+<pre class="listing">
+<span class="line-no"> 358</span>	</pre><dl class="comment">
+<dd class="defbody"></dd></dl>
+<pre class="listing">
+<span class="line-no"> 359</span>	</pre><dl class="comment">
+<dd class="defbody"></dd></dl>
+<pre class="listing">
+<span class="line-no"> 360</span>	<span class="goal-recursion">rifleRanMock</span>(<span class="var">Out</span>, <span class="var">O2</span>, <span class="var">A2</span>, <span class="var">B2</span>, <span class="var">Rand</span>, <span class="var">NSampling</span>, <span class="var">Sampling</span>)</pre><pre class="listing">
+</pre><pre class="listing">
+<span class="line-no"> 360</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 361</span>rifleRanMock</span><span class="clause">(<span class="var">Out</span>, <span class="var">Em</span>, <span class="list">[<span class="var">A1</span>|<span class="var">A2</span>]</span>, <span class="list">[<span class="var">B1</span>|<span class="var">B2</span>]</span>, <span class="int">1</span>, <span class="var">NSampling</span>, <span class="list">[<span class="var">Rand</span>| <span class="var">Sampling</span>]</span>) <span class="neck">:-</span>
+<span class="line-no"> 362</span>	<span class="goal-autoload">append</span><span class="body">(<span class="var">Em</span>, <span class="list">[<span class="var">B1</span>]</span>, <span class="var">O1</span>)<span class="control">,</span>
+<span class="line-no"> 363</span>	<span class="goal-autoload">append</span>(<span class="var">O1</span>, <span class="list">[<span class="var">A1</span>]</span>, <span class="var">O2</span>)<span class="control">,</span></span></span></pre><dl class="comment">
+<dd class="defbody"></dd></dl>
+<pre class="listing">
+<span class="line-no"> 365</span>	</pre><dl class="comment">
+<dd class="defbody"></dd></dl>
+<pre class="listing">
+<span class="line-no"> 366</span>	</pre><dl class="comment">
+<dd class="defbody"></dd></dl>
+<pre class="listing">
+<span class="line-no"> 367</span>	<span class="goal-recursion">rifleRanMock</span>(<span class="var">Out</span>, <span class="var">O2</span>, <span class="var">A2</span>, <span class="var">B2</span>, <span class="var">Rand</span>, <span class="var">NSampling</span>, <span class="var">Sampling</span>)</pre><pre class="listing">
+</pre><pre class="listing">
+<span class="line-no"> 367</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 368</span>rifleRanMock</span><span class="clause">(<span class="var">Out</span>, <span class="var">Em</span>, <span class="empty_list">[]</span>, <span class="list">[<span class="var">B1</span>|<span class="var">B2</span>]</span>, <span class="var">Rand</span>, <span class="var">NSampling</span>, <span class="var">Sampling</span>) <span class="neck">:-</span>
+<span class="line-no"> 369</span>	<span class="goal-autoload">append</span><span class="body">(<span class="var">Em</span>, <span class="list">[<span class="var">B1</span>]</span>, <span class="var">O</span>)<span class="control">,</span>
+<span class="line-no"> 370</span>	<span class="goal-recursion">rifleRanMock</span>(<span class="var">Out</span>, <span class="var">O</span>, <span class="empty_list">[]</span>, <span class="var">B2</span>, <span class="var">Rand</span>, <span class="var">NSampling</span>, <span class="var">Sampling</span>)</span></span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 371</span>rifleRanMock</span><span class="clause">(<span class="var">Out</span>, <span class="var">Em</span>, <span class="list">[<span class="var">A1</span>|<span class="var">A2</span>]</span>, <span class="empty_list">[]</span>, <span class="var">Rand</span>, <span class="var">NSampling</span>, <span class="var">Sampling</span>) <span class="neck">:-</span>
+<span class="line-no"> 372</span>	<span class="goal-autoload">append</span><span class="body">(<span class="var">Em</span>, <span class="list">[<span class="var">A1</span>]</span>, <span class="var">O</span>)<span class="control">,</span>
+<span class="line-no"> 373</span>	<span class="goal-recursion">rifleRanMock</span>(<span class="var">Out</span>, <span class="var">O</span>, <span class="var">A2</span>, <span class="empty_list">[]</span>, <span class="var">Rand</span>, <span class="var">NSampling</span>, <span class="var">Sampling</span>)</span></span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 374</span>rifleRanMock</span><span class="clause">(<span class="var">Out</span>, <span class="var">Out</span>, <span class="empty_list">[]</span>, <span class="empty_list">[]</span>, <span class="var">_</span>, <span class="var">NSampling</span>, <span class="var">NSampling</span>) <span class="neck">:-</span>
+<span class="line-no"> 375</span>	<span class="body"><span class="goal-built_in">!</span></span></span>.<span class="fullstop">
+</span></pre><dl class="comment">
+
+<dt class="pubdef"><span style="float:right"></span><a name="playMix/6"><b class="pred">playMix</b><var class="arglist">(-PlayerA, -ChDeck, +PlayerB, +NDeck, +Dealer, +Table)</var></a> is <b class="det">det</b></dt><dd class="defbody">3rd strategy <code>playMix</code>: 0.5 chance of playing <b>deterministic</b> strategy (1st) and
+0.5 chance of playing <b>deck memory</b> strategy (2nd).
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>PlayerA</var></td><td class="argdescr">- Player's hand <strong>after</strong> player's action.</td></tr>
+<tr><td><var>ChDeck</var></td><td class="argdescr">- List of cards in the deck <strong>after</strong> player's action.</td></tr>
+<tr><td><var>PlayerB</var></td><td class="argdescr">- Player's hand <strong>before</strong> player's action.</td></tr>
+<tr><td><var>NDeck</var></td><td class="argdescr">- List of cards in the deck <strong>before</strong> player's action.</td></tr>
+<tr><td><var>Dealer</var></td><td class="argdescr">- <var>Dealer</var>'s cards: a list of <code>card</code> predicates.</td></tr>
+<tr><td><var>Table</var></td><td class="argdescr">- List of cards held by all players <b>excluding dealer</b>* before
+current round (list of lists).</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd></dl>
+<pre class="listing">
+<span class="head"><span class="line-no"> 390</span>playMix</span><span class="clause">( <span class="var">PlayerA</span>, <span class="var">ChDeck</span>, <span class="var">PlayerB</span>, <span class="var">NDeck</span>, <span class="var">Dealer</span>, <span class="var">Table</span> ) <span class="neck">:-</span>
+<span class="line-no"> 391</span>	<span class="goal-local">playAIDet</span><span class="body">( <span class="var">PlayerAa</span>, <span class="var">ChDeckA</span>, <span class="var">PlayerB</span>, <span class="var">NDeck</span>, <span class="var">Dealer</span> )<span class="control">,</span>
+<span class="line-no"> 392</span>	<span class="goal-local">playAIDeck</span>( <span class="var">PlayerAb</span>, <span class="var">ChDeckB</span>, <span class="var">PlayerB</span>, <span class="var">NDeck</span>, <span class="var">Table</span>)<span class="control">,</span>
+<span class="line-no"> 393</span>	<span class="goal-autoload">random</span>(<span class="int">0</span>, <span class="int">2</span>, <span class="var">Rand</span>)<span class="control">,</span>
+<span class="line-no"> 394</span>	( (<span class="var">PlayerAa</span><span class="goal-built_in">=</span><span class="var">PlayerAb</span><span class="control">,</span> <span class="var">ChDeckA</span><span class="goal-built_in">=</span><span class="var">ChDeckB</span>) <span class="control">-&gt;</span> (<span class="var">PlayerA</span><span class="goal-built_in">=</span><span class="var">PlayerAa</span><span class="control">,</span> <span class="var">ChDeck</span><span class="goal-built_in">=</span><span class="var">ChDeckA</span>)
+<span class="line-no"> 395</span>	<span class="control">;</span> <span class="var">Rand</span><span class="goal-built_in">=</span><span class="int">0</span>                               <span class="control">-&gt;</span> (<span class="var">PlayerA</span><span class="goal-built_in">=</span><span class="var">PlayerAa</span><span class="control">,</span> <span class="var">ChDeck</span><span class="goal-built_in">=</span><span class="var">ChDeckA</span>)
+<span class="line-no"> 396</span>	<span class="control">;</span> <span class="var">Rand</span><span class="goal-built_in">=</span><span class="int">1</span>                               <span class="control">-&gt;</span> (<span class="var">PlayerA</span><span class="goal-built_in">=</span><span class="var">PlayerAb</span><span class="control">,</span> <span class="var">ChDeck</span><span class="goal-built_in">=</span><span class="var">ChDeckB</span></span></span>)<span class="fullstop">
+</span><span class="line-no"> 397</span>	).</pre><dl class="comment">
+
+<dt class="pubdef"><span style="float:right"></span><a name="hardAction/3"><b class="pred">hardAction</b><var class="arglist">(-Action, +DealerCard, +PlayersScore)</var></a> is <b class="det">det</b></dt>
+<dt class="pubdef"><b class="pred">hardAction</b><var class="arglist">(+Action, +DealerCard, +PlayersScore)</var> is <b class="det">det</b></dt><dd class="defbody">A lookup table for <b>hard totals</b> strategy. For pairs the <strong>split</strong> action is
+disregarded.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>Action</var></td><td class="argdescr">- An action to be taken according to strategy, dealer's
+hand and player's score.</td></tr>
+<tr><td><var>DealerCard</var></td><td class="argdescr">- The value of dealer's card facing up.</td></tr>
+<tr><td><var>PlayersScore</var></td><td class="argdescr">- The player's score.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd></dl>
+<pre class="listing">
+<span class="head"><span class="line-no"> 410</span>hardAction</span><span class="clause">(hit, <span class="int">2</span>,  <span class="int">4</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 411</span>hardAction</span><span class="clause">(hit, <span class="int">2</span>,  <span class="int">5</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 412</span>hardAction</span><span class="clause">(hit, <span class="int">2</span>,  <span class="int">6</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 413</span>hardAction</span><span class="clause">(hit, <span class="int">2</span>,  <span class="int">7</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 414</span>hardAction</span><span class="clause">(hit, <span class="int">2</span>,  <span class="int">8</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 415</span>hardAction</span><span class="clause">(hit, <span class="int">2</span>,  <span class="int">9</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 416</span>hardAction</span><span class="clause">(hit, <span class="int">2</span>, <span class="int">10</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 417</span>hardAction</span><span class="clause">(hit, <span class="int">2</span>, <span class="int">11</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 418</span>hardAction</span><span class="clause">(hit, <span class="int">2</span>, <span class="int">12</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 419</span>hardAction</span><span class="clause">(stand, <span class="int">2</span>, <span class="int">13</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 420</span>hardAction</span><span class="clause">(stand, <span class="int">2</span>, <span class="int">14</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 421</span>hardAction</span><span class="clause">(stand, <span class="int">2</span>, <span class="int">15</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 422</span>hardAction</span><span class="clause">(stand, <span class="int">2</span>, <span class="int">16</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 423</span>hardAction</span><span class="clause">(stand, <span class="int">2</span>, <span class="int">17</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 424</span>hardAction</span><span class="clause">(stand, <span class="int">2</span>, <span class="int">18</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 425</span>hardAction</span><span class="clause">(stand, <span class="int">2</span>, <span class="int">19</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 426</span>hardAction</span><span class="clause">(stand, <span class="int">2</span>, <span class="int">20</span>)</span>.<span class="fullstop">
+</span><span class="comment"><span class="line-no"> 427</span>%
+</span><span class="head"><span class="line-no"> 428</span>hardAction</span><span class="clause">(hit, <span class="int">3</span>,  <span class="int">4</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 429</span>hardAction</span><span class="clause">(hit, <span class="int">3</span>,  <span class="int">5</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 430</span>hardAction</span><span class="clause">(hit, <span class="int">3</span>,  <span class="int">6</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 431</span>hardAction</span><span class="clause">(hit, <span class="int">3</span>,  <span class="int">7</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 432</span>hardAction</span><span class="clause">(hit, <span class="int">3</span>,  <span class="int">8</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 433</span>hardAction</span><span class="clause">(hit, <span class="int">3</span>,  <span class="int">9</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 434</span>hardAction</span><span class="clause">(hit, <span class="int">3</span>, <span class="int">10</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 435</span>hardAction</span><span class="clause">(hit, <span class="int">3</span>, <span class="int">11</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 436</span>hardAction</span><span class="clause">(hit, <span class="int">3</span>, <span class="int">12</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 437</span>hardAction</span><span class="clause">(stand, <span class="int">3</span>, <span class="int">13</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 438</span>hardAction</span><span class="clause">(stand, <span class="int">3</span>, <span class="int">14</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 439</span>hardAction</span><span class="clause">(stand, <span class="int">3</span>, <span class="int">15</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 440</span>hardAction</span><span class="clause">(stand, <span class="int">3</span>, <span class="int">16</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 441</span>hardAction</span><span class="clause">(stand, <span class="int">3</span>, <span class="int">17</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 442</span>hardAction</span><span class="clause">(stand, <span class="int">3</span>, <span class="int">18</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 443</span>hardAction</span><span class="clause">(stand, <span class="int">3</span>, <span class="int">19</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 444</span>hardAction</span><span class="clause">(stand, <span class="int">3</span>, <span class="int">20</span>)</span>.<span class="fullstop">
+</span><span class="comment"><span class="line-no"> 445</span>%
+</span><span class="head"><span class="line-no"> 446</span>hardAction</span><span class="clause">(hit, <span class="int">4</span>,  <span class="int">4</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 447</span>hardAction</span><span class="clause">(hit, <span class="int">4</span>,  <span class="int">5</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 448</span>hardAction</span><span class="clause">(hit, <span class="int">4</span>,  <span class="int">6</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 449</span>hardAction</span><span class="clause">(hit, <span class="int">4</span>,  <span class="int">7</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 450</span>hardAction</span><span class="clause">(hit, <span class="int">4</span>,  <span class="int">8</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 451</span>hardAction</span><span class="clause">(hit, <span class="int">4</span>,  <span class="int">9</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 452</span>hardAction</span><span class="clause">(hit, <span class="int">4</span>, <span class="int">10</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 453</span>hardAction</span><span class="clause">(hit, <span class="int">4</span>, <span class="int">11</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 454</span>hardAction</span><span class="clause">(stand, <span class="int">4</span>, <span class="int">12</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 455</span>hardAction</span><span class="clause">(stand, <span class="int">4</span>, <span class="int">13</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 456</span>hardAction</span><span class="clause">(stand, <span class="int">4</span>, <span class="int">14</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 457</span>hardAction</span><span class="clause">(stand, <span class="int">4</span>, <span class="int">15</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 458</span>hardAction</span><span class="clause">(stand, <span class="int">4</span>, <span class="int">16</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 459</span>hardAction</span><span class="clause">(stand, <span class="int">4</span>, <span class="int">17</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 460</span>hardAction</span><span class="clause">(stand, <span class="int">4</span>, <span class="int">18</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 461</span>hardAction</span><span class="clause">(stand, <span class="int">4</span>, <span class="int">19</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 462</span>hardAction</span><span class="clause">(stand, <span class="int">4</span>, <span class="int">20</span>)</span>.<span class="fullstop">
+</span><span class="comment"><span class="line-no"> 463</span>%
+</span><span class="head"><span class="line-no"> 464</span>hardAction</span><span class="clause">(hit, <span class="int">5</span>,  <span class="int">4</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 465</span>hardAction</span><span class="clause">(hit, <span class="int">5</span>,  <span class="int">5</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 466</span>hardAction</span><span class="clause">(hit, <span class="int">5</span>,  <span class="int">6</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 467</span>hardAction</span><span class="clause">(hit, <span class="int">5</span>,  <span class="int">7</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 468</span>hardAction</span><span class="clause">(hit, <span class="int">5</span>,  <span class="int">8</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 469</span>hardAction</span><span class="clause">(hit, <span class="int">5</span>,  <span class="int">9</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 470</span>hardAction</span><span class="clause">(hit, <span class="int">5</span>, <span class="int">10</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 471</span>hardAction</span><span class="clause">(hit, <span class="int">5</span>, <span class="int">11</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 472</span>hardAction</span><span class="clause">(stand, <span class="int">5</span>, <span class="int">12</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 473</span>hardAction</span><span class="clause">(stand, <span class="int">5</span>, <span class="int">13</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 474</span>hardAction</span><span class="clause">(stand, <span class="int">5</span>, <span class="int">14</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 475</span>hardAction</span><span class="clause">(stand, <span class="int">5</span>, <span class="int">15</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 476</span>hardAction</span><span class="clause">(stand, <span class="int">5</span>, <span class="int">16</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 477</span>hardAction</span><span class="clause">(stand, <span class="int">5</span>, <span class="int">17</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 478</span>hardAction</span><span class="clause">(stand, <span class="int">5</span>, <span class="int">18</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 479</span>hardAction</span><span class="clause">(stand, <span class="int">5</span>, <span class="int">19</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 480</span>hardAction</span><span class="clause">(stand, <span class="int">5</span>, <span class="int">20</span>)</span>.<span class="fullstop">
+</span><span class="comment"><span class="line-no"> 481</span>%
+</span><span class="head"><span class="line-no"> 482</span>hardAction</span><span class="clause">(hit, <span class="int">6</span>,  <span class="int">4</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 483</span>hardAction</span><span class="clause">(hit, <span class="int">6</span>,  <span class="int">5</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 484</span>hardAction</span><span class="clause">(hit, <span class="int">6</span>,  <span class="int">6</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 485</span>hardAction</span><span class="clause">(hit, <span class="int">6</span>,  <span class="int">7</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 486</span>hardAction</span><span class="clause">(hit, <span class="int">6</span>,  <span class="int">8</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 487</span>hardAction</span><span class="clause">(hit, <span class="int">6</span>,  <span class="int">9</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 488</span>hardAction</span><span class="clause">(hit, <span class="int">6</span>, <span class="int">10</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 489</span>hardAction</span><span class="clause">(hit, <span class="int">6</span>, <span class="int">11</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 490</span>hardAction</span><span class="clause">(stand, <span class="int">6</span>, <span class="int">12</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 491</span>hardAction</span><span class="clause">(stand, <span class="int">6</span>, <span class="int">13</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 492</span>hardAction</span><span class="clause">(stand, <span class="int">6</span>, <span class="int">14</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 493</span>hardAction</span><span class="clause">(stand, <span class="int">6</span>, <span class="int">15</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 494</span>hardAction</span><span class="clause">(stand, <span class="int">6</span>, <span class="int">16</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 495</span>hardAction</span><span class="clause">(stand, <span class="int">6</span>, <span class="int">17</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 496</span>hardAction</span><span class="clause">(stand, <span class="int">6</span>, <span class="int">18</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 497</span>hardAction</span><span class="clause">(stand, <span class="int">6</span>, <span class="int">19</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 498</span>hardAction</span><span class="clause">(stand, <span class="int">6</span>, <span class="int">20</span>)</span>.<span class="fullstop">
+</span><span class="comment"><span class="line-no"> 499</span>%
+</span><span class="head"><span class="line-no"> 500</span>hardAction</span><span class="clause">(hit, <span class="int">7</span>,  <span class="int">4</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 501</span>hardAction</span><span class="clause">(hit, <span class="int">7</span>,  <span class="int">5</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 502</span>hardAction</span><span class="clause">(hit, <span class="int">7</span>,  <span class="int">6</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 503</span>hardAction</span><span class="clause">(hit, <span class="int">7</span>,  <span class="int">7</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 504</span>hardAction</span><span class="clause">(hit, <span class="int">7</span>,  <span class="int">8</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 505</span>hardAction</span><span class="clause">(hit, <span class="int">7</span>,  <span class="int">9</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 506</span>hardAction</span><span class="clause">(hit, <span class="int">7</span>, <span class="int">10</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 507</span>hardAction</span><span class="clause">(hit, <span class="int">7</span>, <span class="int">11</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 508</span>hardAction</span><span class="clause">(hit, <span class="int">7</span>, <span class="int">12</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 509</span>hardAction</span><span class="clause">(hit, <span class="int">7</span>, <span class="int">13</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 510</span>hardAction</span><span class="clause">(hit, <span class="int">7</span>, <span class="int">14</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 511</span>hardAction</span><span class="clause">(hit, <span class="int">7</span>, <span class="int">15</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 512</span>hardAction</span><span class="clause">(hit, <span class="int">7</span>, <span class="int">16</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 513</span>hardAction</span><span class="clause">(stand, <span class="int">7</span>, <span class="int">17</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 514</span>hardAction</span><span class="clause">(stand, <span class="int">7</span>, <span class="int">18</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 515</span>hardAction</span><span class="clause">(stand, <span class="int">7</span>, <span class="int">19</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 516</span>hardAction</span><span class="clause">(stand, <span class="int">7</span>, <span class="int">20</span>)</span>.<span class="fullstop">
+</span><span class="comment"><span class="line-no"> 517</span>%
+</span><span class="head"><span class="line-no"> 518</span>hardAction</span><span class="clause">(hit, <span class="int">8</span>,  <span class="int">4</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 519</span>hardAction</span><span class="clause">(hit, <span class="int">8</span>,  <span class="int">5</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 520</span>hardAction</span><span class="clause">(hit, <span class="int">8</span>,  <span class="int">6</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 521</span>hardAction</span><span class="clause">(hit, <span class="int">8</span>,  <span class="int">7</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 522</span>hardAction</span><span class="clause">(hit, <span class="int">8</span>,  <span class="int">8</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 523</span>hardAction</span><span class="clause">(hit, <span class="int">8</span>,  <span class="int">9</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 524</span>hardAction</span><span class="clause">(hit, <span class="int">8</span>, <span class="int">10</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 525</span>hardAction</span><span class="clause">(hit, <span class="int">8</span>, <span class="int">11</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 526</span>hardAction</span><span class="clause">(hit, <span class="int">8</span>, <span class="int">12</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 527</span>hardAction</span><span class="clause">(hit, <span class="int">8</span>, <span class="int">13</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 528</span>hardAction</span><span class="clause">(hit, <span class="int">8</span>, <span class="int">14</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 529</span>hardAction</span><span class="clause">(hit, <span class="int">8</span>, <span class="int">15</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 530</span>hardAction</span><span class="clause">(hit, <span class="int">8</span>, <span class="int">16</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 531</span>hardAction</span><span class="clause">(stand, <span class="int">8</span>, <span class="int">17</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 532</span>hardAction</span><span class="clause">(stand, <span class="int">8</span>, <span class="int">18</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 533</span>hardAction</span><span class="clause">(stand, <span class="int">8</span>, <span class="int">19</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 534</span>hardAction</span><span class="clause">(stand, <span class="int">8</span>, <span class="int">20</span>)</span>.<span class="fullstop">
+</span><span class="comment"><span class="line-no"> 535</span>%
+</span><span class="head"><span class="line-no"> 536</span>hardAction</span><span class="clause">(hit, <span class="int">9</span>,  <span class="int">4</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 537</span>hardAction</span><span class="clause">(hit, <span class="int">9</span>,  <span class="int">5</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 538</span>hardAction</span><span class="clause">(hit, <span class="int">9</span>,  <span class="int">6</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 539</span>hardAction</span><span class="clause">(hit, <span class="int">9</span>,  <span class="int">7</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 540</span>hardAction</span><span class="clause">(hit, <span class="int">9</span>,  <span class="int">8</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 541</span>hardAction</span><span class="clause">(hit, <span class="int">9</span>,  <span class="int">9</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 542</span>hardAction</span><span class="clause">(hit, <span class="int">9</span>, <span class="int">10</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 543</span>hardAction</span><span class="clause">(hit, <span class="int">9</span>, <span class="int">11</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 544</span>hardAction</span><span class="clause">(hit, <span class="int">9</span>, <span class="int">12</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 545</span>hardAction</span><span class="clause">(hit, <span class="int">9</span>, <span class="int">13</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 546</span>hardAction</span><span class="clause">(hit, <span class="int">9</span>, <span class="int">14</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 547</span>hardAction</span><span class="clause">(hit, <span class="int">9</span>, <span class="int">15</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 548</span>hardAction</span><span class="clause">(hit, <span class="int">9</span>, <span class="int">16</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 549</span>hardAction</span><span class="clause">(stand, <span class="int">9</span>, <span class="int">17</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 550</span>hardAction</span><span class="clause">(stand, <span class="int">9</span>, <span class="int">18</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 551</span>hardAction</span><span class="clause">(stand, <span class="int">9</span>, <span class="int">19</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 552</span>hardAction</span><span class="clause">(stand, <span class="int">9</span>, <span class="int">20</span>)</span>.<span class="fullstop">
+</span><span class="comment"><span class="line-no"> 553</span>%
+</span><span class="head"><span class="line-no"> 554</span>hardAction</span><span class="clause">(hit, <span class="int">10</span>,  <span class="int">4</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 555</span>hardAction</span><span class="clause">(hit, <span class="int">10</span>,  <span class="int">5</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 556</span>hardAction</span><span class="clause">(hit, <span class="int">10</span>,  <span class="int">6</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 557</span>hardAction</span><span class="clause">(hit, <span class="int">10</span>,  <span class="int">7</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 558</span>hardAction</span><span class="clause">(hit, <span class="int">10</span>,  <span class="int">8</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 559</span>hardAction</span><span class="clause">(hit, <span class="int">10</span>,  <span class="int">9</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 560</span>hardAction</span><span class="clause">(hit, <span class="int">10</span>, <span class="int">10</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 561</span>hardAction</span><span class="clause">(hit, <span class="int">10</span>, <span class="int">11</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 562</span>hardAction</span><span class="clause">(hit, <span class="int">10</span>, <span class="int">12</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 563</span>hardAction</span><span class="clause">(hit, <span class="int">10</span>, <span class="int">13</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 564</span>hardAction</span><span class="clause">(hit, <span class="int">10</span>, <span class="int">14</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 565</span>hardAction</span><span class="clause">(hit, <span class="int">10</span>, <span class="int">15</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 566</span>hardAction</span><span class="clause">(hit, <span class="int">10</span>, <span class="int">16</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 567</span>hardAction</span><span class="clause">(stand, <span class="int">10</span>, <span class="int">17</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 568</span>hardAction</span><span class="clause">(stand, <span class="int">10</span>, <span class="int">18</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 569</span>hardAction</span><span class="clause">(stand, <span class="int">10</span>, <span class="int">19</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 570</span>hardAction</span><span class="clause">(stand, <span class="int">10</span>, <span class="int">20</span>)</span>.<span class="fullstop">
+</span><span class="comment"><span class="line-no"> 571</span>%
+</span><span class="head"><span class="line-no"> 572</span>hardAction</span><span class="clause">(hit, ace,  <span class="int">4</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 573</span>hardAction</span><span class="clause">(hit, ace,  <span class="int">5</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 574</span>hardAction</span><span class="clause">(hit, ace,  <span class="int">6</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 575</span>hardAction</span><span class="clause">(hit, ace,  <span class="int">7</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 576</span>hardAction</span><span class="clause">(hit, ace,  <span class="int">8</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 577</span>hardAction</span><span class="clause">(hit, ace,  <span class="int">9</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 578</span>hardAction</span><span class="clause">(hit, ace, <span class="int">10</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 579</span>hardAction</span><span class="clause">(hit, ace, <span class="int">11</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 580</span>hardAction</span><span class="clause">(hit, ace, <span class="int">12</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 581</span>hardAction</span><span class="clause">(hit, ace, <span class="int">13</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 582</span>hardAction</span><span class="clause">(hit, ace, <span class="int">14</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 583</span>hardAction</span><span class="clause">(hit, ace, <span class="int">15</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 584</span>hardAction</span><span class="clause">(hit, ace, <span class="int">16</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 585</span>hardAction</span><span class="clause">(stand, ace, <span class="int">17</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 586</span>hardAction</span><span class="clause">(stand, ace, <span class="int">18</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 587</span>hardAction</span><span class="clause">(stand, ace, <span class="int">19</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 588</span>hardAction</span><span class="clause">(stand, ace, <span class="int">20</span>)</span>.<span class="fullstop">
+</span></pre><dl class="comment">
+
+<dt class="pubdef"><span style="float:right"></span><a name="softAction/3"><b class="pred">softAction</b><var class="arglist">(-Action, +DealerCard, +PlayersScore)</var></a> is <b class="det">det</b></dt>
+<dt class="pubdef"><b class="pred">softAction</b><var class="arglist">(+Action, +DealerCard, +PlayersScore)</var> is <b class="det">det</b></dt><dd class="defbody">A lookup table for <b>soft totals</b> strategy. For pairs the <strong>split</strong> action is
+disregarded.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>Action</var></td><td class="argdescr">- An action to be taken according to strategy, dealer's
+hand and player's score.</td></tr>
+<tr><td><var>DealerCard</var></td><td class="argdescr">- The value of dealer's card facing up.</td></tr>
+<tr><td><var>PlayersScore</var></td><td class="argdescr">- The player's score.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd></dl>
+<pre class="listing">
+<span class="head"><span class="line-no"> 601</span>softAction</span><span class="clause">(hit,   <span class="int">2</span>, <span class="int">2</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 602</span>softAction</span><span class="clause">(hit,   <span class="int">2</span>, <span class="int">3</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 603</span>softAction</span><span class="clause">(hit,   <span class="int">2</span>, <span class="int">4</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 604</span>softAction</span><span class="clause">(hit,   <span class="int">2</span>, <span class="int">5</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 605</span>softAction</span><span class="clause">(hit,   <span class="int">2</span>, <span class="int">6</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 606</span>softAction</span><span class="clause">(stand, <span class="int">2</span>, <span class="int">7</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 607</span>softAction</span><span class="clause">(stand, <span class="int">2</span>, <span class="int">8</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 608</span>softAction</span><span class="clause">(stand, <span class="int">2</span>, <span class="int">9</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 609</span>softAction</span><span class="clause">(hit, <span class="int">2</span>, <span class="int">11</span>)</span>.<span class="fullstop">%</span><span class="comment">ace
+<span class="line-no"> 610</span>%
+</span><span class="head"><span class="line-no"> 611</span>softAction</span><span class="clause">(hit,   <span class="int">3</span>, <span class="int">2</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 612</span>softAction</span><span class="clause">(hit,   <span class="int">3</span>, <span class="int">3</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 613</span>softAction</span><span class="clause">(hit,   <span class="int">3</span>, <span class="int">4</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 614</span>softAction</span><span class="clause">(hit,   <span class="int">3</span>, <span class="int">5</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 615</span>softAction</span><span class="clause">(hit,   <span class="int">3</span>, <span class="int">6</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 616</span>softAction</span><span class="clause">(stand, <span class="int">3</span>, <span class="int">7</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 617</span>softAction</span><span class="clause">(stand, <span class="int">3</span>, <span class="int">8</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 618</span>softAction</span><span class="clause">(stand, <span class="int">3</span>, <span class="int">9</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 619</span>softAction</span><span class="clause">(hit, <span class="int">3</span>, <span class="int">11</span>)</span>.<span class="fullstop">%</span><span class="comment">ace
+<span class="line-no"> 620</span>%
+</span><span class="head"><span class="line-no"> 621</span>softAction</span><span class="clause">(hit,   <span class="int">4</span>, <span class="int">2</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 622</span>softAction</span><span class="clause">(hit,   <span class="int">4</span>, <span class="int">3</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 623</span>softAction</span><span class="clause">(hit,   <span class="int">4</span>, <span class="int">4</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 624</span>softAction</span><span class="clause">(hit,   <span class="int">4</span>, <span class="int">5</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 625</span>softAction</span><span class="clause">(hit,   <span class="int">4</span>, <span class="int">6</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 626</span>softAction</span><span class="clause">(stand, <span class="int">4</span>, <span class="int">7</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 627</span>softAction</span><span class="clause">(stand, <span class="int">4</span>, <span class="int">8</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 628</span>softAction</span><span class="clause">(stand, <span class="int">4</span>, <span class="int">9</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 629</span>softAction</span><span class="clause">(hit, <span class="int">4</span>, <span class="int">11</span>)</span>.<span class="fullstop">%</span><span class="comment">ace
+<span class="line-no"> 630</span>%
+</span><span class="head"><span class="line-no"> 631</span>softAction</span><span class="clause">(hit,   <span class="int">5</span>, <span class="int">2</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 632</span>softAction</span><span class="clause">(hit,   <span class="int">5</span>, <span class="int">3</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 633</span>softAction</span><span class="clause">(hit,   <span class="int">5</span>, <span class="int">4</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 634</span>softAction</span><span class="clause">(hit,   <span class="int">5</span>, <span class="int">5</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 635</span>softAction</span><span class="clause">(hit,   <span class="int">5</span>, <span class="int">6</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 636</span>softAction</span><span class="clause">(stand, <span class="int">5</span>, <span class="int">7</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 637</span>softAction</span><span class="clause">(stand, <span class="int">5</span>, <span class="int">8</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 638</span>softAction</span><span class="clause">(stand, <span class="int">5</span>, <span class="int">9</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 639</span>softAction</span><span class="clause">(hit, <span class="int">5</span>, <span class="int">11</span>)</span>.<span class="fullstop">%</span><span class="comment">ace
+<span class="line-no"> 640</span>%
+</span><span class="head"><span class="line-no"> 641</span>softAction</span><span class="clause">(hit,   <span class="int">6</span>, <span class="int">2</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 642</span>softAction</span><span class="clause">(hit,   <span class="int">6</span>, <span class="int">3</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 643</span>softAction</span><span class="clause">(hit,   <span class="int">6</span>, <span class="int">4</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 644</span>softAction</span><span class="clause">(hit,   <span class="int">6</span>, <span class="int">5</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 645</span>softAction</span><span class="clause">(hit,   <span class="int">6</span>, <span class="int">6</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 646</span>softAction</span><span class="clause">(stand, <span class="int">6</span>, <span class="int">7</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 647</span>softAction</span><span class="clause">(stand, <span class="int">6</span>, <span class="int">8</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 648</span>softAction</span><span class="clause">(stand, <span class="int">6</span>, <span class="int">9</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 649</span>softAction</span><span class="clause">(hit, <span class="int">6</span>, <span class="int">11</span>)</span>.<span class="fullstop">%</span><span class="comment">ace
+<span class="line-no"> 650</span>%
+</span><span class="head"><span class="line-no"> 651</span>softAction</span><span class="clause">(hit,   <span class="int">7</span>, <span class="int">2</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 652</span>softAction</span><span class="clause">(hit,   <span class="int">7</span>, <span class="int">3</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 653</span>softAction</span><span class="clause">(hit,   <span class="int">7</span>, <span class="int">4</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 654</span>softAction</span><span class="clause">(hit,   <span class="int">7</span>, <span class="int">5</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 655</span>softAction</span><span class="clause">(hit,   <span class="int">7</span>, <span class="int">6</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 656</span>softAction</span><span class="clause">(stand, <span class="int">7</span>, <span class="int">7</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 657</span>softAction</span><span class="clause">(stand, <span class="int">7</span>, <span class="int">8</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 658</span>softAction</span><span class="clause">(stand, <span class="int">7</span>, <span class="int">9</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 659</span>softAction</span><span class="clause">(hit, <span class="int">7</span>, <span class="int">11</span>)</span>.<span class="fullstop">%</span><span class="comment">ace
+<span class="line-no"> 660</span>%
+</span><span class="head"><span class="line-no"> 661</span>softAction</span><span class="clause">(hit,   <span class="int">8</span>, <span class="int">2</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 662</span>softAction</span><span class="clause">(hit,   <span class="int">8</span>, <span class="int">3</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 663</span>softAction</span><span class="clause">(hit,   <span class="int">8</span>, <span class="int">4</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 664</span>softAction</span><span class="clause">(hit,   <span class="int">8</span>, <span class="int">5</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 665</span>softAction</span><span class="clause">(hit,   <span class="int">8</span>, <span class="int">6</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 666</span>softAction</span><span class="clause">(stand, <span class="int">8</span>, <span class="int">7</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 667</span>softAction</span><span class="clause">(stand, <span class="int">8</span>, <span class="int">8</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 668</span>softAction</span><span class="clause">(stand, <span class="int">8</span>, <span class="int">9</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 669</span>softAction</span><span class="clause">(hit, <span class="int">8</span>, <span class="int">11</span>)</span>.<span class="fullstop">%</span><span class="comment">ace
+<span class="line-no"> 670</span>%
+</span><span class="head"><span class="line-no"> 671</span>softAction</span><span class="clause">(hit,   <span class="int">9</span>, <span class="int">2</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 672</span>softAction</span><span class="clause">(hit,   <span class="int">9</span>, <span class="int">3</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 673</span>softAction</span><span class="clause">(hit,   <span class="int">9</span>, <span class="int">4</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 674</span>softAction</span><span class="clause">(hit,   <span class="int">9</span>, <span class="int">5</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 675</span>softAction</span><span class="clause">(hit,   <span class="int">9</span>, <span class="int">6</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 676</span>softAction</span><span class="clause">(hit,   <span class="int">9</span>, <span class="int">7</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 677</span>softAction</span><span class="clause">(stand, <span class="int">9</span>, <span class="int">8</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 678</span>softAction</span><span class="clause">(stand, <span class="int">9</span>, <span class="int">9</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 679</span>softAction</span><span class="clause">(hit, <span class="int">9</span>, <span class="int">11</span>)</span>.<span class="fullstop">%</span><span class="comment">ace
+<span class="line-no"> 680</span>%
+</span><span class="head"><span class="line-no"> 681</span>softAction</span><span class="clause">(hit,   <span class="int">10</span>, <span class="int">2</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 682</span>softAction</span><span class="clause">(hit,   <span class="int">10</span>, <span class="int">3</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 683</span>softAction</span><span class="clause">(hit,   <span class="int">10</span>, <span class="int">4</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 684</span>softAction</span><span class="clause">(hit,   <span class="int">10</span>, <span class="int">5</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 685</span>softAction</span><span class="clause">(hit,   <span class="int">10</span>, <span class="int">6</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 686</span>softAction</span><span class="clause">(hit,   <span class="int">10</span>, <span class="int">7</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 687</span>softAction</span><span class="clause">(stand, <span class="int">10</span>, <span class="int">8</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 688</span>softAction</span><span class="clause">(stand, <span class="int">10</span>, <span class="int">9</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 689</span>softAction</span><span class="clause">(hit, <span class="int">10</span>, <span class="int">11</span>)</span>.<span class="fullstop">%</span><span class="comment">ace
+<span class="line-no"> 690</span>%
+</span><span class="head"><span class="line-no"> 691</span>softAction</span><span class="clause">(hit,   ace, <span class="int">2</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 692</span>softAction</span><span class="clause">(hit,   ace, <span class="int">3</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 693</span>softAction</span><span class="clause">(hit,   ace, <span class="int">4</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 694</span>softAction</span><span class="clause">(hit,   ace, <span class="int">5</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 695</span>softAction</span><span class="clause">(hit,   ace, <span class="int">6</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 696</span>softAction</span><span class="clause">(hit,   ace, <span class="int">7</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 697</span>softAction</span><span class="clause">(stand, ace, <span class="int">8</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 698</span>softAction</span><span class="clause">(stand, ace, <span class="int">9</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 699</span>softAction</span><span class="clause">(hit,   ace, <span class="int">11</span>)</span>.<span class="fullstop">%</span><span class="comment">ace
+</span></pre>
+</body>
+</html>

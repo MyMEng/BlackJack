@@ -1,0 +1,719 @@
+<!DOCTYPE html<html>
+  <head>
+    <title>blackJack.pl</title>
+    <link rel="stylesheet" type="text/css" href="res/pllisting.css">
+    <link rel="stylesheet" type="text/css" href="res/pldoc.css">
+  </head>
+<body>
+
+<div class="src_formats">View source with <a href="blackJack.pl-format_comments=false&amp;show=src.html">raw comments</a> or as <a href="blackJack.pl-show=raw">raw</a></div>
+<pre class="listing">
+<span class="functor"></span></pre>
+<div class="comment">
+
+<h1 class="module">Blackjack game simulator</h1>
+
+<p>
+This module contains Blackjack game simulator: predicates and configuration. It
+is responsible for running the game and I/O interactions.</p>
+
+<dl class="tags">
+<dt class="keyword-author">author</dt><dd class="keyword-author">- Kacper Sokol</dd>
+<dt class="keyword-license">license</dt><dd class="keyword-license">- GPL
+*/</dd>
+</dl>
+
+</div>
+<pre class="listing">
+<span class="directive"><span class="neck"><span class="line-no">  10</span>:- <span class="goal-built_in">module</span><span class="body">( <span class="identifier">blackJack</span>,
+<span class="line-no">  11</span>  <span class="list">[<span class="goal-local">players</span><span class="predicate_indicator"><span class="predicate_indicator">/</span><span class="arity">1</span></span>,
+<span class="line-no">  12</span>   <span class="goal-local">initShuffles</span><span class="predicate_indicator"><span class="predicate_indicator">/</span><span class="arity">1</span></span>,
+<span class="line-no">  13</span>   <span class="goal-local">blackJack</span><span class="predicate_indicator"><span class="predicate_indicator">/</span><span class="arity">0</span></span>,
+<span class="line-no">  14</span>   <span class="goal-local">userPlayer</span><span class="predicate_indicator"><span class="predicate_indicator">/</span><span class="arity">1</span></span>,
+<span class="line-no">  15</span>   <span class="goal-local">scoreTop</span><span class="predicate_indicator"><span class="predicate_indicator">/</span><span class="arity">2</span></span>,
+<span class="line-no">  16</span>   <span class="goal-local">split</span><span class="predicate_indicator"><span class="predicate_indicator">/</span><span class="arity">4</span></span>]</span>
+<span class="line-no">  17</span>  )</span></span>.</span><span class="fullstop"></span><span class="line-no">  18</span>
+<span class="directive"><span class="neck"><span class="line-no">  19</span>:- <span class="goal-built_in">set_prolog_stack</span><span class="body">(local,  <span class="functor">limit</span>(<span class="int">4 000 000 000</span>))</span></span>.</span><span class="fullstop"></span><span class="directive"><span class="neck"><span class="line-no">  20</span>:- <span class="goal-built_in">ensure_loaded</span><span class="body">(<span class="file">library(real)</span>)</span></span>.</span><span class="fullstop"></span><span class="directive"><span class="neck"><span class="line-no">  21</span>:- <span class="goal-built_in">use_module</span><span class="body">(<span class="file">deck</span>)</span></span>.</span><span class="fullstop"></span><span class="directive"><span class="neck"><span class="line-no">  22</span>:- <span class="goal-built_in">use_module</span><span class="body">(<span class="file">playerStrategies</span>)</span></span>.</span><span class="fullstop"></span><span class="directive"><span class="neck"><span class="line-no">  23</span>:- <span class="goal-built_in">use_module</span><span class="body">(<span class="file">dealerStrategies</span>)</span></span>.</span><span class="fullstop"></span></pre><dl class="comment">
+
+<dt class="pubdef"><span style="float:right"></span><a name="plays/1"><b class="pred">plays</b><var class="arglist">(-N)</var></a> is <b class="det">det</b></dt><dd class="defbody">Defines number of plays. Proposed values:
+<ul>
+<li>random shuffling - 300,</li>
+<li>deterministic shuffling - 50,</li>
+<li>two decks with random shuffling 100.</li>
+</ul>
+
+<p>
+Otherwise you may run into <b>out of global stack</b> troubles.</p>
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>N</var></td><td class="argdescr">- Number of plays.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd></dl>
+<pre class="listing">
+<span class="head"><span class="line-no">  35</span>plays</span><span class="clause">(<span class="int">300</span>)</span>.<span class="fullstop">
+</span></pre><dl class="comment">
+
+<dt class="pubdef"><span style="float:right"></span><a name="playerMode/1"><b class="pred">playerMode</b><var class="arglist">(-Mode)</var></a> is <b class="det">det</b></dt><dd class="defbody">Defines type of play:
+<ul>
+<li><code>interactive</code> - a player controlled by the user is added,</li>
+<li><code>experimental</code> - all players are controlled by AI algorithms as defined
+in <code>playAISequence</code> predicate in <code>playerStrategies</code> module.</li>
+</ul>
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>Mode</var></td><td class="argdescr">- <var>Mode</var> of play-through.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd></dl>
+<pre class="listing">
+<span class="head"><span class="line-no">  46</span>playerMode</span><span class="clause">(experimental)</span>.<span class="fullstop">
+</span></pre><dl class="comment">
+
+<dt class="pubdef"><span style="float:right"></span><a name="players/1"><b class="pred">players</b><var class="arglist">(-PlayersNo)</var></a> is <b class="det">det</b></dt><dd class="defbody">Defines number of AI controlled players; the AI algorithms are assigned in
+<code>playAISequence</code> predicate in <code>playerStrategies</code> module.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>PlayersNo</var></td><td class="argdescr">- Number of AI controlled players.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd></dl>
+<pre class="listing">
+<span class="head-exported"><span class="line-no">  55</span>players</span><span class="clause">(<span class="int">4</span>)</span>.<span class="fullstop">
+</span></pre><dl class="comment">
+
+<dt class="pubdef"><span style="float:right"></span><a name="initShuffles/1"><b class="pred">initShuffles</b><var class="arglist">(-N)</var></a> is <b class="det">det</b></dt><dd class="defbody">Defines number of initial shuffles: the shuffles before cards are dealt and
+the game starts. The upper limit on this value is 10.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>N</var></td><td class="argdescr">- Number of initial shuffles.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd></dl>
+<pre class="listing">
+<span class="head-exported"><span class="line-no">  64</span>initShuffles</span><span class="clause">(<span class="int">10</span>)</span>.<span class="fullstop">
+</span></pre><dl class="comment">
+
+<dt class="pubdef"><span style="float:right"></span><a name="blackJack/0"><b class="pred">blackJack</b></a> is <b class="det">det</b></dt><dd class="defbody">The game's main loop. The game is initialised and run based on global
+parameters defined in header of each module.</dd></dl>
+<pre class="listing">
+<span class="head-exported"><span class="line-no">  71</span>blackJack</span><span class="clause"> <span class="neck">:-</span>
+<span class="line-no">  72</span>	<span class="goal-imported">&lt;-</span><span class="body"> <span class="quoted_atom">'library(Matrix)'</span><span class="control">,</span> <span class="comment">% load R Matrix library
+</span><span class="line-no">  73</span>	<span class="goal-local">plays</span>(<span class="var">Gno</span>)<span class="control">,</span> <span class="comment">%Get nubmer of games
+</span><span class="line-no">  74</span>	<span class="goal-local">getNoPlayers</span>(<span class="var">Pno</span>)<span class="control">,</span>
+<span class="line-no">  75</span>	scores <span class="goal-imported">&lt;-</span> <span class="functor">matrix</span>(data<span class="functor">=</span><span class="int">0</span>, nrow<span class="functor">=</span><span class="var">Gno</span>, ncol<span class="functor">=</span><span class="var">Pno</span>)<span class="control">,</span> <span class="comment">% initialise score mx
+</span><span class="line-no">  76</span>	<span class="goal-built_in">write</span>(<span class="quoted_atom">'scores:'</span>)<span class="control">,</span> <span class="goal-built_in">nl</span><span class="control">,</span>
+<span class="line-no">  77</span>	<span class="goal-imported">&lt;-</span> scores<span class="control">,</span>
+<span class="line-no">  78</span>	<span class="goal-local">blackJack</span>(<span class="var">Gno</span>)<span class="control">,</span>
+<span class="line-no">  79</span>	<span class="comment">% save matrix and plot and save graph---histogram
+</span><span class="line-no">  80</span>	<span class="goal-imported">&lt;-</span> <span class="functor">'write.csv'</span>(scores, file <span class="functor">=</span> <span class="functor">+</span><span class="string">"./scores.csv"</span>)<span class="control">,</span>
+<span class="line-no">  81</span>	sums <span class="goal-imported">&lt;-</span> <span class="quoted_atom">'colSums(scores, na.rm = FALSE, dims = 1)'</span><span class="control">,</span>
+<span class="line-no">  82</span>	sums<span class="list">[<span class="int">1</span>]</span> <span class="goal-imported">&lt;-</span> sums<span class="list">[<span class="int">1</span>]</span> <span class="functor">/</span> (<span class="var">Pno</span><span class="functor">-</span><span class="int">1</span>)<span class="control">,</span>
+<span class="line-no">  83</span>	<span class="goal-imported">&lt;-</span> <span class="functor">barplot</span>(sums)<span class="control">,</span>
+<span class="line-no">  84</span>	<span class="var">Bar</span> <span class="goal-built_in">is</span> <span class="var">Gno</span> <span class="functor">/</span> <span class="int">2</span><span class="control">,</span>
+<span class="line-no">  85</span>	<span class="goal-imported">&lt;-</span> <span class="functor">abline</span>(h<span class="functor">=</span><span class="var">Bar</span>)<span class="control">,</span>
+<span class="line-no">  86</span>	<span class="goal-imported">&lt;-</span> <span class="quoted_atom">'png(filename="./scores.png")'</span><span class="control">,</span>
+<span class="line-no">  87</span>	<span class="goal-imported">&lt;-</span> <span class="functor">barplot</span>(sums)<span class="control">,</span>
+<span class="line-no">  88</span>	<span class="goal-imported">&lt;-</span> <span class="functor">abline</span>(h<span class="functor">=</span><span class="var">Bar</span>)<span class="control">,</span>
+<span class="line-no">  89</span>	<span class="goal-imported">&lt;-</span> <span class="quoted_atom">'dev.off()'</span></span></span>.<span class="fullstop">
+</span><span class="comment"><span class="line-no">  90</span>%
+</span><span id="blackJack/1" class="head"><span class="line-no">  91</span>blackJack</span><span class="clause">(<span class="int">0</span>) <span class="neck">:-</span> <span class="body"><span class="goal-built_in">!</span></span></span>.<span class="fullstop">
+</span><span class="head"><span class="line-no">  92</span>blackJack</span><span class="clause">(<span class="var">X</span>) <span class="neck">:-</span>
+<span class="line-no">  93</span>	<span class="goal-local">play</span><span class="body">(<span class="var">X</span>)<span class="control">,</span>
+<span class="line-no">  94</span>	<span class="var">X1</span> <span class="goal-built_in">is</span> <span class="var">X</span> <span class="functor">-</span> <span class="int">1</span><span class="control">,</span>
+<span class="line-no">  95</span>	<span class="goal-recursion">blackJack</span>(<span class="var">X1</span>)</span></span>.<span class="fullstop">
+</span></pre><dl class="comment">
+
+<dt class="pubdef"><span style="float:right"></span><a name="play/1"><b class="pred">play</b><var class="arglist">(+Gno)</var></a> is <b class="det">det</b></dt><dd class="defbody">Initialises and tun a single game.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>Gno</var></td><td class="argdescr">- Number of games to be run.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd></dl>
+<pre class="listing">
+<span class="head"><span class="line-no"> 103</span>play</span><span class="clause">(<span class="var">Gno</span>) <span class="neck">:-</span>
+<span class="line-no"> 104</span>	<span class="goal-imported">deck</span><span class="body">(<span class="var">Deck</span>)<span class="control">,</span> <span class="comment">% generate deck
+</span><span class="line-no"> 105</span>	<span class="goal-local">initShuffles</span>(<span class="var">N</span>)<span class="control">,</span>
+<span class="line-no"> 106</span>	<span class="goal-imported">shuffle</span>(<span class="var">Shuffled</span>, <span class="var">Deck</span>, <span class="var">N</span>)<span class="control">,</span> <span class="comment">% initial deck shuffle
+</span><span class="line-no"> 107</span>	<span class="goal-imported">initDeal</span>(<span class="var">Table</span>, <span class="var">NewDeck</span>, <span class="var">Shuffled</span>)<span class="control">,</span> <span class="comment">% deal the table
+</span><span class="line-no"> 108</span>	<span class="goal-built_in">write</span>(<span class="quoted_atom">'Initial table state:'</span>)<span class="control">,</span> <span class="goal-built_in">nl</span><span class="control">,</span>
+<span class="line-no"> 109</span>	<span class="goal-local">printGame</span>(<span class="var">Table</span>, init)<span class="control">,</span>
+<span class="line-no"> 110</span>	<span class="goal-local">players</span>(<span class="var">X</span>)<span class="control">,</span> <span class="goal-local">refusal</span>(<span class="var">Refused</span>, <span class="var">X</span>, <span class="int">0</span>)<span class="control">,</span> <span class="comment">% get list of players who refused to play
+</span><span class="line-no"> 111</span>	<span class="goal-local">theGame</span>(<span class="var">FinalTable</span>, <span class="var">Table</span>, <span class="var">NewDeck</span>, <span class="int">1</span>, <span class="var">Refused</span>)<span class="control">,</span>
+<span class="line-no"> 112</span>	<span class="goal-local">appendScores</span>(<span class="var">FinalTable</span>, <span class="var">Gno</span>)</span></span>.<span class="fullstop">
+</span></pre><dl class="comment">
+
+<dt class="pubdef"><span style="float:right"></span><a name="appendScores/2"><b class="pred">appendScores</b><var class="arglist">(+FinalTable, +Gno)</var></a> is <b class="det">det</b></dt><dd class="defbody">Calculates the scores and puts them into R variables for graph plotting and
+CSV exporting.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>FinalTable</var></td><td class="argdescr">- The final card allocation on the table (list of lists of
+<code>card</code> predicates).</td></tr>
+<tr><td><var>Gno</var></td><td class="argdescr">- Game id.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd></dl>
+<pre class="listing">
+<span class="head"><span class="line-no"> 123</span>appendScores</span><span class="clause">(<span class="var">FinalTable</span>, <span class="var">Gno</span>) <span class="neck">:-</span>
+<span class="line-no"> 124</span>	<span class="goal-local">getScoreTable</span><span class="body">(<span class="var">Lis</span>, <span class="var">FinalTable</span>)<span class="control">,</span> <span class="comment">% &lt;- this failed &lt;- resolved
+</span></span></span></pre><dl class="comment">
+<dd class="defbody"></dd></dl>
+<pre class="listing">
+<span class="line-no"> 126</span>	<span class="goal-built_in">write</span>(<span class="quoted_atom">'Lis:'</span>)<span class="control">,</span> <span class="goal-built_in">nl</span><span class="control">,</span> <span class="goal-built_in">write</span>(<span class="var">Lis</span>)<span class="control">,</span> <span class="goal-built_in">nl</span><span class="control">,</span>
+<span class="line-no"> 127</span>	scores<span class="list">[<span class="var">Gno</span>,*]</span> <span class="goal-imported">&lt;-</span> <span class="var">Lis</span></pre><pre class="listing">
+</pre><pre class="listing">
+<span class="line-no"> 127</span>.<span class="fullstop">
+</span><span class="comment"><span class="line-no"> 128</span>%
+</span><span id="getScoreTable/2" class="head"><span class="line-no"> 129</span>getScoreTable</span><span class="clause">(<span class="var">Lis</span>, <span class="list">[<span class="var">Dealer</span>|<span class="var">FinalTable</span>]</span>) <span class="neck">:-</span>
+<span class="line-no"> 130</span>	<span class="goal-local">scoreTop</span><span class="body">(<span class="var">D</span>, <span class="var">Dealer</span>)<span class="control">,</span>
+<span class="line-no"> 131</span>	<span class="goal-local">getScores</span>(<span class="var">LisPlay</span>, <span class="var">Deals</span>, <span class="int">0</span>, <span class="empty_list">[]</span>, <span class="var">D</span>, <span class="var">FinalTable</span> )<span class="control">,</span>
+<span class="line-no"> 132</span>	<span class="goal-autoload">append</span>(<span class="list">[<span class="var">Deals</span>]</span>, <span class="var">LisPlay</span>, <span class="var">Lis</span>)</span></span>.<span class="fullstop">
+</span><span class="comment"><span class="line-no"> 133</span>%
+</span><span id="getScores/6" class="head"><span class="line-no"> 134</span>getScores</span><span class="clause">(<span class="var">Lis</span>, <span class="var">Deals</span>, <span class="var">Deals</span>, <span class="var">Lis</span>, <span class="var">_</span>, <span class="empty_list">[]</span> ) <span class="neck">:-</span> <span class="body"><span class="goal-built_in">!</span></span></span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 135</span>getScores</span><span class="clause">(<span class="var">Lis</span>, <span class="var">Deals</span>, <span class="var">DCount</span>, <span class="var">Accum</span>, <span class="var">D</span>, <span class="list">[<span class="var">Curr</span>|<span class="var">FinalTable</span>]</span> ) <span class="neck">:-</span>
+<span class="line-no"> 136</span>	<span class="goal-local">scoreTop</span><span class="body">(<span class="var">C</span>, <span class="var">Curr</span>)<span class="control">,</span>
+<span class="line-no"> 137</span>	( (<span class="var">C</span> <span class="goal-built_in">=</span> <span class="var">D</span><span class="control">,</span> <span class="var">C</span> <span class="goal-built_in">=&lt;</span> <span class="int">21</span>)  <span class="control">-&gt;</span> (<span class="goal-autoload">append</span>(<span class="var">Accum</span>, <span class="list">[<span class="int">1</span>]</span>, <span class="var">AccumPlus</span>)<span class="control">,</span> <span class="var">NDCount</span> <span class="goal-built_in">is</span> <span class="int">1</span> <span class="functor">+</span> <span class="var">DCount</span> )
+<span class="line-no"> 138</span>	<span class="control">;</span> (<span class="var">C</span> <span class="goal-built_in">&lt;</span> <span class="var">D</span><span class="control">,</span> <span class="var">D</span> <span class="goal-built_in">=&lt;</span> <span class="int">21</span>)  <span class="control">-&gt;</span> (<span class="goal-autoload">append</span>(<span class="var">Accum</span>, <span class="list">[<span class="int">0</span>]</span>, <span class="var">AccumPlus</span>)<span class="control">,</span> <span class="var">NDCount</span> <span class="goal-built_in">is</span> <span class="int">1</span> <span class="functor">+</span> <span class="var">DCount</span> )
+<span class="line-no"> 139</span>	<span class="control">;</span> (<span class="var">C</span> <span class="goal-built_in">=&lt;</span> <span class="int">21</span><span class="control">,</span> <span class="var">D</span> <span class="goal-built_in">&gt;</span> <span class="int">21</span>) <span class="control">-&gt;</span> (<span class="goal-autoload">append</span>(<span class="var">Accum</span>, <span class="list">[<span class="int">1</span>]</span>, <span class="var">AccumPlus</span>)<span class="control">,</span> <span class="var">NDCount</span> <span class="goal-built_in">is</span> <span class="var">DCount</span> )
+<span class="line-no"> 140</span>	<span class="control">;</span> (<span class="var">C</span> <span class="goal-built_in">&gt;</span> <span class="int">21</span><span class="control">,</span> <span class="var">D</span> <span class="goal-built_in">&gt;</span> <span class="int">21</span>)  <span class="control">-&gt;</span> (<span class="goal-autoload">append</span>(<span class="var">Accum</span>, <span class="list">[<span class="int">0</span>]</span>, <span class="var">AccumPlus</span>)<span class="control">,</span> <span class="var">NDCount</span> <span class="goal-built_in">is</span> <span class="var">DCount</span> )
+<span class="line-no"> 141</span>	<span class="control">;</span> (<span class="var">C</span> <span class="goal-built_in">&gt;</span> <span class="var">D</span><span class="control">,</span> <span class="var">C</span> <span class="goal-built_in">=&lt;</span> <span class="int">21</span>)  <span class="control">-&gt;</span> (<span class="goal-autoload">append</span>(<span class="var">Accum</span>, <span class="list">[<span class="int">1</span>]</span>, <span class="var">AccumPlus</span>)<span class="control">,</span> <span class="var">NDCount</span> <span class="goal-built_in">is</span> <span class="var">DCount</span> )
+<span class="line-no"> 142</span>	<span class="control">;</span> (<span class="var">C</span> <span class="goal-built_in">&gt;</span> <span class="int">21</span><span class="control">,</span> <span class="var">D</span> <span class="goal-built_in">=&lt;</span> <span class="int">21</span>) <span class="control">-&gt;</span> (<span class="goal-autoload">append</span>(<span class="var">Accum</span>, <span class="list">[<span class="int">0</span>]</span>, <span class="var">AccumPlus</span>)<span class="control">,</span> <span class="var">NDCount</span> <span class="goal-built_in">is</span> <span class="int">1</span> <span class="functor">+</span> <span class="var">DCount</span> )
+<span class="line-no"> 143</span>	)<span class="control">,</span>
+<span class="line-no"> 144</span>	<span class="goal-recursion">getScores</span>(<span class="var">Lis</span>, <span class="var">Deals</span>, <span class="var">NDCount</span>, <span class="var">AccumPlus</span>, <span class="var">D</span>, <span class="var">FinalTable</span> )</span></span>.<span class="fullstop">
+</span></pre><dl class="comment">
+
+<dt class="pubdef"><span style="float:right"></span><a name="scoreTop/2"><b class="pred">scoreTop</b><var class="arglist">(-Sc, +Hand)</var></a> is <b class="det">det</b></dt><dd class="defbody">Gets the highest score closest to 21 but not exceeding it if possible (ace
+handling).
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>Sc</var></td><td class="argdescr">- The optimal score of the input hand.</td></tr>
+<tr><td><var>Hand</var></td><td class="argdescr">- A list of player's cards (<code>card</code> predicates).</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd></dl>
+<pre class="listing">
+<span class="head-exported"><span class="line-no"> 154</span>scoreTop</span><span class="clause">(<span class="var">Sc</span>, <span class="var">Hand</span>) <span class="neck">:-</span>
+<span class="line-no"> 155</span>	<span class="goal-built_in">findall</span><span class="body">( <span class="var">S</span>, <span class="goal-imported">score</span>(<span class="var">S</span>, <span class="var">Hand</span>), <span class="var">Scores</span> )<span class="control">,</span>
+<span class="line-no"> 156</span>	<span class="goal-local">getTop</span>(<span class="var">Sc</span>, <span class="var">Scores</span>)</span></span>.<span class="fullstop">
+</span><span class="comment"><span class="line-no"> 157</span>%
+</span><span id="getTop/2" class="head"><span class="line-no"> 158</span>getTop</span><span class="clause">(<span class="var">Sc</span>, <span class="list">[<span class="var">H</span>|<span class="var">Scores</span>]</span>) <span class="neck">:-</span>
+<span class="line-no"> 159</span>	<span class="goal-local">getTop</span><span class="body">(<span class="var">Sc</span>, <span class="var">H</span>, <span class="var">Scores</span>)</span></span>.<span class="fullstop">
+</span><span id="getTop/3" class="head"><span class="line-no"> 160</span>getTop</span><span class="clause">(<span class="var">Sc</span>, <span class="var">Sc</span>, <span class="empty_list">[]</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 161</span>getTop</span><span class="clause">(<span class="var">Sc</span>, <span class="var">Current</span>, <span class="list">[<span class="var">H</span>|<span class="var">Rest</span>]</span>) <span class="neck">:-</span>
+<span class="line-no"> 162</span>	( (<span class="var">H</span><span class="body"> <span class="goal-built_in">&gt;</span> <span class="var">Current</span><span class="control">,</span> <span class="var">H</span> <span class="goal-built_in">=&lt;</span> <span class="int">21</span>)       <span class="control">-&gt;</span> <span class="goal-recursion">getTop</span>(<span class="var">Sc</span>, <span class="var">H</span>, <span class="var">Rest</span>)
+<span class="line-no"> 163</span>	<span class="control">;</span> (<span class="var">H</span> <span class="goal-built_in">&lt;</span> <span class="var">Current</span><span class="control">,</span> <span class="var">Current</span> <span class="goal-built_in">&gt;</span> <span class="int">21</span> ) <span class="control">-&gt;</span> <span class="goal-recursion">getTop</span>(<span class="var">Sc</span>, <span class="var">H</span>, <span class="var">Rest</span>)
+<span class="line-no"> 164</span>	<span class="control">;</span> <span class="goal-autoload">otherwise</span>                    <span class="control">-&gt;</span> <span class="goal-recursion">getTop</span>(<span class="var">Sc</span>, <span class="var">Current</span>, <span class="var">Rest</span>)</span></span>
+<span class="fullstop"><span class="line-no"> 165</span>	</span>).</pre><dl class="comment">
+
+<dt class="pubdef"><span style="float:right"></span><a name="theGame/5"><b class="pred">theGame</b><var class="arglist">(-FinalTable, +Table, +Deck, +Ask, +Refused)</var></a> is <b class="det">det</b></dt><dd class="defbody">A predicate collection for a single game - the game engine.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>FinalTable</var></td><td class="argdescr">- The table after the whole round.</td></tr>
+<tr><td><var>Table</var></td><td class="argdescr">- The initial table - initial deal.</td></tr>
+<tr><td><var>Deck</var></td><td class="argdescr">- The deck of cards to draw additional cards.</td></tr>
+<tr><td><var>Ask</var></td><td class="argdescr">- Player interaction parameter: 1 - ask player for card
+drawing (interactive mode only); 0 - do not ask the player.</td></tr>
+<tr><td><var>Refused</var></td><td class="argdescr">- A vector of 0's (allow) and 1's (do not allow) indicating
+which player is allowed to draw additional card.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd></dl>
+<pre class="listing">
+<span class="head"><span class="line-no"> 179</span>theGame</span><span class="clause">(<span class="var">Table</span>, <span class="var">Table</span>, <span class="var">_</span>, <span class="int">0</span>, <span class="var">Refused</span>) <span class="neck">:-</span>
+<span class="line-no"> 180</span>	<span class="goal-local">players</span><span class="body">(<span class="var">X</span>)<span class="control">,</span></span></span></pre><dl class="comment">
+<dd class="defbody"></dd></dl>
+<pre class="listing">
+<span class="line-no"> 182</span>	</pre><dl class="comment">
+<dd class="defbody"></dd></dl>
+<pre class="listing">
+<span class="line-no"> 183</span>	<span class="goal-local">refusal</span>(<span class="var">RefusedOriginal</span>, <span class="var">X</span>, <span class="int">1</span>)<span class="control">,</span>
+<span class="line-no"> 184</span>	<span class="var">RefusedOriginal</span> <span class="goal-built_in">=</span> <span class="var">Refused</span><span class="control">,</span>
+<span class="line-no"> 185</span>	<span class="goal-built_in">write</span>(<span class="quoted_atom">'The End'</span>)<span class="control">,</span> <span class="goal-built_in">nl</span><span class="control">,</span>
+<span class="line-no"> 186</span>	<span class="goal-built_in">write</span>(<span class="quoted_atom">'================================================================================'</span>)<span class="control">,</span> <span class="goal-built_in">nl</span><span class="control">,</span></pre><dl class="comment">
+<dd class="defbody"></dd></dl>
+<pre class="listing">
+<span class="line-no"> 188</span>	<span class="goal-built_in">!</span></pre><pre class="listing">
+</pre><pre class="listing">
+<span class="line-no"> 188</span>.<span class="fullstop">
+</span><span class="comment"><span class="line-no"> 189</span>% play the game
+</span><span class="head"><span class="line-no"> 190</span>theGame</span><span class="clause">(<span class="var">FinalTable</span>, <span class="var">Table</span>, <span class="var">Deck</span>, <span class="var">Ask</span>, <span class="var">Refused</span>) <span class="neck">:-</span>
+<span class="line-no"> 191</span>	<span class="goal-local">userPlayer</span><span class="body">(<span class="var">U</span>)<span class="control">,</span></span></span></pre><dl class="comment">
+<dd class="defbody"></dd></dl>
+<pre class="listing">
+<span class="line-no"> 194</span>	<span class="goal-local">checkBJ</span>(<span class="var">Allowence</span>, <span class="var">_</span>, <span class="var">Table</span>)<span class="control">,</span> <span class="comment">% check for initial BlackJack
+</span></pre><dl class="comment">
+<dd class="defbody"></dd></dl>
+<pre class="listing">
+<span class="line-no"> 196</span>	<span class="goal-local">aIbj</span>(<span class="var">ReRefused</span>, <span class="var">Allowence</span>, <span class="var">Refused</span>)<span class="control">,</span>
+<span class="line-no"> 197</span>
+<span class="line-no"> 198</span>	<span class="comment">% what if there is no player
+</span><span class="line-no"> 199</span>	((	<span class="var">U</span> <span class="goal-built_in">=</span> <span class="int">1</span><span class="control">,</span>
+<span class="line-no"> 200</span>		<span class="goal-local">getNoPlayers</span>(<span class="var">R</span>)<span class="control">,</span> <span class="comment">% get player ID
+</span><span class="line-no"> 201</span>		<span class="goal-autoload">nth1</span>(<span class="var">R</span>, <span class="var">Allowence</span>, <span class="var">Elem</span>)<span class="control">,</span>
+<span class="line-no"> 202</span>		( (<span class="control">\+</span> (<span class="var">Elem</span> <span class="goal-built_in">=</span> <span class="int">-1</span>)<span class="control">,</span> <span class="var">Ask</span> <span class="goal-built_in">=</span> <span class="int">1</span>)  <span class="control">-&gt;</span> <span class="goal-local">askCard</span>(<span class="var">Answer</span>) <span class="comment">% ask if player has not already lost
+</span><span class="line-no"> 203</span>		<span class="control">;</span> <span class="goal-autoload">otherwise</span>                  <span class="control">-&gt;</span> <span class="var">Answer</span> <span class="goal-built_in">=</span> <span class="int">0</span>
+<span class="line-no"> 204</span>		)<span class="control">,</span>
+<span class="line-no"> 205</span>
+<span class="line-no"> 206</span>		<span class="comment">% do not allow to take card once you have refused
+</span><span class="line-no"> 207</span>
+<span class="line-no"> 208</span>		( <span class="var">Answer</span> <span class="goal-built_in">=</span> <span class="int">1</span> <span class="control">-&gt;</span> (<span class="goal-imported">addCard</span>(<span class="var">NewTable</span>, <span class="var">NewDeck</span>, <span class="var">Deck</span>, <span class="var">Table</span>, <span class="var">R</span>)<span class="control">,</span> <span class="var">Ask1</span> <span class="goal-built_in">=</span> <span class="var">Ask</span>)
+<span class="line-no"> 209</span>		<span class="control">;</span> <span class="var">Answer</span> <span class="goal-built_in">=</span> <span class="int">0</span> <span class="control">-&gt;</span> ( <span class="var">NewTable</span> <span class="goal-built_in">=</span> <span class="var">Table</span><span class="control">,</span> <span class="var">NewDeck</span> <span class="goal-built_in">=</span> <span class="var">Deck</span><span class="control">,</span> <span class="var">Ask1</span> <span class="goal-built_in">is</span> <span class="int">0</span> )
+<span class="line-no"> 210</span>		)
+<span class="line-no"> 211</span>	 ) <span class="control">;</span> (
+<span class="line-no"> 212</span>	 	<span class="var">Ask1</span> <span class="goal-built_in">=</span> <span class="var">Ask</span><span class="control">,</span>
+<span class="line-no"> 213</span>	 	<span class="var">U</span> <span class="goal-built_in">=</span> <span class="int">0</span><span class="control">,</span>
+<span class="line-no"> 214</span>	 	<span class="var">NewTable</span> <span class="goal-built_in">=</span> <span class="var">Table</span><span class="control">,</span>
+<span class="line-no"> 215</span>	 	<span class="var">NewDeck</span> <span class="goal-built_in">=</span> <span class="var">Deck</span>
+<span class="line-no"> 216</span>	 )
+<span class="line-no"> 217</span>	)<span class="control">,</span></pre><dl class="comment">
+<dd class="defbody"></dd></dl>
+<pre class="listing">
+<span class="line-no"> 220</span>	<span class="goal-imported">playAI</span>(<span class="var">NTable</span>, <span class="var">NDeck</span>, <span class="var">NRefused</span>, <span class="var">NewTable</span>, <span class="var">NewDeck</span>, <span class="var">ReRefused</span>)<span class="control">,</span> <span class="comment">% do the AI magic
+</span></pre><dl class="comment">
+<dd class="defbody"></dd></dl>
+<pre class="listing">
+<span class="line-no"> 223</span>	</pre><dl class="comment">
+<dd class="defbody"></dd></dl>
+<pre class="listing">
+<span class="line-no"> 224</span>	<span class="comment">% if BJ do not allow`
+</span><span class="line-no"> 225</span>	<span class="goal-autoload">nth1</span>(<span class="int">1</span>, <span class="var">Allowence</span>, <span class="var">Cru</span>)<span class="control">,</span>
+<span class="line-no"> 226</span>	( <span class="var">Cru</span> <span class="goal-built_in">=</span>  <span class="int">1</span> <span class="control">-&gt;</span> (<span class="var">NNTable</span> <span class="goal-built_in">=</span> <span class="var">NTable</span><span class="control">,</span> <span class="var">NNDeck</span> <span class="goal-built_in">=</span> <span class="var">NDeck</span>)
+<span class="line-no"> 227</span>	<span class="control">;</span> <span class="var">Cru</span> <span class="goal-built_in">=</span> <span class="int">-1</span> <span class="control">-&gt;</span> (<span class="var">NNTable</span> <span class="goal-built_in">=</span> <span class="var">NTable</span><span class="control">,</span> <span class="var">NNDeck</span> <span class="goal-built_in">=</span> <span class="var">NDeck</span>)
+<span class="line-no"> 228</span>	<span class="control">;</span> <span class="var">Cru</span> <span class="goal-built_in">=</span>  <span class="int">0</span> <span class="control">-&gt;</span> <span class="goal-imported">croupierAI</span>(<span class="var">NNTable</span>, <span class="var">NNDeck</span>, <span class="var">NTable</span>, <span class="var">NDeck</span>) <span class="comment">% do the AI magic
+</span><span class="line-no"> 229</span>	)<span class="control">,</span>
+<span class="line-no"> 230</span>
+<span class="line-no"> 231</span>	<span class="goal-local">printGame</span>(<span class="var">NNTable</span>, cont)<span class="control">,</span></pre><dl class="comment">
+<dd class="defbody"></dd></dl>
+<pre class="listing">
+<span class="line-no"> 233</span>	</pre><dl class="comment">
+<dd class="defbody"></dd></dl>
+<pre class="listing">
+<span class="line-no"> 235</span>	</pre><dl class="comment">
+<dd class="defbody"></dd></dl>
+<pre class="listing">
+<span class="line-no"> 236</span>	( <span class="var">U</span> <span class="goal-built_in">=</span> <span class="int">0</span>     <span class="control">-&gt;</span> <span class="var">Ask2</span> <span class="goal-built_in">is</span> <span class="int">0</span>
+<span class="line-no"> 237</span>	<span class="control">;</span> <span class="goal-autoload">otherwise</span> <span class="control">-&gt;</span> <span class="var">Ask2</span> <span class="goal-built_in">is</span> <span class="var">Ask1</span>
+<span class="line-no"> 238</span>	)<span class="control">,</span>
+<span class="line-no"> 239</span>
+<span class="line-no"> 240</span>	<span class="goal-recursion">theGame</span>(<span class="var">FinalTable</span>, <span class="var">NNTable</span>, <span class="var">NNDeck</span>, <span class="var">Ask2</span>, <span class="var">NRefused</span>)</pre><pre class="listing">
+</pre><pre class="listing">
+<span class="line-no"> 240</span>.<span class="fullstop">
+</span></pre><dl class="comment">
+
+<dt class="pubdef"><span style="float:right"></span><a name="aIbj/3"><b class="pred">aIbj</b><var class="arglist">(-ReRefused, +Allowance, +Refused)</var></a> is <b class="det">det</b></dt><dd class="defbody">Updates the player refusal vector - a vector which indicates which player
+has refused a card hence is no allowed to take one any more - based on
+player's score: if a player hits or exceeds 21 it is no more allowed to take
+a card.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>ReRefused</var></td><td class="argdescr">- Updated player refusal vector based on scores.</td></tr>
+<tr><td><var>Allowance</var></td><td class="argdescr">- A vector of the current player's status in the game: -1 -
+more than 21 points; 0 - less than 21 points; 1 - exactly
+21 points.</td></tr>
+<tr><td><var>
+
+<blockquote>
+<w>Refused</w> <w>Players</w> <w>refused</w> <w>to</w> <w>take</w> <w>the</w> <w>card</w> <w>hence</w> <w>are</w> <w>not</w> <w>allowed</w> <w>to</w>
+<w>play</w> <w>any</w> <w>more</w> - <w>a</w> <w>vector</w> <w>of</w> <w>1</w>'<w>s</w> (<w>refused</w>) <w>and</w> <w>0</w>'<w>s</w> (<w>not</w> <w>yet</w>
+<w>refused</w>).
+</blockquote>
+
+</var></td><td class="argdescr">- </td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd></dl>
+<pre class="listing">
+<span class="head"><span class="line-no"> 257</span>aIbj</span><span class="clause">(<span class="var">ReRefused</span>, <span class="list">[<span class="var">_</span>|<span class="var">Allowence</span>]</span>, <span class="var">Refused</span>) <span class="neck">:-</span>
+<span class="line-no"> 258</span>	<span class="goal-local">aIbj</span><span class="body">(<span class="var">ReRefused</span>, <span class="empty_list">[]</span>, <span class="var">Allowence</span>, <span class="var">Refused</span>)</span></span>.<span class="fullstop">
+</span><span id="aIbj/4" class="head"><span class="line-no"> 259</span>aIbj</span><span class="clause">(<span class="var">Refused</span>, <span class="var">Refused</span>, <span class="var">_</span>, <span class="empty_list">[]</span>) <span class="neck">:-</span> <span class="body"><span class="goal-built_in">!</span></span></span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 260</span>aIbj</span><span class="clause">(<span class="var">Refused</span>, <span class="var">Collector</span>, <span class="list">[<span class="var">A</span>|<span class="var">Allowence</span>]</span>, <span class="list">[<span class="var">R</span>|<span class="var">RRefused</span>]</span>) <span class="neck">:-</span>
+<span class="line-no"> 261</span>	( <span class="var">A</span><span class="body"> <span class="goal-built_in">=</span> <span class="int">1</span>     <span class="control">-&gt;</span> <span class="goal-autoload">append</span>( <span class="var">Collector</span>, <span class="list">[<span class="var">A</span>]</span>, <span class="var">NewCollector</span> )
+<span class="line-no"> 262</span>	<span class="control">;</span> <span class="goal-autoload">otherwise</span> <span class="control">-&gt;</span> <span class="goal-autoload">append</span>( <span class="var">Collector</span>, <span class="list">[<span class="var">R</span>]</span>, <span class="var">NewCollector</span> )
+<span class="line-no"> 263</span>	)<span class="control">,</span>
+<span class="line-no"> 264</span>	<span class="goal-recursion">aIbj</span>(<span class="var">Refused</span>, <span class="var">NewCollector</span>, <span class="var">Allowence</span>, <span class="var">RRefused</span>)</span></span>.<span class="fullstop">
+</span></pre><dl class="comment">
+
+<dt class="pubdef"><span style="float:right"></span><a name="checkTheEnd/1"><b class="pred">checkTheEnd</b><var class="arglist">(+Aa)</var></a> is <b class="det">det</b></dt><dd class="defbody">Checks whether all players are done playing.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>Aa</var></td><td class="argdescr">- The players status (list of player states); see checkBJ:ScoreTabel
+for details.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd></dl>
+<pre class="listing">
+<span class="head-unreferenced"><span class="line-no"> 273</span>checkTheEnd</span><span class="clause">( <span class="list">[ <span class="int">-1</span>|<span class="var">Aa</span> ]</span> ) <span class="neck">:-</span>
+<span class="line-no"> 274</span>	<span class="goal-recursion">checkTheEnd</span><span class="body">( <span class="var">Aa</span> )</span></span>.<span class="fullstop">
+</span><span class="head-unreferenced"><span class="line-no"> 275</span>checkTheEnd</span><span class="clause">( <span class="empty_list">[]</span> )</span>.<span class="fullstop">
+</span></pre><dl class="comment">
+
+<dt class="pubdef"><span style="float:right"></span><a name="userPlayer/1"><b class="pred">userPlayer</b><var class="arglist">(-N)</var></a> is <b class="det">det</b></dt><dd class="defbody">Checks whether interactive player is activated and returns 1 if so.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>N</var></td><td class="argdescr">- Number of interactive players in the game: 1 or 0.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd></dl>
+<pre class="listing">
+<span class="head-exported"><span class="line-no"> 283</span>userPlayer</span><span class="clause">(<span class="var">N</span>) <span class="neck">:-</span>
+<span class="line-no"> 284</span>	<span class="goal-local">playerMode</span><span class="body">(<span class="var">M</span>)<span class="control">,</span>
+<span class="line-no"> 285</span>	<span class="goal-local">userPlayer</span>(<span class="var">N</span>, <span class="var">M</span>)</span></span>.<span class="fullstop">
+</span><span class="comment"><span class="line-no"> 286</span>%
+</span><span id="userPlayer/2" class="head"><span class="line-no"> 287</span>userPlayer</span><span class="clause">(<span class="var">N</span>, interactive) <span class="neck">:-</span>
+<span class="line-no"> 288</span>	<span class="var">N</span><span class="body"> <span class="goal-built_in">is</span> <span class="int">1</span></span></span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 289</span>userPlayer</span><span class="clause">(<span class="var">N</span>, experimental) <span class="neck">:-</span>
+<span class="line-no"> 290</span>	<span class="var">N</span><span class="body"> <span class="goal-built_in">is</span> <span class="int">0</span></span></span>.<span class="fullstop">
+</span></pre><dl class="comment">
+
+<dt class="pubdef"><span style="float:right"></span><a name="getNoPlayers/1"><b class="pred">getNoPlayers</b><var class="arglist">(-R)</var></a> is <b class="det">det</b></dt><dd class="defbody">Calculates the total number of players in the game including dealer, AIs and
+interactive player.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>R</var></td><td class="argdescr">- Number of players in the game.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd></dl>
+<pre class="listing">
+<span class="head"><span class="line-no"> 299</span>getNoPlayers</span><span class="clause">(<span class="var">R</span>) <span class="neck">:-</span>
+<span class="line-no"> 300</span>	<span class="goal-local">players</span><span class="body">(<span class="var">P</span>)<span class="control">,</span>
+<span class="line-no"> 301</span>	<span class="goal-local">userPlayer</span>(<span class="var">Q</span>)<span class="control">,</span>
+<span class="line-no"> 302</span>	<span class="var">R</span> <span class="goal-built_in">is</span> <span class="var">P</span> <span class="functor">+</span> <span class="int">1</span> <span class="functor">+</span> <span class="var">Q</span></span></span>.<span class="fullstop">
+</span></pre><dl class="comment">
+
+<dt class="pubdef"><span style="float:right"></span><a name="refusal/3"><b class="pred">refusal</b><var class="arglist">(-Ls, +X, +Content)</var></a> is <b class="det">det</b></dt><dd class="defbody">Generates a list with <var>X</var> elements <var>Content</var>.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>Ls</var></td><td class="argdescr">- List populated with <var>X</var> occurrences of <var>Content</var>.</td></tr>
+<tr><td><var>X</var></td><td class="argdescr">- Number of elements to be populated.</td></tr>
+<tr><td><var>Content</var></td><td class="argdescr">- Element to be populated.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd></dl>
+<pre class="listing">
+<span class="head"><span class="line-no"> 312</span>refusal</span><span class="clause">(<span class="empty_list">[]</span>, <span class="int">0</span>, <span class="var">_</span>) <span class="neck">:-</span> <span class="body"><span class="goal-built_in">!</span></span></span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 313</span>refusal</span><span class="clause">(<span class="list">[<span class="var">Content</span>]</span>, <span class="int">1</span>, <span class="var">Content</span>) <span class="neck">:-</span> <span class="body"><span class="goal-built_in">!</span></span></span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 314</span>refusal</span><span class="clause">(<span class="var">Ls</span>, <span class="var">X</span>, <span class="var">Content</span>) <span class="neck">:-</span>
+<span class="line-no"> 315</span>	<span class="var">L</span><span class="body"> <span class="goal-built_in">=</span> <span class="list">[<span class="var">Content</span>]</span><span class="control">,</span>
+<span class="line-no"> 316</span>	<span class="goal-local">refusal</span>(<span class="var">Ls</span>, <span class="var">L</span>, <span class="int">1</span>, <span class="var">X</span>, <span class="var">Content</span>)</span></span>.<span class="fullstop">
+</span><span class="comment"><span class="line-no"> 317</span>%
+</span><span id="refusal/5" class="head"><span class="line-no"> 318</span>refusal</span><span class="clause">(<span class="var">L</span>, <span class="var">L</span>, <span class="var">X</span>, <span class="var">X</span>, <span class="var">_</span>) <span class="neck">:-</span> <span class="body"><span class="goal-built_in">!</span></span></span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 319</span>refusal</span><span class="clause">(<span class="var">Ls</span>, <span class="var">L</span>, <span class="var">C</span>, <span class="var">X</span>, <span class="var">Content</span>) <span class="neck">:-</span>
+<span class="line-no"> 320</span>	<span class="var">C1</span><span class="body"> <span class="goal-built_in">is</span> <span class="var">C</span> <span class="functor">+</span> <span class="int">1</span><span class="control">,</span>
+<span class="line-no"> 321</span>	<span class="goal-autoload">append</span>(<span class="var">L</span>, <span class="list">[<span class="var">Content</span>]</span>, <span class="var">L1</span>)<span class="control">,</span>
+<span class="line-no"> 322</span>	<span class="goal-recursion">refusal</span>(<span class="var">Ls</span>, <span class="var">L1</span>, <span class="var">C1</span>, <span class="var">X</span>, <span class="var">Content</span>)</span></span>.<span class="fullstop">
+</span></pre><dl class="comment">
+
+<dt class="pubdef"><span style="float:right"></span><a name="checkBJ/3"><b class="pred">checkBJ</b><var class="arglist">(-ScoreTable, -Values, +Table)</var></a> is <b class="det">det</b></dt><dd class="defbody">Checks the status of the game - instant win/loose; returns all possible
+scores of each hand no the table.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>ScoreTable</var></td><td class="argdescr">- The current player's status in the game: -1 - more than
+21 points; 0 - less than 21 points; 1 - exactly 21 points.</td></tr>
+<tr><td><var>Values</var></td><td class="argdescr">- The list of player's scores; each player can have more
+than one score in case he has an ace in his hand.</td></tr>
+<tr><td><var>Table</var></td><td class="argdescr">- List of cards held by all player (list of lists).</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd></dl>
+<pre class="listing">
+<span class="head"><span class="line-no"> 335</span>checkBJ</span><span class="clause">( <span class="var">ScoreTable</span>, <span class="var">Values</span>, <span class="var">Table</span> ) <span class="neck">:-</span>
+<span class="line-no"> 336</span>	<span class="goal-local">checkBJ</span><span class="body">( <span class="var">ScoreTable</span>, <span class="var">Values</span>, <span class="empty_list">[]</span>, <span class="empty_list">[]</span>, <span class="var">Table</span> )</span></span>.<span class="fullstop">
+</span><span id="checkBJ/5" class="head"><span class="line-no"> 337</span>checkBJ</span><span class="clause">( <span class="var">ScoreTable</span>, <span class="var">Values</span>, <span class="var">Accum1</span>, <span class="var">Accum2</span>, <span class="list">[<span class="var">H</span>|<span class="var">Table</span>]</span> ) <span class="neck">:-</span>
+<span class="line-no"> 338</span>	<span class="goal-built_in">findall</span><span class="body">( <span class="var">S</span>, <span class="goal-imported">score</span>(<span class="var">S</span>, <span class="var">H</span>), <span class="var">Scores</span> )<span class="control">,</span>
+<span class="line-no"> 339</span>	<span class="goal-autoload">append</span>( <span class="var">Accum2</span>, <span class="list">[<span class="var">Scores</span>]</span>, <span class="var">V1</span> )<span class="control">,</span>
+<span class="line-no"> 340</span>	<span class="goal-local">findMinBJ</span>( <span class="var">Smin</span>, <span class="var">Scores</span> )<span class="control">,</span>
+<span class="line-no"> 341</span>	( <span class="var">Smin</span> <span class="goal-built_in">=</span> <span class="int">21</span> <span class="control">-&gt;</span> <span class="goal-autoload">append</span>( <span class="var">Accum1</span>, <span class="list">[<span class="int">1</span> ]</span>, <span class="var">Ulated</span> )
+<span class="line-no"> 342</span>	<span class="control">;</span> <span class="var">Smin</span> <span class="goal-built_in">&lt;</span> <span class="int">21</span> <span class="control">-&gt;</span> <span class="goal-autoload">append</span>( <span class="var">Accum1</span>, <span class="list">[<span class="int">0</span> ]</span>, <span class="var">Ulated</span> )
+<span class="line-no"> 343</span>	<span class="control">;</span> <span class="var">Smin</span> <span class="goal-built_in">&gt;</span> <span class="int">21</span> <span class="control">-&gt;</span> <span class="goal-autoload">append</span>( <span class="var">Accum1</span>, <span class="list">[<span class="int">-1</span>]</span>, <span class="var">Ulated</span> )
+<span class="line-no"> 344</span>	)<span class="control">,</span>
+<span class="line-no"> 345</span>	<span class="goal-recursion">checkBJ</span>(<span class="var">ScoreTable</span>, <span class="var">Values</span>, <span class="var">Ulated</span>, <span class="var">V1</span>, <span class="var">Table</span>)</span></span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 346</span>checkBJ</span><span class="clause">(<span class="var">Score</span>, <span class="var">Values</span>, <span class="var">Score</span>, <span class="var">Values</span>, <span class="empty_list">[]</span>)</span>.<span class="fullstop">
+</span></pre><dl class="comment">
+
+<dt class="pubdef"><span style="float:right"></span><a name="findMinBJ/2"><b class="pred">findMinBJ</b><var class="arglist">(-Smin, +Scores)</var></a> is <b class="det">det</b></dt><dd class="defbody">If 21 is in the list it is returned otherwise, the minimum of the input list
+is returned.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>Smin</var></td><td class="argdescr">- The minimum in the input list <strong>or</strong> 21 if a member of the
+list.</td></tr>
+<tr><td><var>Scores</var></td><td class="argdescr">- The list of (unsorted) numbers.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd></dl>
+<pre class="listing">
+<span class="head"><span class="line-no"> 357</span>findMinBJ</span><span class="clause">( <span class="var">Smin</span>, <span class="var">Scores</span> ) <span class="neck">:-</span>
+<span class="line-no"> 358</span>	<span class="goal-autoload">member</span><span class="body">(<span class="int">21</span>, <span class="var">Scores</span>)<span class="control">,</span> <span class="goal-built_in">!</span><span class="control">,</span>
+<span class="line-no"> 359</span>	<span class="var">Smin</span> <span class="goal-built_in">is</span> <span class="int">21</span></span></span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 360</span>findMinBJ</span><span class="clause">( <span class="var">Smin</span>, <span class="var">Scores</span> ) <span class="neck">:-</span>
+<span class="line-no"> 361</span>	<span class="goal-local">findMin</span><span class="body">(<span class="var">Smin</span>, <span class="var">Scores</span>)</span></span>.<span class="fullstop">
+</span></pre><dl class="comment">
+
+<dt class="pubdef"><span style="float:right"></span><a name="findMin/2"><b class="pred">findMin</b><var class="arglist">(-Smin, +Scores)</var></a> is <b class="det">det</b></dt><dd class="defbody">Finds the minimum of the input list.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>Smin</var></td><td class="argdescr">- The minimum in the input list.</td></tr>
+<tr><td><var>Scores</var></td><td class="argdescr">- The list of (unsorted) numbers.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd></dl>
+<pre class="listing">
+<span class="head"><span class="line-no"> 370</span>findMin</span><span class="clause">( <span class="var">Smin</span>, <span class="list">[<span class="var">S</span>|<span class="var">Scores</span>]</span> ) <span class="neck">:-</span>
+<span class="line-no"> 371</span>	<span class="var">Min</span><span class="body"> <span class="goal-built_in">is</span> <span class="var">S</span><span class="control">,</span>
+<span class="line-no"> 372</span>	<span class="goal-local">findMin</span>(<span class="var">Smin</span>, <span class="var">Min</span>, <span class="var">Scores</span>)</span></span>.<span class="fullstop">
+</span><span class="comment"><span class="line-no"> 373</span>%
+</span><span id="findMin/3" class="head"><span class="line-no"> 374</span>findMin</span><span class="clause">(<span class="var">Smin</span>, <span class="var">Min</span>, <span class="list">[<span class="var">S</span>|<span class="var">Scores</span>]</span>) <span class="neck">:-</span>
+<span class="line-no"> 375</span>	( <span class="var">Min</span><span class="body"> <span class="goal-built_in">&gt;=</span> <span class="var">S</span>  <span class="control">-&gt;</span> <span class="var">NewMin</span> <span class="goal-built_in">is</span> <span class="var">S</span>
+<span class="line-no"> 376</span>	<span class="control">;</span> <span class="goal-autoload">otherwise</span> <span class="control">-&gt;</span> <span class="var">NewMin</span> <span class="goal-built_in">is</span> <span class="var">Min</span>
+<span class="line-no"> 377</span>	)<span class="control">,</span>
+<span class="line-no"> 378</span>	<span class="goal-recursion">findMin</span>(<span class="var">Smin</span>, <span class="var">NewMin</span>, <span class="var">Scores</span>)</span></span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 379</span>findMin</span><span class="clause">(<span class="var">S</span>, <span class="var">S</span>, <span class="empty_list">[]</span>)</span>.<span class="fullstop">
+</span></pre><dl class="comment">
+
+<dt class="pubdef"><span style="float:right"></span><a name="split/4"><b class="pred">split</b><var class="arglist">(-A, -B, +List, +Num)</var></a> is <b class="det">det</b></dt><dd class="defbody">Split a list into two sub-lists at given index. Index can be 1:# of elements
+in the input list. The indexing starts at 1. The specified index and all of
+the following elements will be placed in the second list.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>A</var></td><td class="argdescr">- Pre-index sub-list.</td></tr>
+<tr><td><var>B</var></td><td class="argdescr">- Post-index sub-list.</td></tr>
+<tr><td><var>List</var></td><td class="argdescr">- The list to be split.</td></tr>
+<tr><td><var>Num</var></td><td class="argdescr">- The list to be split.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd></dl>
+<pre class="listing">
+<span class="head-exported"><span class="line-no"> 392</span>split</span><span class="clause">(<span class="var">A</span>, <span class="var">B</span>, <span class="var">List</span>, <span class="var">Num</span>) <span class="neck">:-</span>
+<span class="line-no"> 393</span>	<span class="goal-local">split_</span><span class="body">(<span class="var">A</span>, <span class="empty_list">[]</span>, <span class="var">List</span>, <span class="var">Num</span>)<span class="control">,</span>
+<span class="line-no"> 394</span>	<span class="goal-autoload">append</span>(<span class="var">A</span>, <span class="var">B</span>, <span class="var">List</span>)</span></span>.<span class="fullstop">
+</span><span id="split_/4" class="head"><span class="line-no"> 395</span>split_</span><span class="clause">(<span class="var">A</span>, <span class="var">A</span>, <span class="var">_</span>, <span class="int">1</span>) <span class="neck">:-</span> <span class="body"><span class="goal-built_in">!</span></span></span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 396</span>split_</span><span class="clause">(<span class="var">A</span>, <span class="var">A</span>, <span class="var">_</span>, <span class="float">1.0</span>) <span class="neck">:-</span> <span class="body"><span class="goal-built_in">!</span></span></span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 397</span>split_</span><span class="clause">(<span class="var">A</span>, <span class="var">Acum</span>, <span class="list">[<span class="var">H</span>|<span class="var">T</span>]</span>, <span class="var">Num</span>) <span class="neck">:-</span>
+<span class="line-no"> 398</span>	<span class="var">NumN</span><span class="body"> <span class="goal-built_in">is</span> <span class="var">Num</span> <span class="functor">-</span> <span class="int">1</span><span class="control">,</span>
+<span class="line-no"> 399</span>	<span class="goal-autoload">append</span>(<span class="var">Acum</span>, <span class="list">[<span class="var">H</span>]</span>, <span class="var">Sup</span>)<span class="control">,</span>
+<span class="line-no"> 400</span>	<span class="goal-recursion">split_</span>(<span class="var">A</span>, <span class="var">Sup</span>, <span class="var">T</span>, <span class="var">NumN</span>)</span></span>.<span class="fullstop">
+</span></pre><dl class="comment">
+
+<dt class="pubdef"><span style="float:right"></span><a name="printGame/2"><b class="pred">printGame</b><var class="arglist">(+Table, +Type)</var></a> is <b class="det">det</b></dt><dd class="defbody">Nicely prints out a game state. It assumes that the first player on the
+table is the dealer.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>Table</var></td><td class="argdescr">- List of cards held by all player (list of lists).</td></tr>
+<tr><td><var>Type</var></td><td class="argdescr">- <var>Type</var> of a <code>line(s)</code> to be printed <code>initial</code>: the first one or <code>cont</code>:
+any other.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd></dl>
+<pre class="listing">
+<span class="head"><span class="line-no"> 411</span>printGame</span><span class="clause">(<span class="var">Table</span>, <span class="var">Type</span>) <span class="neck">:-</span>
+<span class="line-no"> 412</span>	<span class="goal-local">players</span><span class="body">(<span class="var">X</span>)<span class="control">,</span> <span class="goal-local">userPlayer</span>(<span class="var">Y</span>)<span class="control">,</span>
+<span class="line-no"> 413</span>	<span class="var">Total</span> <span class="goal-built_in">is</span> <span class="var">X</span> <span class="functor">+</span> <span class="var">Y</span> <span class="functor">+</span> <span class="int">1</span><span class="control">,</span>
+<span class="line-no"> 414</span>	<span class="goal-built_in">write</span>(<span class="quoted_atom">'Table:'</span>)<span class="control">,</span> <span class="goal-built_in">nl</span><span class="control">,</span>
+<span class="line-no"> 415</span>	<span class="goal-local">printHands</span>(<span class="var">Table</span>, <span class="var">Total</span>, <span class="int">1</span>, <span class="var">Type</span>)</span></span>.<span class="fullstop">
+</span></pre><dl class="comment">
+
+<dt class="pubdef"><span style="float:right"></span><a name="printHands/4"><b class="pred">printHands</b><var class="arglist">(+Table, +Total, +N, +Type)</var></a> is <b class="det">det</b></dt><dd class="defbody">Nicely prints out a table of cards. It assumes that the first player on the
+table is the dealer.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>Table</var></td><td class="argdescr">- List of cards held by all player (list of lists).</td></tr>
+<tr><td><var>Total</var></td><td class="argdescr">- <var>Total</var> number of players including dealer, AIs and interactive.</td></tr>
+<tr><td><var>N</var></td><td class="argdescr">- Player counter: 1-#ofPlayers.</td></tr>
+<tr><td><var>Type</var></td><td class="argdescr">- <var>Type</var> of a <code>line(s)</code> to be printed <code>initial</code>: the first one or <code>cont</code>:
+any other.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd></dl>
+<pre class="listing">
+<span class="head"><span class="line-no"> 428</span>printHands</span><span class="clause">(<span class="list">[<span class="var">H</span>|<span class="var">T</span>]</span>, <span class="var">Total</span>, <span class="var">N</span>, <span class="var">Type</span>) <span class="neck">:-</span>
+<span class="line-no"> 429</span>	<span class="goal-local">userPlayer</span><span class="body">(<span class="var">U</span>)<span class="control">,</span>
+<span class="line-no"> 430</span>	( <span class="var">N</span> <span class="goal-built_in">=</span> <span class="int">1</span>                <span class="control">-&gt;</span> ( <span class="goal-built_in">write</span>(<span class="quoted_atom">'Casino'</span>)<span class="control">,</span> <span class="var">Restrict</span> <span class="goal-built_in">is</span> <span class="int">1</span> )
+<span class="line-no"> 431</span>	<span class="control">;</span> ( <span class="var">N</span> <span class="goal-built_in">=</span> <span class="var">Total</span><span class="control">,</span> <span class="var">U</span> <span class="goal-built_in">=</span> <span class="int">1</span> ) <span class="control">-&gt;</span> ( <span class="goal-built_in">write</span>(<span class="quoted_atom">'My'</span>)<span class="control">,</span> <span class="var">Restrict</span> <span class="goal-built_in">is</span> <span class="int">0</span> )
+<span class="line-no"> 432</span>	<span class="control">;</span> <span class="goal-autoload">otherwise</span>            <span class="control">-&gt;</span> ( <span class="goal-built_in">write</span>(<span class="quoted_atom">'AI'</span>)<span class="control">,</span> <span class="var">No</span> <span class="goal-built_in">is</span> <span class="var">N</span> <span class="functor">-</span> <span class="int">1</span><span class="control">,</span> <span class="goal-built_in">write</span>(<span class="var">No</span>)<span class="control">,</span> <span class="var">Restrict</span> <span class="goal-built_in">is</span> <span class="int">0</span> )
+<span class="line-no"> 433</span>	)<span class="control">,</span>
+<span class="line-no"> 434</span>	<span class="goal-built_in">write</span>(<span class="quoted_atom">':	'</span>)<span class="control">,</span>
+<span class="line-no"> 435</span>	<span class="goal-local">printHand</span>(<span class="var">H</span>, <span class="var">Restrict</span>, <span class="var">Type</span>)<span class="control">,</span> <span class="goal-built_in">nl</span><span class="control">,</span>
+<span class="line-no"> 436</span>	<span class="var">N</span> <span class="goal-built_in">=&lt;</span> <span class="var">Total</span><span class="control">,</span>
+<span class="line-no"> 437</span>	<span class="var">N1</span> <span class="goal-built_in">is</span> <span class="var">N</span> <span class="functor">+</span> <span class="int">1</span><span class="control">,</span>
+<span class="line-no"> 438</span>	<span class="goal-recursion">printHands</span>(<span class="var">T</span>, <span class="var">Total</span>, <span class="var">N1</span>, <span class="var">Type</span>)</span></span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 439</span>printHands</span><span class="clause">(<span class="empty_list">[]</span>, <span class="var">N</span>, <span class="var">N1</span>, <span class="var">_</span>) <span class="neck">:-</span>
+<span class="line-no"> 440</span>	<span class="var">N1</span><span class="body"> <span class="goal-built_in">is</span> <span class="var">N</span> <span class="functor">+</span> <span class="int">1</span></span></span>.<span class="fullstop">
+</span><span id="printHands/2" class="head-unreferenced"><span class="line-no"> 441</span>printHands</span><span class="clause">(<span class="empty_list">[]</span>, <span class="var">_</span>)</span>.<span class="fullstop">
+</span></pre><dl class="comment">
+
+<dt class="pubdef"><span style="float:right"></span><a name="printHand/3"><b class="pred">printHand</b><var class="arglist">(+Hand, +N, +Type)</var></a> is <b class="det">det</b></dt><dd class="defbody">Nicely prints out a hand of cards. Can be used for both dealer by hiding the
+first card or by players by showing all of the cards - see the parameters for
+details.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>Hand</var></td><td class="argdescr">- A hand of player to be printed (list of <code>card</code> predicates).</td></tr>
+<tr><td><var>N</var></td><td class="argdescr">- 0: hides the first card; 1: shows all the cards.</td></tr>
+<tr><td><var>Type</var></td><td class="argdescr">- <var>Type</var> of a line to be printed <code>initial</code>: the first one or <code>cont</code>:
+any other.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd></dl>
+<pre class="listing">
+<span class="head"><span class="line-no"> 454</span>printHand</span><span class="clause">(<span class="list">[<span class="functor">card</span>( <span class="var">_</span>, <span class="var">_</span> )|<span class="var">T</span>]</span>, <span class="int">1</span>, init) <span class="neck">:-</span>
+<span class="line-no"> 455</span>	<span class="goal-built_in">write</span><span class="body">(<span class="quoted_atom">'_'</span>)<span class="control">,</span>
+<span class="line-no"> 456</span>	<span class="goal-built_in">write</span>(<span class="quoted_atom">'_'</span>)<span class="control">,</span>
+<span class="line-no"> 457</span>	<span class="goal-built_in">write</span>(<span class="quoted_atom">' '</span>)<span class="control">,</span>
+<span class="line-no"> 458</span>	<span class="goal-recursion">printHand</span>(<span class="var">T</span>, <span class="int">0</span>, init)</span></span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 459</span>printHand</span><span class="clause">( <span class="var">D</span>, <span class="int">1</span>, cont) <span class="neck">:-</span>
+<span class="line-no"> 460</span>	<span class="goal-recursion">printHand</span><span class="body">( <span class="var">D</span>, <span class="int">0</span>, cont)</span></span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 461</span>printHand</span><span class="clause">(<span class="list">[<span class="functor">card</span>( <span class="var">Suit</span>, <span class="var">Rank</span> )|<span class="var">T</span>]</span>, <span class="int">0</span>, <span class="var">_</span>) <span class="neck">:-</span>
+<span class="line-no"> 462</span>	<span class="goal-built_in">write</span><span class="body">(<span class="var">Suit</span>)<span class="control">,</span>
+<span class="line-no"> 463</span>	( <span class="var">Rank</span> <span class="goal-built_in">=</span> ace    <span class="control">-&gt;</span> <span class="goal-built_in">write</span>(<span class="quoted_atom">'A'</span>)
+<span class="line-no"> 464</span>	<span class="control">;</span> <span class="var">Rank</span> <span class="goal-built_in">=</span> jack   <span class="control">-&gt;</span> <span class="goal-built_in">write</span>(<span class="quoted_atom">'J'</span>)
+<span class="line-no"> 465</span>	<span class="control">;</span> <span class="var">Rank</span> <span class="goal-built_in">=</span> queen  <span class="control">-&gt;</span> <span class="goal-built_in">write</span>(<span class="quoted_atom">'Q'</span>)
+<span class="line-no"> 466</span>	<span class="control">;</span> <span class="var">Rank</span> <span class="goal-built_in">=</span> king   <span class="control">-&gt;</span> <span class="goal-built_in">write</span>(<span class="quoted_atom">'K'</span>)
+<span class="line-no"> 467</span>	<span class="control">;</span> <span class="goal-built_in">integer</span>(<span class="var">Rank</span>) <span class="control">-&gt;</span> <span class="goal-built_in">write</span>(<span class="var">Rank</span>)
+<span class="line-no"> 468</span>	)<span class="control">,</span>
+<span class="line-no"> 469</span>	<span class="goal-built_in">write</span>(<span class="quoted_atom">' '</span>)<span class="control">,</span>
+<span class="line-no"> 470</span>	<span class="goal-recursion">printHand</span>(<span class="var">T</span>, <span class="int">0</span>, <span class="var">_</span>)</span></span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 471</span>printHand</span><span class="clause">(<span class="empty_list">[]</span>, <span class="var">_</span>, <span class="var">_</span>)</span>.<span class="fullstop">
+</span></pre><dl class="comment">
+
+<dt class="pubdef"><span style="float:right"></span><a name="askCard/1"><b class="pred">askCard</b><var class="arglist">(-Answer)</var></a> is <b class="det">det</b></dt><dd class="defbody">Asks whether the user wants to get a new card.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>Answer</var></td><td class="argdescr">- Boolean valued decision variable: 1 (yes) or 0 (no).</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd></dl>
+<pre class="listing">
+<span class="head"><span class="line-no"> 479</span>askCard</span><span class="clause">(<span class="var">Answer</span>) <span class="neck">:-</span>
+<span class="line-no"> 480</span>	<span class="goal-built_in">write</span><span class="body">(<span class="quoted_atom">'Do you want to draw a card? [y/n]'</span>)<span class="control">,</span> <span class="goal-built_in">nl</span><span class="control">,</span> <span class="comment">% [121] / [110]
+</span><span class="line-no"> 481</span>	<span class="goal-autoload">read_line_to_codes</span>(user_input, <span class="var">Input</span>)<span class="control">,</span>
+<span class="line-no"> 482</span>	( <span class="var">Input</span> <span class="goal-built_in">=</span> <span class="list">[<span class="int">121</span>]</span> <span class="control">-&gt;</span> <span class="var">Answer</span> <span class="goal-built_in">is</span> <span class="int">1</span>
+<span class="line-no"> 483</span>	<span class="control">;</span> <span class="var">Input</span> <span class="goal-built_in">=</span> <span class="list">[<span class="int">110</span>]</span> <span class="control">-&gt;</span> <span class="var">Answer</span> <span class="goal-built_in">is</span> <span class="int">0</span>
+<span class="line-no"> 484</span>	<span class="control">;</span> <span class="goal-autoload">otherwise</span>     <span class="control">-&gt;</span> <span class="goal-recursion">askCard</span>(<span class="var">Answer</span>)</span></span>
+<span class="fullstop"><span class="line-no"> 485</span>	</span></pre>
+</body>
+</html>

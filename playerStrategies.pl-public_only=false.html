@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>playerStrategies.pl -- Player strategies for the Blackjack game simulator</title>
+
+<script type="text/javascript" src="res/jquery.js">
+
+</script>
+<script type="text/javascript" src="res/pldoc.js">
+
+</script>
+<link rel="stylesheet" type="text/css" href="res/pldoc.css">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+</head>
+<body>
+
+<h1 class="file"><span style="float:right"><a href="playerStrategies.pl.html"><img class="action" alt="All predicates" title="Click to show exports only" src="res/private.png"></a><a href="playerStrategies.pl-show=src.html"><img class="action" alt="Show source" title="Show source" src="res/source.png"></a></span>playerStrategies.pl -- Player strategies for the Blackjack game simulator</h1>
+
+<p>
+This module contains player strategies configuration and predicates.</p>
+
+<dl class="tags">
+<dt class="keyword-author">author</dt><dd class="keyword-author">- Kacper Sokol</dd>
+<dt class="keyword-license">license</dt><dd class="keyword-license">- GPL</dd>
+</dl>
+
+<dl>
+<dt class="privdef"><span style="float:right"></span><a name="dealType/2"><b class="pred">dealType</b><var class="arglist">(-Type, +Player)</var></a> is <b class="det">det</b><span class="anot" style="float:right">[private]</span></dt><dd class="defbody">Check the hand type of given player:
+<ul>
+<li><b>hard</b> - if it does not contain any ace;</li>
+<li><b>soft</b> - if it contains at least one ace.</li>
+</ul>
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>Type</var></td><td class="argdescr">- The type of the player's hand: <code>hard</code> or <code>soft</code>.</td></tr>
+<tr><td><var>Player</var></td><td class="argdescr">- <var>Player</var>'s cards: a list of <code>card</code> predicates.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd>
+<dt class="privdef"><span style="float:right"></span><a name="dealerFaceUp/2"><b class="pred">dealerFaceUp</b><var class="arglist">(-ValueR, +Hand)</var></a> is <b class="det">det</b><span class="anot" style="float:right">[private]</span></dt><dd class="defbody">Checks value of face-up card (2nd card) - used mainly with dealer's hand.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>ValueR</var></td><td class="argdescr">- The value of face-up card (2nd card).</td></tr>
+<tr><td><var>Hand</var></td><td class="argdescr">- Player's cards: a list of <code>card</code> predicates.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd>
+<dt class="privdef"><span style="float:right"></span><a name="cardsOnTable/2"><b class="pred">cardsOnTable</b><var class="arglist">(-N, +Table)</var></a> is <b class="det">det</b><span class="anot" style="float:right">[private]</span></dt><dd class="defbody">Counts the number of cards on the table.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>N</var></td><td class="argdescr">- The number of all cards on the table.</td></tr>
+<tr><td><var>Table</var></td><td class="argdescr">- List of cards held by all player (list of lists).</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd>
+<dt class="privdef"><span style="float:right"></span><a name="attach/4"><b class="pred">attach</b><var class="arglist">(-NLs, +Ls, +Elem, +X)</var></a> is <b class="det">det</b><span class="anot" style="float:right">[private]</span></dt><dd class="defbody">Attaches element <var>Elem</var> to list <var>Ls</var> at position <var>X</var>; where the position is
+an index counted from 1.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>NLs</var></td><td class="argdescr">- The output list with attached element.</td></tr>
+<tr><td><var>Ls</var></td><td class="argdescr">- The input list to which the new element should be attached.</td></tr>
+<tr><td><var>Elem</var></td><td class="argdescr">- The element to be attached.</td></tr>
+<tr><td><var>X</var></td><td class="argdescr">- The position's index (starting at 1) at which the element is
+attached.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd>
+<dt class="privdef"><span style="float:right"></span><a name="replace/4"><b class="pred">replace</b><var class="arglist">(-NLs, +Ls, +Elem, +X)</var></a> is <b class="det">det</b><span class="anot" style="float:right">[private]</span></dt><dd class="defbody">Replaces the element with index <var>X</var> (counting from 1) in the list <var>Ls</var> with
+new element <var>Elem</var>. The original element is disregarded.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>NLs</var></td><td class="argdescr">- The output list with replaced element.</td></tr>
+<tr><td><var>Ls</var></td><td class="argdescr">- The input list in which the old element is replaced with the new
+one.</td></tr>
+<tr><td><var>Elem</var></td><td class="argdescr">- The new element that is placed in the list.</td></tr>
+<tr><td><var>X</var></td><td class="argdescr">- The position's index (starting at 1) at which the element is
+replaced.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd>
+<dt class="pubdef"><span style="float:right"></span><a name="playAI/6"><b class="pred">playAI</b><var class="arglist">(-NTable, -NNDeck, -NRefuse, +Table, +NDeck, +Refuse)</var></a> is <b class="det">det</b></dt><dd class="defbody">Assigns strategy to each player via <code>playAISequence</code> predicate and return
+resulting: table, deck, refusal list.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>NTable</var></td><td class="argdescr">- <b>New</b> list of cards held by all player after current round.</td></tr>
+<tr><td><var>NNDeck</var></td><td class="argdescr">- <b>New</b> list of cards remaining in the deck after current round.</td></tr>
+<tr><td><var>NRefuse</var></td><td class="argdescr">- <b>New</b> list of players not allowed to draw a card after
+current round.</td></tr>
+<tr><td><var>Table</var></td><td class="argdescr">- List of cards held by all player before current round.</td></tr>
+<tr><td><var>NDeck</var></td><td class="argdescr">- List of cards remaining in the deck before current round.</td></tr>
+<tr><td><var>Refuse</var></td><td class="argdescr">- List of players not allowed to draw a card before current
+round.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd>
+<dt class="privdef"><span style="float:right"></span><a name="playAISequence/9"><b class="pred">playAISequence</b><var class="arglist">(-NewTable, -NNDeck, -NRefuse, +Table, +NDeck, +Dealer, +Counter, +X, +Refuse)</var></a> is <b class="det">det</b><span class="anot" style="float:right">[private]</span></dt><dd class="defbody">Assigns strategy to each player and simulates then; then returns resulting:
+table, deck, refusal list. The first player in the list plays <code>playAIDet</code>,
+the second <code>playAIDeck</code>, the third <code>playAIMix</code>, the fourth <b>always holds</b>,
+finally the rest of the players are playing <code>playAIDet</code> strategy.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>NewTable</var></td><td class="argdescr">- <b>New</b> list of cards held by all players <strong>excluding dealer</strong>
+after current round.</td></tr>
+<tr><td><var>NNDeck</var></td><td class="argdescr">- <b>New</b> list of cards remaining in the deck after current round.</td></tr>
+<tr><td><var>NRefuse</var></td><td class="argdescr">- <b>New</b> list of players not allowed to draw a card after
+current round.</td></tr>
+<tr><td><var>Table</var></td><td class="argdescr">- List of cards held by all players <b>excluding dealer</b>* before
+current round.</td></tr>
+<tr><td><var>NDeck</var></td><td class="argdescr">- List of cards remaining in the deck before current round.</td></tr>
+<tr><td><var>Dealer</var></td><td class="argdescr">- <var>Dealer</var>'s cards: a list of <code>card</code> predicates.</td></tr>
+<tr><td><var>Counter</var></td><td class="argdescr">- The loop counter.</td></tr>
+<tr><td><var>X</var></td><td class="argdescr">- The total number of AI driven players.</td></tr>
+<tr><td><var>Refuse</var></td><td class="argdescr">- List of players not allowed to draw a card before current
+round.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd>
+<dt class="privdef"><span style="float:right"></span><a name="playAIDet/5"><b class="pred">playAIDet</b><var class="arglist">(-NPlayer, -NDeck, +Player, +Deck, +Dealer)</var></a> is <b class="det">det</b><span class="anot" style="float:right">[private]</span></dt><dd class="defbody">1st strategy <code>playAIDet</code>: Deterministic strategy which can only <b>hit</b> in the
+first round.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>NPlayer</var></td><td class="argdescr">- <var>Player</var>'s hand <strong>after</strong> player's action.</td></tr>
+<tr><td><var>NDeck</var></td><td class="argdescr">- List of cards in the deck <strong>after</strong> player's action.</td></tr>
+<tr><td><var>Player</var></td><td class="argdescr">- <var>Player</var>'s hand <strong>before</strong> player's action.</td></tr>
+<tr><td><var>Deck</var></td><td class="argdescr">- List of cards in the deck <strong>before</strong> player's action.</td></tr>
+<tr><td><var>Dealer</var></td><td class="argdescr">- <var>Dealer</var>'s cards: a list of <code>card</code> predicates.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd>
+<dt class="privdef"><span style="float:right"></span><a name="playAIDeck/5"><b class="pred">playAIDeck</b><var class="arglist">(-PlayerA, -ChDeck, +PlayerB, +Deck, +Table)</var></a> is <b class="det">det</b><span class="anot" style="float:right">[private]</span></dt><dd class="defbody">2nd strategy <code>playAIDeck</code>: Shuffle tracking strategy which estimates <b>deck
+probabilities</b>. It assumes that the deck has started being in ordered; then
+it calculates probabilities of each card occurring at given position and
+decides to hit or stand based on the cards with highest probabilities.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>PlayerA</var></td><td class="argdescr">- Player's hand <strong>after</strong> player's action.</td></tr>
+<tr><td><var>ChDeck</var></td><td class="argdescr">- List of cards in the deck <strong>after</strong> player's action.</td></tr>
+<tr><td><var>PlayerB</var></td><td class="argdescr">- Player's hand <strong>before</strong> player's action.</td></tr>
+<tr><td><var>Deck</var></td><td class="argdescr">- List of cards in the deck <strong>before</strong> player's action.</td></tr>
+<tr><td><var>Table</var></td><td class="argdescr">- List of cards held by all players <b>excluding dealer</b>* before
+current round (list of lists).</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd>
+<dt class="privdef"><span style="float:right"></span><a name="initDeckProbabilities/3"><b class="pred">initDeckProbabilities</b><var class="arglist">(-Deck, +Quantity, +Type)</var></a> is <b class="det">det</b><span class="anot" style="float:right">[private]</span></dt><dd class="defbody">Simulate card shuffle by preparing deck probability table for initial number
+of shuffles. The type of shuffle can be one of those defined by <code>shuffleMode</code>
+parameter in <code>deck</code> package. The binary vector (list of 0's and 1's) that
+decides probability of given card position in shuffle is estimated based on
+shuffle type.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>Deck</var></td><td class="argdescr">- A shuffled initial deck of cards (list of predicates <code>card</code>).</td></tr>
+<tr><td><var>Quantity</var></td><td class="argdescr">- Total umber of shuffles to do.</td></tr>
+<tr><td><var>Type</var></td><td class="argdescr">- <var>Type</var> of card shuffle to simulate.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd>
+<dt class="privdef"><span style="float:right"></span><a name="shuffleMock/4"><b class="pred">shuffleMock</b><var class="arglist">(-Shuffled, +Deck, +N, +Sampling)</var></a> is <b class="det">det</b><span class="anot" style="float:right">[private]</span></dt><dd class="defbody">Simulate card shuffle; the type of shuffle to simulate is taken from system
+settings: see <code>shuffleMode</code> parameter in <code>deck</code> package.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>Shuffled</var></td><td class="argdescr">- <var>Shuffled</var> deck of cards (list of predicates <code>card</code>).</td></tr>
+<tr><td><var>Deck</var></td><td class="argdescr">- A deck of cards to be shuffled (list of predicates <code>card</code>).</td></tr>
+<tr><td><var>N</var></td><td class="argdescr">- Shuffling counter - number of shuffles to do.</td></tr>
+<tr><td><var>Sampling</var></td><td class="argdescr">- A binary vector (list of 0's and 1's) that decides whether
+card from given pile (pile A) should be placed on top or
+bottom of the card from other pile (pile B).</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd>
+<dt class="privdef"><span style="float:right"></span><a name="rifleDetMock/3"><b class="pred">rifleDetMock</b><var class="arglist">(-Out, +A, +B)</var></a> is <b class="det">det</b><span class="anot" style="float:right">[private]</span></dt><dd class="defbody">Rifle-shuffle two piles of cards deterministically. The only random bit here
+is whether the shuffle starts with pile <var>A</var> or pile <var>B</var>.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>Out</var></td><td class="argdescr">- Merged deck (list of predicates <code>card</code>).</td></tr>
+<tr><td><var>A</var></td><td class="argdescr">- 1st part of deck to be merged (list of predicates <code>card</code>).</td></tr>
+<tr><td><var>B</var></td><td class="argdescr">- 2nd part of deck to be merged (list of predicates <code>card</code>).</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd>
+<dt class="privdef"><span style="float:right"></span><a name="rifleRanMock/5"><b class="pred">rifleRanMock</b><var class="arglist">(-Out, +A, +B, -NSampling, +Sampling)</var></a> is <b class="det">det</b><span class="anot" style="float:right">[private]</span></dt><dd class="defbody">Rifle-shuffle two piles of cards with <b>random</b> card selection.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>Out</var></td><td class="argdescr">- Merged deck (list of predicates <code>card</code>).</td></tr>
+<tr><td><var>A</var></td><td class="argdescr">- 1st part of deck to be merged (list of predicates <code>card</code>).</td></tr>
+<tr><td><var>B</var></td><td class="argdescr">- 2nd part of deck to be merged (list of predicates <code>card</code>).</td></tr>
+<tr><td><var>NSampling</var></td><td class="argdescr">- See <var>Sampling</var> parameter; the leftovers needed for next
+round of shuffling.</td></tr>
+<tr><td><var>Sampling</var></td><td class="argdescr">- <var>A</var> binary vector (list of 0's and 1's) that decides whether
+card from given pile (pile <var>A</var>) should be placed on top or
+bottom of the card from other pile (pile <var>B</var>).</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd>
+<dt class="privdef"><span style="float:right"></span><a name="playMix/6"><b class="pred">playMix</b><var class="arglist">(-PlayerA, -ChDeck, +PlayerB, +NDeck, +Dealer, +Table)</var></a> is <b class="det">det</b><span class="anot" style="float:right">[private]</span></dt><dd class="defbody">3rd strategy <code>playMix</code>: 0.5 chance of playing <b>deterministic</b> strategy (1st) and
+0.5 chance of playing <b>deck memory</b> strategy (2nd).
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>PlayerA</var></td><td class="argdescr">- Player's hand <strong>after</strong> player's action.</td></tr>
+<tr><td><var>ChDeck</var></td><td class="argdescr">- List of cards in the deck <strong>after</strong> player's action.</td></tr>
+<tr><td><var>PlayerB</var></td><td class="argdescr">- Player's hand <strong>before</strong> player's action.</td></tr>
+<tr><td><var>NDeck</var></td><td class="argdescr">- List of cards in the deck <strong>before</strong> player's action.</td></tr>
+<tr><td><var>Dealer</var></td><td class="argdescr">- <var>Dealer</var>'s cards: a list of <code>card</code> predicates.</td></tr>
+<tr><td><var>Table</var></td><td class="argdescr">- List of cards held by all players <b>excluding dealer</b>* before
+current round (list of lists).</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd>
+<dt class="privdef"><span style="float:right"></span><a name="hardAction/3"><b class="pred">hardAction</b><var class="arglist">(-Action, +DealerCard, +PlayersScore)</var></a> is <b class="det">det</b><span class="anot" style="float:right">[private]</span></dt>
+<dt class="privdef"><b class="pred">hardAction</b><var class="arglist">(+Action, +DealerCard, +PlayersScore)</var> is <b class="det">det</b><span class="anot" style="float:right">[private]</span></dt><dd class="defbody">A lookup table for <b>hard totals</b> strategy. For pairs the <strong>split</strong> action is
+disregarded.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>Action</var></td><td class="argdescr">- An action to be taken according to strategy, dealer's
+hand and player's score.</td></tr>
+<tr><td><var>DealerCard</var></td><td class="argdescr">- The value of dealer's card facing up.</td></tr>
+<tr><td><var>PlayersScore</var></td><td class="argdescr">- The player's score.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd>
+<dt class="privdef"><span style="float:right"></span><a name="softAction/3"><b class="pred">softAction</b><var class="arglist">(-Action, +DealerCard, +PlayersScore)</var></a> is <b class="det">det</b><span class="anot" style="float:right">[private]</span></dt>
+<dt class="privdef"><b class="pred">softAction</b><var class="arglist">(+Action, +DealerCard, +PlayersScore)</var> is <b class="det">det</b><span class="anot" style="float:right">[private]</span></dt><dd class="defbody">A lookup table for <b>soft totals</b> strategy. For pairs the <strong>split</strong> action is
+disregarded.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>Action</var></td><td class="argdescr">- An action to be taken according to strategy, dealer's
+hand and player's score.</td></tr>
+<tr><td><var>DealerCard</var></td><td class="argdescr">- The value of dealer's card facing up.</td></tr>
+<tr><td><var>PlayersScore</var></td><td class="argdescr">- The player's score.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd>
+</dl>
+
+</body>
+</html>

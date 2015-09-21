@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>blackJack.pl -- Blackjack game simulator</title>
+
+<script type="text/javascript" src="res/jquery.js">
+
+</script>
+<script type="text/javascript" src="res/pldoc.js">
+
+</script>
+<link rel="stylesheet" type="text/css" href="res/pldoc.css">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+</head>
+<body>
+
+<h1 class="file"><span style="float:right"><a href="blackJack.pl-public_only=false.html"><img class="action" alt="Public" title="Click to include private" src="res/public.png"></a><a href="blackJack.pl-show=src.html"><img class="action" alt="Show source" title="Show source" src="res/source.png"></a></span>blackJack.pl -- Blackjack game simulator</h1>
+
+<p>
+This module contains Blackjack game simulator: predicates and configuration. It
+is responsible for running the game and I/O interactions.</p>
+
+<dl class="tags">
+<dt class="keyword-author">author</dt><dd class="keyword-author">- Kacper Sokol</dd>
+<dt class="keyword-license">license</dt><dd class="keyword-license">- GPL</dd>
+</dl>
+
+<dl>
+<dt class="pubdef"><span style="float:right"></span><a name="players/1"><b class="pred">players</b><var class="arglist">(-PlayersNo)</var></a> is <b class="det">det</b></dt><dd class="defbody">Defines number of AI controlled players; the AI algorithms are assigned in
+<code>playAISequence</code> predicate in <code>playerStrategies</code> module.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>PlayersNo</var></td><td class="argdescr">- Number of AI controlled players.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd>
+<dt class="pubdef"><span style="float:right"></span><a name="initShuffles/1"><b class="pred">initShuffles</b><var class="arglist">(-N)</var></a> is <b class="det">det</b></dt><dd class="defbody">Defines number of initial shuffles: the shuffles before cards are dealt and
+the game starts. The upper limit on this value is 10.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>N</var></td><td class="argdescr">- Number of initial shuffles.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd>
+<dt class="pubdef"><span style="float:right"></span><a name="blackJack/0"><b class="pred">blackJack</b></a> is <b class="det">det</b></dt><dd class="defbody">The game's main loop. The game is initialised and run based on global
+parameters defined in header of each module.</dd>
+<dt class="pubdef"><span style="float:right"></span><a name="scoreTop/2"><b class="pred">scoreTop</b><var class="arglist">(-Sc, +Hand)</var></a> is <b class="det">det</b></dt><dd class="defbody">Gets the highest score closest to 21 but not exceeding it if possible (ace
+handling).
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>Sc</var></td><td class="argdescr">- The optimal score of the input hand.</td></tr>
+<tr><td><var>Hand</var></td><td class="argdescr">- A list of player's cards (<code>card</code> predicates).</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd>
+<dt class="pubdef"><span style="float:right"></span><a name="userPlayer/1"><b class="pred">userPlayer</b><var class="arglist">(-N)</var></a> is <b class="det">det</b></dt><dd class="defbody">Checks whether interactive player is activated and returns 1 if so.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>N</var></td><td class="argdescr">- Number of interactive players in the game: 1 or 0.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd>
+<dt class="pubdef"><span style="float:right"></span><a name="split/4"><b class="pred">split</b><var class="arglist">(-A, -B, +List, +Num)</var></a> is <b class="det">det</b></dt><dd class="defbody">Split a list into two sub-lists at given index. Index can be 1:# of elements
+in the input list. The indexing starts at 1. The specified index and all of
+the following elements will be placed in the second list.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>A</var></td><td class="argdescr">- Pre-index sub-list.</td></tr>
+<tr><td><var>B</var></td><td class="argdescr">- Post-index sub-list.</td></tr>
+<tr><td><var>List</var></td><td class="argdescr">- The list to be split.</td></tr>
+<tr><td><var>Num</var></td><td class="argdescr">- The list to be split.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd>
+</dl>
+
+</body>
+</html>

@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>blackJack.pl -- Blackjack game simulator</title>
+
+<script type="text/javascript" src="res/jquery.js">
+
+</script>
+<script type="text/javascript" src="res/pldoc.js">
+
+</script>
+<link rel="stylesheet" type="text/css" href="res/pldoc.css">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+</head>
+<body>
+
+<h1 class="file"><span style="float:right"><a href="blackJack.pl.html"><img class="action" alt="All predicates" title="Click to show exports only" src="res/private.png"></a><a href="blackJack.pl-show=src.html"><img class="action" alt="Show source" title="Show source" src="res/source.png"></a></span>blackJack.pl -- Blackjack game simulator</h1>
+
+<p>
+This module contains Blackjack game simulator: predicates and configuration. It
+is responsible for running the game and I/O interactions.</p>
+
+<dl class="tags">
+<dt class="keyword-author">author</dt><dd class="keyword-author">- Kacper Sokol</dd>
+<dt class="keyword-license">license</dt><dd class="keyword-license">- GPL</dd>
+</dl>
+
+<dl>
+<dt class="privdef"><span style="float:right"></span><a name="plays/1"><b class="pred">plays</b><var class="arglist">(-N)</var></a> is <b class="det">det</b><span class="anot" style="float:right">[private]</span></dt><dd class="defbody">Defines number of plays. Proposed values:
+<ul>
+<li>random shuffling - 300,</li>
+<li>deterministic shuffling - 50,</li>
+<li>two decks with random shuffling 100.</li>
+</ul>
+
+<p>
+Otherwise you may run into <b>out of global stack</b> troubles.</p>
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>N</var></td><td class="argdescr">- Number of plays.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd>
+<dt class="privdef"><span style="float:right"></span><a name="playerMode/1"><b class="pred">playerMode</b><var class="arglist">(-Mode)</var></a> is <b class="det">det</b><span class="anot" style="float:right">[private]</span></dt><dd class="defbody">Defines type of play:
+<ul>
+<li><code>interactive</code> - a player controlled by the user is added,</li>
+<li><code>experimental</code> - all players are controlled by AI algorithms as defined
+in <code>playAISequence</code> predicate in <code>playerStrategies</code> module.</li>
+</ul>
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>Mode</var></td><td class="argdescr">- <var>Mode</var> of play-through.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd>
+<dt class="pubdef"><span style="float:right"></span><a name="players/1"><b class="pred">players</b><var class="arglist">(-PlayersNo)</var></a> is <b class="det">det</b></dt><dd class="defbody">Defines number of AI controlled players; the AI algorithms are assigned in
+<code>playAISequence</code> predicate in <code>playerStrategies</code> module.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>PlayersNo</var></td><td class="argdescr">- Number of AI controlled players.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd>
+<dt class="pubdef"><span style="float:right"></span><a name="initShuffles/1"><b class="pred">initShuffles</b><var class="arglist">(-N)</var></a> is <b class="det">det</b></dt><dd class="defbody">Defines number of initial shuffles: the shuffles before cards are dealt and
+the game starts. The upper limit on this value is 10.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>N</var></td><td class="argdescr">- Number of initial shuffles.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd>
+<dt class="pubdef"><span style="float:right"></span><a name="blackJack/0"><b class="pred">blackJack</b></a> is <b class="det">det</b></dt><dd class="defbody">The game's main loop. The game is initialised and run based on global
+parameters defined in header of each module.</dd>
+<dt class="privdef"><span style="float:right"></span><a name="play/1"><b class="pred">play</b><var class="arglist">(+Gno)</var></a> is <b class="det">det</b><span class="anot" style="float:right">[private]</span></dt><dd class="defbody">Initialises and tun a single game.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>Gno</var></td><td class="argdescr">- Number of games to be run.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd>
+<dt class="privdef"><span style="float:right"></span><a name="appendScores/2"><b class="pred">appendScores</b><var class="arglist">(+FinalTable, +Gno)</var></a> is <b class="det">det</b><span class="anot" style="float:right">[private]</span></dt><dd class="defbody">Calculates the scores and puts them into R variables for graph plotting and
+CSV exporting.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>FinalTable</var></td><td class="argdescr">- The final card allocation on the table (list of lists of
+<code>card</code> predicates).</td></tr>
+<tr><td><var>Gno</var></td><td class="argdescr">- Game id.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd>
+<dt class="pubdef"><span style="float:right"></span><a name="scoreTop/2"><b class="pred">scoreTop</b><var class="arglist">(-Sc, +Hand)</var></a> is <b class="det">det</b></dt><dd class="defbody">Gets the highest score closest to 21 but not exceeding it if possible (ace
+handling).
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>Sc</var></td><td class="argdescr">- The optimal score of the input hand.</td></tr>
+<tr><td><var>Hand</var></td><td class="argdescr">- A list of player's cards (<code>card</code> predicates).</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd>
+<dt class="privdef"><span style="float:right"></span><a name="theGame/5"><b class="pred">theGame</b><var class="arglist">(-FinalTable, +Table, +Deck, +Ask, +Refused)</var></a> is <b class="det">det</b><span class="anot" style="float:right">[private]</span></dt><dd class="defbody">A predicate collection for a single game - the game engine.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>FinalTable</var></td><td class="argdescr">- The table after the whole round.</td></tr>
+<tr><td><var>Table</var></td><td class="argdescr">- The initial table - initial deal.</td></tr>
+<tr><td><var>Deck</var></td><td class="argdescr">- The deck of cards to draw additional cards.</td></tr>
+<tr><td><var>Ask</var></td><td class="argdescr">- Player interaction parameter: 1 - ask player for card
+drawing (interactive mode only); 0 - do not ask the player.</td></tr>
+<tr><td><var>Refused</var></td><td class="argdescr">- A vector of 0's (allow) and 1's (do not allow) indicating
+which player is allowed to draw additional card.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd>
+<dt class="privdef"><span style="float:right"></span><a name="aIbj/3"><b class="pred">aIbj</b><var class="arglist">(-ReRefused, +Allowance, +Refused)</var></a> is <b class="det">det</b><span class="anot" style="float:right">[private]</span></dt><dd class="defbody">Updates the player refusal vector - a vector which indicates which player
+has refused a card hence is no allowed to take one any more - based on
+player's score: if a player hits or exceeds 21 it is no more allowed to take
+a card.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>ReRefused</var></td><td class="argdescr">- Updated player refusal vector based on scores.</td></tr>
+<tr><td><var>Allowance</var></td><td class="argdescr">- A vector of the current player's status in the game: -1 -
+more than 21 points; 0 - less than 21 points; 1 - exactly
+21 points.</td></tr>
+<tr><td><var>
+
+<blockquote>
+<w>Refused</w> <w>Players</w> <w>refused</w> <w>to</w> <w>take</w> <w>the</w> <w>card</w> <w>hence</w> <w>are</w> <w>not</w> <w>allowed</w> <w>to</w>
+<w>play</w> <w>any</w> <w>more</w> - <w>a</w> <w>vector</w> <w>of</w> <w>1</w>'<w>s</w> (<w>refused</w>) <w>and</w> <w>0</w>'<w>s</w> (<w>not</w> <w>yet</w>
+<w>refused</w>).
+</blockquote>
+
+</var></td><td class="argdescr">- </td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd>
+<dt class="privdef"><span style="float:right"></span><a name="checkTheEnd/1"><b class="pred">checkTheEnd</b><var class="arglist">(+Aa)</var></a> is <b class="det">det</b><span class="anot" style="float:right">[private]</span></dt><dd class="defbody">Checks whether all players are done playing.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>Aa</var></td><td class="argdescr">- The players status (list of player states); see checkBJ:ScoreTabel
+for details.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd>
+<dt class="pubdef"><span style="float:right"></span><a name="userPlayer/1"><b class="pred">userPlayer</b><var class="arglist">(-N)</var></a> is <b class="det">det</b></dt><dd class="defbody">Checks whether interactive player is activated and returns 1 if so.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>N</var></td><td class="argdescr">- Number of interactive players in the game: 1 or 0.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd>
+<dt class="privdef"><span style="float:right"></span><a name="getNoPlayers/1"><b class="pred">getNoPlayers</b><var class="arglist">(-R)</var></a> is <b class="det">det</b><span class="anot" style="float:right">[private]</span></dt><dd class="defbody">Calculates the total number of players in the game including dealer, AIs and
+interactive player.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>R</var></td><td class="argdescr">- Number of players in the game.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd>
+<dt class="privdef"><span style="float:right"></span><a name="refusal/3"><b class="pred">refusal</b><var class="arglist">(-Ls, +X, +Content)</var></a> is <b class="det">det</b><span class="anot" style="float:right">[private]</span></dt><dd class="defbody">Generates a list with <var>X</var> elements <var>Content</var>.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>Ls</var></td><td class="argdescr">- List populated with <var>X</var> occurrences of <var>Content</var>.</td></tr>
+<tr><td><var>X</var></td><td class="argdescr">- Number of elements to be populated.</td></tr>
+<tr><td><var>Content</var></td><td class="argdescr">- Element to be populated.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd>
+<dt class="privdef"><span style="float:right"></span><a name="checkBJ/3"><b class="pred">checkBJ</b><var class="arglist">(-ScoreTable, -Values, +Table)</var></a> is <b class="det">det</b><span class="anot" style="float:right">[private]</span></dt><dd class="defbody">Checks the status of the game - instant win/loose; returns all possible
+scores of each hand no the table.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>ScoreTable</var></td><td class="argdescr">- The current player's status in the game: -1 - more than
+21 points; 0 - less than 21 points; 1 - exactly 21 points.</td></tr>
+<tr><td><var>Values</var></td><td class="argdescr">- The list of player's scores; each player can have more
+than one score in case he has an ace in his hand.</td></tr>
+<tr><td><var>Table</var></td><td class="argdescr">- List of cards held by all player (list of lists).</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd>
+<dt class="privdef"><span style="float:right"></span><a name="findMinBJ/2"><b class="pred">findMinBJ</b><var class="arglist">(-Smin, +Scores)</var></a> is <b class="det">det</b><span class="anot" style="float:right">[private]</span></dt><dd class="defbody">If 21 is in the list it is returned otherwise, the minimum of the input list
+is returned.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>Smin</var></td><td class="argdescr">- The minimum in the input list <strong>or</strong> 21 if a member of the
+list.</td></tr>
+<tr><td><var>Scores</var></td><td class="argdescr">- The list of (unsorted) numbers.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd>
+<dt class="privdef"><span style="float:right"></span><a name="findMin/2"><b class="pred">findMin</b><var class="arglist">(-Smin, +Scores)</var></a> is <b class="det">det</b><span class="anot" style="float:right">[private]</span></dt><dd class="defbody">Finds the minimum of the input list.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>Smin</var></td><td class="argdescr">- The minimum in the input list.</td></tr>
+<tr><td><var>Scores</var></td><td class="argdescr">- The list of (unsorted) numbers.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd>
+<dt class="pubdef"><span style="float:right"></span><a name="split/4"><b class="pred">split</b><var class="arglist">(-A, -B, +List, +Num)</var></a> is <b class="det">det</b></dt><dd class="defbody">Split a list into two sub-lists at given index. Index can be 1:# of elements
+in the input list. The indexing starts at 1. The specified index and all of
+the following elements will be placed in the second list.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>A</var></td><td class="argdescr">- Pre-index sub-list.</td></tr>
+<tr><td><var>B</var></td><td class="argdescr">- Post-index sub-list.</td></tr>
+<tr><td><var>List</var></td><td class="argdescr">- The list to be split.</td></tr>
+<tr><td><var>Num</var></td><td class="argdescr">- The list to be split.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd>
+<dt class="privdef"><span style="float:right"></span><a name="printGame/2"><b class="pred">printGame</b><var class="arglist">(+Table, +Type)</var></a> is <b class="det">det</b><span class="anot" style="float:right">[private]</span></dt><dd class="defbody">Nicely prints out a game state. It assumes that the first player on the
+table is the dealer.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>Table</var></td><td class="argdescr">- List of cards held by all player (list of lists).</td></tr>
+<tr><td><var>Type</var></td><td class="argdescr">- <var>Type</var> of a <code>line(s)</code> to be printed <code>initial</code>: the first one or <code>cont</code>:
+any other.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd>
+<dt class="privdef"><span style="float:right"></span><a name="printHands/4"><b class="pred">printHands</b><var class="arglist">(+Table, +Total, +N, +Type)</var></a> is <b class="det">det</b><span class="anot" style="float:right">[private]</span></dt><dd class="defbody">Nicely prints out a table of cards. It assumes that the first player on the
+table is the dealer.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>Table</var></td><td class="argdescr">- List of cards held by all player (list of lists).</td></tr>
+<tr><td><var>Total</var></td><td class="argdescr">- <var>Total</var> number of players including dealer, AIs and interactive.</td></tr>
+<tr><td><var>N</var></td><td class="argdescr">- Player counter: 1-#ofPlayers.</td></tr>
+<tr><td><var>Type</var></td><td class="argdescr">- <var>Type</var> of a <code>line(s)</code> to be printed <code>initial</code>: the first one or <code>cont</code>:
+any other.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd>
+<dt class="privdef"><span style="float:right"></span><a name="printHand/3"><b class="pred">printHand</b><var class="arglist">(+Hand, +N, +Type)</var></a> is <b class="det">det</b><span class="anot" style="float:right">[private]</span></dt><dd class="defbody">Nicely prints out a hand of cards. Can be used for both dealer by hiding the
+first card or by players by showing all of the cards - see the parameters for
+details.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>Hand</var></td><td class="argdescr">- A hand of player to be printed (list of <code>card</code> predicates).</td></tr>
+<tr><td><var>N</var></td><td class="argdescr">- 0: hides the first card; 1: shows all the cards.</td></tr>
+<tr><td><var>Type</var></td><td class="argdescr">- <var>Type</var> of a line to be printed <code>initial</code>: the first one or <code>cont</code>:
+any other.</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd>
+<dt class="privdef"><span style="float:right"></span><a name="askCard/1"><b class="pred">askCard</b><var class="arglist">(-Answer)</var></a> is <b class="det">det</b><span class="anot" style="float:right">[private]</span></dt><dd class="defbody">Asks whether the user wants to get a new card.
+
+<dl class="tags">
+<dt class="tag">Arguments:</dt><dd>
+
+<table class="arglist">
+<tr><td><var>Answer</var></td><td class="argdescr">- Boolean valued decision variable: 1 (yes) or 0 (no).</td></tr>
+</table>
+
+</dd>
+</dl>
+
+</dd>
+</dl>
+
+</body>
+</html>

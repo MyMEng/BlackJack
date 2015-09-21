@@ -1,0 +1,325 @@
+<!DOCTYPE html<html>
+  <head>
+    <title>deck.pl</title>
+    <link rel="stylesheet" type="text/css" href="res/pllisting.css">
+    <link rel="stylesheet" type="text/css" href="res/pldoc.css">
+  </head>
+<body>
+
+<div class="src_formats">View source with <a href="deck.pl-format_comments=true&amp;show=src.html">formatted comments</a> or as <a href="deck.pl-format_comments=false&amp;show=raw">raw</a></div>
+<pre class="listing">
+<span class="structured_comment"><span class="line-no">   1</span>/** &lt;module&gt; Predicates for handling a deck of card
+<span class="line-no">   2</span>
+<span class="line-no">   3</span>This module contains configuration and predicates responsible for handling
+<span class="line-no">   4</span>deck(s) of cards through the game.
+<span class="line-no">   5</span>
+<span class="line-no">   6</span>@author Kacper Sokol
+<span class="line-no">   7</span>@license GPL
+<span class="line-no">   8</span>*/
+</span><span class="line-no">   9</span>
+<span class="directive"><span class="neck"><span class="line-no">  10</span>:- <span class="goal-built_in">module</span><span class="body">( <span class="identifier">deck</span>,
+<span class="line-no">  11</span>  <span class="list">[<span class="goal-local">decks</span><span class="predicate_indicator"><span class="predicate_indicator">/</span><span class="arity">1</span></span>,
+<span class="line-no">  12</span>   <span class="goal-local">shuffleMode</span><span class="predicate_indicator"><span class="predicate_indicator">/</span><span class="arity">1</span></span>,
+<span class="line-no">  13</span>   <span class="goal-local">deck</span><span class="predicate_indicator"><span class="predicate_indicator">/</span><span class="arity">1</span></span>,
+<span class="line-no">  14</span>   <span class="goal-local">shuffle</span><span class="predicate_indicator"><span class="predicate_indicator">/</span><span class="arity">3</span></span>,
+<span class="line-no">  15</span>   <span class="goal-local">initDeal</span><span class="predicate_indicator"><span class="predicate_indicator">/</span><span class="arity">3</span></span>,
+<span class="line-no">  16</span>   <span class="goal-local">score</span><span class="predicate_indicator"><span class="predicate_indicator">/</span><span class="arity">2</span></span>,
+<span class="line-no">  17</span>   <span class="goal-local">getPiles</span><span class="predicate_indicator"><span class="predicate_indicator">/</span><span class="arity">3</span></span>,
+<span class="line-no">  18</span>   <span class="goal-local">addCard</span><span class="predicate_indicator"><span class="predicate_indicator">/</span><span class="arity">5</span></span>]</span>
+<span class="line-no">  19</span>  )</span></span>.</span><span class="fullstop"></span><span class="line-no">  20</span>
+<span class="directive"><span class="neck"><span class="line-no">  21</span>:- <span class="goal-built_in">use_module</span><span class="body">(<span class="file">blackJack</span>)</span></span>.</span><span class="fullstop"> </span><span class="comment">% players
+</span><span class="line-no">  22</span>
+<span id="decks/1"><span><span class="structured_comment"><span class="line-no">  23</span>%% decks(-N) is det.
+<span class="line-no">  24</span>%
+<span class="line-no">  25</span>% Defines the number of decks used in the game.
+<span class="line-no">  26</span>%
+<span class="line-no">  27</span>% @param N  Number of decks used in the game.
+<span class="line-no">  28</span>%
+</span><span class="head-exported"><span class="line-no">  29</span>decks</span><span class="clause">(<span class="int">1</span>)</span>.<span class="fullstop">
+</span><span class="line-no">  30</span>
+<span id="shuffleMode/1"><span><span class="structured_comment"><span class="line-no">  31</span>%% shuffleMode(-Type) is det.
+<span class="line-no">  32</span>%
+<span class="line-no">  33</span>% Defines the type of deck shuffling used in the game; can be either:
+<span class="line-no">  34</span>%  * deterministic, or
+<span class="line-no">  35</span>%  * random.
+<span class="line-no">  36</span>%
+<span class="line-no">  37</span>% The deterministic shuffling splits the pile in half randomly selects the half 
+<span class="line-no">  38</span>% and merge halves interchangeably. The random shuffling also splits the deck 
+<span class="line-no">  39</span>% but then tosses a coin on each card merge which card should go first.
+<span class="line-no">  40</span>%
+<span class="line-no">  41</span>% @param Type  Type of shuffling used in the game.
+<span class="line-no">  42</span>%
+</span><span class="head-exported"><span class="line-no">  43</span>shuffleMode</span><span class="clause">(random)</span>.<span class="fullstop">
+</span><span class="line-no">  44</span>
+<span id="suits/1"><span><span class="structured_comment"><span class="line-no">  45</span>%% suits(-Type) is det.
+<span class="line-no">  46</span>%
+<span class="line-no">  47</span>% Defines suits of cards:
+<span class="line-no">  48</span>%  * clubs(♣),
+<span class="line-no">  49</span>%  * diamonds(♦),
+<span class="line-no">  50</span>%  * hearts(♥) and
+<span class="line-no">  51</span>%  * spades(♠).
+<span class="line-no">  52</span>%
+<span class="line-no">  53</span>% @param Type  Type of card's suit.
+<span class="line-no">  54</span>%
+</span><span class="head"><span class="line-no">  55</span>suits</span><span class="clause">(♦)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no">  56</span>suits</span><span class="clause">(♥)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no">  57</span>suits</span><span class="clause">(♠)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no">  58</span>suits</span><span class="clause">(♣)</span>.<span class="fullstop">
+</span><span class="line-no">  59</span>
+<span id="ranks/1"><span><span class="structured_comment"><span class="line-no">  60</span>%% ranks(-Rank) is det.
+<span class="line-no">  61</span>%
+<span class="line-no">  62</span>% Defines the possible ranks of card: ace, 2, 3, 4, 5, 6, 7, 8, 9, 10, jack, 
+<span class="line-no">  63</span>% queen, king.
+<span class="line-no">  64</span>%
+<span class="line-no">  65</span>% @param Rank  Rank of card.
+<span class="line-no">  66</span>%
+</span><span class="head"><span class="line-no">  67</span>ranks</span><span class="clause">(  ace)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no">  68</span>ranks</span><span class="clause">(    <span class="int">2</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no">  69</span>ranks</span><span class="clause">(    <span class="int">3</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no">  70</span>ranks</span><span class="clause">(    <span class="int">4</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no">  71</span>ranks</span><span class="clause">(    <span class="int">5</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no">  72</span>ranks</span><span class="clause">(    <span class="int">6</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no">  73</span>ranks</span><span class="clause">(    <span class="int">7</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no">  74</span>ranks</span><span class="clause">(    <span class="int">8</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no">  75</span>ranks</span><span class="clause">(    <span class="int">9</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no">  76</span>ranks</span><span class="clause">(   <span class="int">10</span>)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no">  77</span>ranks</span><span class="clause">( jack)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no">  78</span>ranks</span><span class="clause">(queen)</span>.<span class="fullstop">
+</span><span class="head"><span class="line-no">  79</span>ranks</span><span class="clause">( king)</span>.<span class="fullstop">
+</span><span class="line-no">  80</span>
+<span id="card/2"><span><span class="structured_comment"><span class="line-no">  81</span>%% card(+Suit, +Rank) is det.
+<span class="line-no">  82</span>%% card(-Suit, -Rank) is nondet.
+<span class="line-no">  83</span>%
+<span class="line-no">  84</span>% Represents a card.
+<span class="line-no">  85</span>%
+<span class="line-no">  86</span>% @param Suit  Suit of card.
+<span class="line-no">  87</span>% @param Rank  Rank of card.
+<span class="line-no">  88</span>%
+</span><span class="head"><span class="line-no">  89</span>card</span><span class="clause">( <span class="var">Suit</span>, <span class="var">Rank</span> ) <span class="neck">:-</span>
+<span class="line-no">  90</span>	<span class="goal-local">suits</span><span class="body">( <span class="var">Suit</span> )<span class="control">,</span> <span class="goal-local">ranks</span>( <span class="var">Rank</span> )</span></span>.<span class="fullstop">
+</span><span class="line-no">  91</span>
+<span id="value/2"><span><span class="structured_comment"><span class="line-no">  92</span>%% value(-Value, :Card) is det.
+<span class="line-no">  93</span>%
+<span class="line-no">  94</span>% Converts card predicate to its value. The `Card` variable is given by 
+<span class="line-no">  95</span>% `card(+S, +R)` predicate with: `S` - Suit of card; `R` - Rank of card.
+<span class="line-no">  96</span>%
+<span class="line-no">  97</span>% @param Value  Value of given card.
+<span class="line-no">  98</span>% @param Card   The card.
+<span class="line-no">  99</span>%
+</span><span class="head"><span class="line-no"> 100</span>value</span><span class="clause">( <span class="var">Value</span>, <span class="functor">card</span>( <span class="var">S</span>, <span class="var">R</span> ) ) <span class="neck">:-</span>
+<span class="line-no"> 101</span>	( <span class="var">S</span><span class="body"> <span class="goal-built_in">=</span> ♣<span class="control">;</span> <span class="var">S</span> <span class="goal-built_in">=</span> ♦<span class="control">;</span> <span class="var">S</span> <span class="goal-built_in">=</span> ♥<span class="control">;</span> <span class="var">S</span> <span class="goal-built_in">=</span> ♠ )<span class="control">,</span> <span class="goal-built_in">!</span><span class="control">,</span>
+<span class="line-no"> 102</span>	( <span class="var">R</span> <span class="goal-built_in">=</span> ace   <span class="control">-&gt;</span> ( <span class="var">Value</span> <span class="goal-built_in">is</span> <span class="int">11</span> <span class="control">;</span> <span class="var">Value</span> <span class="goal-built_in">is</span> <span class="int">1</span> )
+<span class="line-no"> 103</span>	<span class="control">;</span> <span class="var">R</span> <span class="goal-built_in">=</span> jack  <span class="control">-&gt;</span> <span class="var">Value</span> <span class="goal-built_in">is</span> <span class="int">10</span>
+<span class="line-no"> 104</span>	<span class="control">;</span> <span class="var">R</span> <span class="goal-built_in">=</span> queen <span class="control">-&gt;</span> <span class="var">Value</span> <span class="goal-built_in">is</span> <span class="int">10</span>
+<span class="line-no"> 105</span>	<span class="control">;</span> <span class="var">R</span> <span class="goal-built_in">=</span> king  <span class="control">-&gt;</span> <span class="var">Value</span> <span class="goal-built_in">is</span> <span class="int">10</span>
+<span class="line-no"> 106</span>	<span class="control">;</span> <span class="goal-autoload">otherwise</span> <span class="control">-&gt;</span> <span class="var">Value</span> <span class="goal-built_in">is</span> <span class="var">R</span></span></span>
+<span class="fullstop"><span class="line-no"> 107</span>	</span>).
+<span class="line-no"> 108</span>
+<span id="score/2"><span><span class="structured_comment"><span class="line-no"> 109</span>%% score(-Score, +Hand) is det.
+<span class="line-no"> 110</span>%
+<span class="line-no"> 111</span>% Calculates value of player's hand.
+<span class="line-no"> 112</span>%
+<span class="line-no"> 113</span>% @param Score  Value of given hand.
+<span class="line-no"> 114</span>% @param Hand   A list of `card` predicates.
+<span class="line-no"> 115</span>%
+</span><span class="head-exported"><span class="line-no"> 116</span>score</span><span class="clause">( <span class="var">Score</span>, <span class="var">Hand</span> ) <span class="neck">:-</span> <span class="comment">% Hand
+</span><span class="line-no"> 117</span>	<span class="goal-local">score</span><span class="body">( <span class="var">Score</span>, <span class="var">Hand</span>, <span class="int">0</span> )</span></span>.<span class="fullstop">
+</span><span id="score/3" class="head"><span class="line-no"> 118</span>score</span><span class="clause">( <span class="var">Score</span>, <span class="list">[<span class="var">Card</span>|<span class="var">Hand</span>]</span>, <span class="var">V</span> ) <span class="neck">:-</span>
+<span class="line-no"> 119</span>	<span class="goal-local">value</span><span class="body">(<span class="var">Q</span>, <span class="var">Card</span>)<span class="control">,</span>
+<span class="line-no"> 120</span>	<span class="var">Vn</span> <span class="goal-built_in">is</span> <span class="var">V</span> <span class="functor">+</span> <span class="var">Q</span><span class="control">,</span>
+<span class="line-no"> 121</span>	<span class="goal-recursion">score</span>(<span class="var">Score</span>, <span class="var">Hand</span>, <span class="var">Vn</span>)</span></span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 122</span>score</span><span class="clause">( <span class="var">Score</span>, <span class="empty_list">[]</span>, <span class="var">V</span> ) <span class="neck">:-</span>
+<span class="line-no"> 123</span>	<span class="var">Score</span><span class="body"> <span class="goal-built_in">is</span> <span class="var">V</span></span></span>.<span class="fullstop">
+</span><span class="line-no"> 124</span>
+<span id="deck/1"><span><span class="structured_comment"><span class="line-no"> 125</span>%% deck(-Deck) is det.
+<span class="line-no"> 126</span>%
+<span class="line-no"> 127</span>% Generates deck(s) based on their predefined number (`decks` parameter in 
+<span class="line-no"> 128</span>%	`deck` module).
+<span class="line-no"> 129</span>%
+<span class="line-no"> 130</span>% @param Deck  Deck(s) generated based on system parameters.
+<span class="line-no"> 131</span>%
+</span><span class="head-exported"><span class="line-no"> 132</span>deck</span><span class="clause">(<span class="var">Deck</span>) <span class="neck">:-</span>
+<span class="line-no"> 133</span>	<span class="goal-local">decks</span><span class="body">(<span class="var">No</span>)<span class="control">,</span>
+<span class="line-no"> 134</span>	<span class="goal-local">deck</span>(<span class="var">Deck</span>, <span class="empty_list">[]</span>, <span class="var">No</span>)</span></span>.<span class="fullstop">
+</span><span id="deck/3" class="head"><span class="line-no"> 135</span>deck</span><span class="clause">(<span class="var">Deck</span>, <span class="var">Holder</span>, <span class="int">0</span>) <span class="neck">:-</span>
+<span class="line-no"> 136</span>	<span class="goal-autoload">append</span><span class="body">(<span class="var">Holder</span>, <span class="empty_list">[]</span>, <span class="var">Deck</span>)<span class="control">,</span>
+<span class="line-no"> 137</span>	<span class="goal-built_in">!</span></span></span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 138</span>deck</span><span class="clause">(<span class="var">Deck</span>, <span class="var">Holder</span>, <span class="var">No</span>) <span class="neck">:-</span>
+<span class="line-no"> 139</span>	<span class="var">Np</span><span class="body"> <span class="goal-built_in">is</span> <span class="var">No</span> <span class="functor">-</span> <span class="int">1</span><span class="control">,</span>
+<span class="line-no"> 140</span>	<span class="goal-built_in">findall</span>(<span class="functor">card</span>(<span class="var">S</span>,<span class="var">R</span>), <span class="goal-local">card</span>(<span class="var">S</span>, <span class="var">R</span>), <span class="var">New</span>)<span class="control">,</span>
+<span class="line-no"> 141</span>	<span class="goal-autoload">append</span>(<span class="var">Holder</span>, <span class="var">New</span>, <span class="var">NewHolder</span>)<span class="control">,</span>
+<span class="line-no"> 142</span>	<span class="goal-recursion">deck</span>(<span class="var">Deck</span>, <span class="var">NewHolder</span>, <span class="var">Np</span>)</span></span>.<span class="fullstop">
+</span><span class="line-no"> 143</span>
+<span id="woN/3"><span><span class="structured_comment"><span class="line-no"> 144</span>%% woN(-Out, +E, +In) is det.
+<span class="line-no"> 145</span>%
+<span class="line-no"> 146</span>% Returns the `In` list without element `E`.
+<span class="line-no"> 147</span>%
+<span class="line-no"> 148</span>% @param Out  The list with specified element removed.
+<span class="line-no"> 149</span>% @param E    An element ot be removed from the input list.
+<span class="line-no"> 150</span>% @param In   List with the element to be removed.
+<span class="line-no"> 151</span>%
+</span><span class="head"><span class="line-no"> 152</span>woN</span><span class="clause">(<span class="var">Out</span>, <span class="var">E</span>, <span class="var">In</span>) <span class="neck">:-</span>
+<span class="line-no"> 153</span>	<span class="goal-autoload">select</span><span class="body">(<span class="var">E</span>, <span class="var">In</span>, <span class="var">Out</span>)<span class="control">,</span> <span class="goal-built_in">!</span></span></span>.<span class="fullstop">
+</span><span class="line-no"> 154</span>
+<span id="initDeal/3"><span><span class="structured_comment"><span class="line-no"> 155</span>%% initDeal(-Table, -NewDeck, +Deck) is det.
+<span class="line-no"> 156</span>%
+<span class="line-no"> 157</span>% Deals the cards from the `Deck` to all players defined by `players` predicate 
+<span class="line-no"> 158</span>% defined in `blackJack` module. The initial deal consists of two cards given 
+<span class="line-no"> 159</span>% to each player &amp; two cards for the house. This predicate returns the new deck 
+<span class="line-no"> 160</span>% without just dealt cards and the table i.e. list of lists containing cards of 
+<span class="line-no"> 161</span>% each player.
+<span class="line-no"> 162</span>%
+<span class="line-no"> 163</span>% @param Table    List of cards held by all player (list of lists).
+<span class="line-no"> 164</span>% @param NewDeck  Deck(s) of card with removed cards that were used for initial 
+<span class="line-no"> 165</span>%                 deal.
+<span class="line-no"> 166</span>% @param Deck     Deck(s) of cards used for initial deal.
+<span class="line-no"> 167</span>%
+</span><span class="head-exported"><span class="line-no"> 168</span>initDeal</span><span class="clause">(<span class="var">Table</span>, <span class="var">NewDeck</span>, <span class="var">Deck</span>) <span class="neck">:-</span>
+<span class="line-no"> 169</span>	<span class="goal-imported">players</span><span class="body">(<span class="var">P</span>)<span class="control">,</span>
+<span class="line-no"> 170</span>	<span class="goal-imported">userPlayer</span>(<span class="var">Q</span>)<span class="control">,</span>
+<span class="line-no"> 171</span>	<span class="var">AtTable</span> <span class="goal-built_in">is</span> <span class="var">P</span> <span class="functor">+</span> <span class="int">1</span> <span class="functor">+</span> <span class="var">Q</span><span class="control">,</span>
+<span class="line-no"> 172</span>	<span class="structured_comment">%% CardDeals is AtTable * 2, % deal 2 cards for each player
+</span><span class="line-no"> 173</span>	<span class="goal-local">initDeal</span>(<span class="var">Table</span>, <span class="var">NewDeck</span>, <span class="empty_list">[]</span>, <span class="var">Deck</span> ,<span class="var">Deck</span>, <span class="var">AtTable</span>, <span class="int">1</span>)</span></span>.<span class="fullstop">
+</span><span class="comment"><span class="line-no"> 174</span>%
+</span><span id="initDeal/7" class="head"><span class="line-no"> 175</span>initDeal</span><span class="clause">(<span class="var">Table</span>, <span class="var">Deck</span>, <span class="var">Table</span>, <span class="var">Deck</span>, <span class="var">_</span>, <span class="var">AtTable</span>, <span class="var">Current</span>) <span class="neck">:-</span>
+<span class="line-no"> 176</span>	<span class="var">AtTable</span><span class="body"> <span class="goal-built_in">is</span> <span class="var">Current</span> <span class="functor">-</span> <span class="int">1</span><span class="control">,</span> <span class="goal-built_in">!</span></span></span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 177</span>initDeal</span><span class="clause">(<span class="var">Table</span>, <span class="var">NewDeck</span>, <span class="var">TemporaryTable</span>, <span class="var">DissortingD</span>, <span class="var">Deck</span>, <span class="var">AtTable</span>, <span class="var">Current</span>) <span class="neck">:-</span>
+<span class="line-no"> 178</span>	<span class="goal-autoload">nth1</span><span class="body">(<span class="var">Current</span>, <span class="var">Deck</span>, <span class="var">C1</span>)<span class="control">,</span> <span class="comment">% draw element N
+</span><span class="line-no"> 179</span>	<span class="var">Current1</span> <span class="goal-built_in">is</span> <span class="var">Current</span> <span class="functor">+</span> <span class="var">AtTable</span><span class="control">,</span> <span class="comment">% get new index
+</span><span class="line-no"> 180</span>	<span class="goal-autoload">nth1</span>(<span class="var">Current1</span>, <span class="var">Deck</span>, <span class="var">C2</span>)<span class="control">,</span> <span class="comment">% draw next card
+</span><span class="line-no"> 181</span>	<span class="goal-local">woN</span>(<span class="var">Deck1</span>, <span class="var">C1</span>, <span class="var">DissortingD</span>)<span class="control">,</span> <span class="comment">% delete first card
+</span><span class="line-no"> 182</span>	<span class="goal-local">woN</span>(<span class="var">Deck2</span>, <span class="var">C2</span>, <span class="var">Deck1</span>)<span class="control">,</span> <span class="comment">% delete first card
+</span><span class="line-no"> 183</span>	<span class="var">Next</span> <span class="goal-built_in">is</span> <span class="var">Current</span> <span class="functor">+</span> <span class="int">1</span><span class="control">,</span> <span class="comment">% new current player
+</span><span class="line-no"> 184</span>	<span class="goal-autoload">append</span>(<span class="list">[<span class="var">C1</span>]</span>, <span class="list">[<span class="var">C2</span>]</span>, <span class="var">Person</span>)<span class="control">,</span> <span class="comment">% create one hand
+</span><span class="line-no"> 185</span>	<span class="goal-autoload">append</span>(<span class="var">TemporaryTable</span>, <span class="list">[<span class="var">Person</span>]</span>, <span class="var">Table2</span>)<span class="control">,</span><span class="comment">% generate i-th player
+</span><span class="line-no"> 186</span>	<span class="goal-recursion">initDeal</span>(<span class="var">Table</span>, <span class="var">NewDeck</span>, <span class="var">Table2</span>, <span class="var">Deck2</span>, <span class="var">Deck</span>, <span class="var">AtTable</span>, <span class="var">Next</span>)</span></span>.<span class="fullstop">
+</span><span class="line-no"> 187</span>
+<span id="shuffle/3"><span><span class="structured_comment"><span class="line-no"> 188</span>%% shuffle(-Shuffled, +Deck, +N) is det.
+<span class="line-no"> 189</span>%
+<span class="line-no"> 190</span>% Manages shuffling: decides which shuffling algorithm to use based on type 
+<span class="line-no"> 191</span>% defined by `shuffleMode` predicate defined in `deck` package.
+<span class="line-no"> 192</span>%
+<span class="line-no"> 193</span>% @param Shuffled  The shuffled deck (list of `card` predicate).
+<span class="line-no"> 194</span>% @param Deck      The deck to be shuffled (list of `card` predicate).
+<span class="line-no"> 195</span>% @param N         Number of shuffles.
+<span class="line-no"> 196</span>%
+</span><span class="head-exported"><span class="line-no"> 197</span>shuffle</span><span class="clause">(<span class="var">Shf</span>, <span class="var">Shf</span>, <span class="int">0</span>) <span class="neck">:-</span>
+<span class="line-no"> 198</span>	<span class="body"><span class="goal-built_in">!</span></span></span>.<span class="fullstop">
+</span><span class="head-exported"><span class="line-no"> 199</span>shuffle</span><span class="clause">(<span class="var">Shuffled</span>, <span class="var">Deck</span>, <span class="var">N</span>) <span class="neck">:-</span>
+<span class="line-no"> 200</span>	<span class="goal-local">shuffleMode</span><span class="body">(<span class="var">Mode</span>)<span class="control">,</span>
+<span class="line-no"> 201</span>	<span class="goal-autoload">proper_length</span>(<span class="var">Deck</span>, <span class="var">Len</span>)<span class="control">,</span>
+<span class="line-no"> 202</span>	<span class="var">Half</span> <span class="goal-built_in">is</span> <span class="var">Len</span> <span class="functor">/</span> <span class="int">2</span><span class="control">,</span>
+<span class="line-no"> 203</span>	<span class="goal-local">getPiles</span>(<span class="var">A</span>, <span class="var">_</span>, <span class="var">Half</span>)<span class="control">,</span>
+<span class="line-no"> 204</span>	<span class="var">A1</span> <span class="goal-built_in">is</span> <span class="var">A</span> <span class="functor">+</span> <span class="int">1</span><span class="control">,</span>
+<span class="line-no"> 205</span>	<span class="goal-imported">split</span>(<span class="var">P1</span>, <span class="var">P2</span>, <span class="var">Deck</span>, <span class="var">A1</span>)<span class="control">,</span> <span class="comment">% get two piles
+</span><span class="line-no"> 206</span>	<span class="comment">% random or deterministic
+</span><span class="line-no"> 207</span>	( <span class="var">Mode</span> <span class="goal-built_in">=</span> random        <span class="control">-&gt;</span> <span class="goal-local">rifleRan</span>(<span class="var">Forward</span>, <span class="var">P1</span>, <span class="var">P2</span>)
+<span class="line-no"> 208</span>	<span class="control">;</span> <span class="var">Mode</span> <span class="goal-built_in">=</span> deterministic <span class="control">-&gt;</span> <span class="goal-local">rifleDet</span>(<span class="var">Forward</span>, <span class="var">P1</span>, <span class="var">P2</span>)
+<span class="line-no"> 209</span>	)<span class="control">,</span>
+<span class="line-no"> 210</span>	<span class="var">N1</span> <span class="goal-built_in">is</span> <span class="var">N</span> <span class="functor">-</span> <span class="int">1</span><span class="control">,</span>
+<span class="line-no"> 211</span>	<span class="goal-recursion">shuffle</span>( <span class="var">Shuffled</span>, <span class="var">Forward</span>, <span class="var">N1</span> )</span></span>.<span class="fullstop">
+</span><span class="line-no"> 212</span>
+<span id="rifleDet/3"><span><span class="structured_comment"><span class="line-no"> 213</span>%% rifleDet(-Out, +A, +B) is det.
+<span class="line-no"> 214</span>%
+<span class="line-no"> 215</span>% Rifle-shuffle two piles of cards deterministically: split the deck into two 
+<span class="line-no"> 216</span>% parts and merge them one by one. The only random bit here is whether the 
+<span class="line-no"> 217</span>% shuffle starts with pile A or pile B.
+<span class="line-no"> 218</span>%
+<span class="line-no"> 219</span>% @param Out  Merged deck (list of predicates `card`).
+<span class="line-no"> 220</span>% @param A    1st part of deck to be merged (list of predicates `card`).
+<span class="line-no"> 221</span>% @param B    2nd part of deck to be merged (list of predicates `card`).
+<span class="line-no"> 222</span>%
+</span><span class="head"><span class="line-no"> 223</span>rifleDet</span><span class="clause">(<span class="var">Out</span>, <span class="var">A</span>, <span class="var">B</span>) <span class="neck">:-</span>
+<span class="line-no"> 224</span>	<span class="goal-autoload">random</span><span class="body">(<span class="int">0</span>, <span class="int">2</span>, <span class="var">Rand</span>)<span class="control">,</span> <span class="comment">% decide whether left pile goes on top or bottom,
+</span><span class="line-no"> 225</span>	( <span class="var">Rand</span> <span class="goal-built_in">=</span> <span class="int">0</span> <span class="control">-&gt;</span> <span class="goal-local">rifleDet</span>(<span class="var">Out</span>, <span class="empty_list">[]</span>, <span class="var">A</span>, <span class="var">B</span>)
+<span class="line-no"> 226</span>	<span class="control">;</span> <span class="var">Rand</span> <span class="goal-built_in">=</span> <span class="int">1</span> <span class="control">-&gt;</span> <span class="goal-local">rifleDet</span>(<span class="var">Out</span>, <span class="empty_list">[]</span>, <span class="var">B</span>, <span class="var">A</span>)</span></span>
+<span class="fullstop"><span class="line-no"> 227</span>	</span>).
+<span id="rifleDet/4" class="head"><span class="line-no"> 228</span>rifleDet</span><span class="clause">(<span class="var">Out</span>, <span class="var">Em</span>, <span class="list">[<span class="var">A1</span>|<span class="var">A2</span>]</span>, <span class="list">[<span class="var">B1</span>|<span class="var">B2</span>]</span>) <span class="neck">:-</span>
+<span class="line-no"> 229</span>	<span class="goal-autoload">append</span><span class="body">(<span class="var">Em</span>, <span class="list">[<span class="var">A1</span>]</span>, <span class="var">O1</span>)<span class="control">,</span>
+<span class="line-no"> 230</span>	<span class="goal-autoload">append</span>(<span class="var">O1</span>, <span class="list">[<span class="var">B1</span>]</span>, <span class="var">O2</span>)<span class="control">,</span>
+<span class="line-no"> 231</span>	<span class="goal-recursion">rifleDet</span>(<span class="var">Out</span>, <span class="var">O2</span>, <span class="var">A2</span>, <span class="var">B2</span>)</span></span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 232</span>rifleDet</span><span class="clause">(<span class="var">Out</span>, <span class="var">Em</span>, <span class="empty_list">[]</span>, <span class="list">[<span class="var">B1</span>|<span class="var">B2</span>]</span>) <span class="neck">:-</span>
+<span class="line-no"> 233</span>	<span class="goal-autoload">append</span><span class="body">(<span class="var">Em</span>, <span class="list">[<span class="var">B1</span>]</span>, <span class="var">O</span>)<span class="control">,</span>
+<span class="line-no"> 234</span>	<span class="goal-recursion">rifleDet</span>(<span class="var">Out</span>, <span class="var">O</span>, <span class="empty_list">[]</span>, <span class="var">B2</span>)</span></span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 235</span>rifleDet</span><span class="clause">(<span class="var">Out</span>, <span class="var">Em</span>, <span class="list">[<span class="var">A1</span>|<span class="var">A2</span>]</span>, <span class="empty_list">[]</span>) <span class="neck">:-</span>
+<span class="line-no"> 236</span>	<span class="goal-autoload">append</span><span class="body">(<span class="var">Em</span>, <span class="list">[<span class="var">A1</span>]</span>, <span class="var">O</span>)<span class="control">,</span>
+<span class="line-no"> 237</span>	<span class="goal-recursion">rifleDet</span>(<span class="var">Out</span>, <span class="var">O</span>, <span class="var">A2</span>, <span class="empty_list">[]</span>)</span></span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 238</span>rifleDet</span><span class="clause">(<span class="var">Out</span>, <span class="var">Out</span>, <span class="empty_list">[]</span>, <span class="empty_list">[]</span>) <span class="neck">:-</span>
+<span class="line-no"> 239</span>	<span class="body"><span class="goal-built_in">!</span></span></span>.<span class="fullstop">
+</span><span class="line-no"> 240</span>
+<span id="rifleRan/3"><span><span class="structured_comment"><span class="line-no"> 241</span>%% rifleRan(-Out, +A, +B) is det.
+<span class="line-no"> 242</span>%
+<span class="line-no"> 243</span>% Rifle-shuffle two piles of cards with *random* card selection i.e. split the 
+<span class="line-no"> 244</span>% deck into two parts and merge them by tossing a coin for each card to decide 
+<span class="line-no"> 245</span>% whether it goes on the top or bottom of the merged pile.
+<span class="line-no"> 246</span>%
+<span class="line-no"> 247</span>% @param Out  Merged deck (list of predicates `card`).
+<span class="line-no"> 248</span>% @param A    1st part of deck to be merged (list of predicates `card`).
+<span class="line-no"> 249</span>% @param B    2nd part of deck to be merged (list of predicates `card`).
+<span class="line-no"> 250</span>%
+</span><span class="head"><span class="line-no"> 251</span>rifleRan</span><span class="clause">(<span class="var">Out</span>, <span class="var">A</span>, <span class="var">B</span>) <span class="neck">:-</span>
+<span class="line-no"> 252</span>	<span class="goal-autoload">random</span><span class="body">(<span class="int">0</span>, <span class="int">2</span>, <span class="var">Rand</span>)<span class="control">,</span> <span class="comment">% decide whether left pile goes on top or bottom
+</span><span class="line-no"> 253</span>	<span class="goal-local">rifleRan</span>(<span class="var">Out</span>, <span class="empty_list">[]</span>, <span class="var">A</span>, <span class="var">B</span>, <span class="var">Rand</span>)</span></span>.<span class="fullstop">
+</span><span id="rifleRan/5" class="head"><span class="line-no"> 254</span>rifleRan</span><span class="clause">(<span class="var">Out</span>, <span class="var">Em</span>, <span class="list">[<span class="var">A1</span>|<span class="var">A2</span>]</span>, <span class="list">[<span class="var">B1</span>|<span class="var">B2</span>]</span>, <span class="int">0</span>) <span class="neck">:-</span>
+<span class="line-no"> 255</span>	<span class="goal-autoload">append</span><span class="body">(<span class="var">Em</span>, <span class="list">[<span class="var">A1</span>]</span>, <span class="var">O1</span>)<span class="control">,</span>
+<span class="line-no"> 256</span>	<span class="goal-autoload">append</span>(<span class="var">O1</span>, <span class="list">[<span class="var">B1</span>]</span>, <span class="var">O2</span>)<span class="control">,</span>
+<span class="line-no"> 257</span>	<span class="goal-autoload">random</span>(<span class="int">0</span>, <span class="int">2</span>, <span class="var">Rand</span>)<span class="control">,</span>
+<span class="line-no"> 258</span>	<span class="goal-recursion">rifleRan</span>(<span class="var">Out</span>, <span class="var">O2</span>, <span class="var">A2</span>, <span class="var">B2</span>, <span class="var">Rand</span>)</span></span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 259</span>rifleRan</span><span class="clause">(<span class="var">Out</span>, <span class="var">Em</span>, <span class="list">[<span class="var">A1</span>|<span class="var">A2</span>]</span>, <span class="list">[<span class="var">B1</span>|<span class="var">B2</span>]</span>, <span class="int">1</span>) <span class="neck">:-</span>
+<span class="line-no"> 260</span>	<span class="goal-autoload">append</span><span class="body">(<span class="var">Em</span>, <span class="list">[<span class="var">B1</span>]</span>, <span class="var">O1</span>)<span class="control">,</span>
+<span class="line-no"> 261</span>	<span class="goal-autoload">append</span>(<span class="var">O1</span>, <span class="list">[<span class="var">A1</span>]</span>, <span class="var">O2</span>)<span class="control">,</span>
+<span class="line-no"> 262</span>	<span class="goal-autoload">random</span>(<span class="int">0</span>, <span class="int">2</span>, <span class="var">Rand</span>)<span class="control">,</span>
+<span class="line-no"> 263</span>	<span class="goal-recursion">rifleRan</span>(<span class="var">Out</span>, <span class="var">O2</span>, <span class="var">A2</span>, <span class="var">B2</span>, <span class="var">Rand</span>)</span></span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 264</span>rifleRan</span><span class="clause">(<span class="var">Out</span>, <span class="var">Em</span>, <span class="empty_list">[]</span>, <span class="list">[<span class="var">B1</span>|<span class="var">B2</span>]</span>, <span class="var">Rand</span>) <span class="neck">:-</span>
+<span class="line-no"> 265</span>	<span class="goal-autoload">append</span><span class="body">(<span class="var">Em</span>, <span class="list">[<span class="var">B1</span>]</span>, <span class="var">O</span>)<span class="control">,</span>
+<span class="line-no"> 266</span>	<span class="goal-recursion">rifleRan</span>(<span class="var">Out</span>, <span class="var">O</span>, <span class="empty_list">[]</span>, <span class="var">B2</span>, <span class="var">Rand</span>)</span></span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 267</span>rifleRan</span><span class="clause">(<span class="var">Out</span>, <span class="var">Em</span>, <span class="list">[<span class="var">A1</span>|<span class="var">A2</span>]</span>, <span class="empty_list">[]</span>, <span class="var">Rand</span>) <span class="neck">:-</span>
+<span class="line-no"> 268</span>	<span class="goal-autoload">append</span><span class="body">(<span class="var">Em</span>, <span class="list">[<span class="var">A1</span>]</span>, <span class="var">O</span>)<span class="control">,</span>
+<span class="line-no"> 269</span>	<span class="goal-recursion">rifleRan</span>(<span class="var">Out</span>, <span class="var">O</span>, <span class="var">A2</span>, <span class="empty_list">[]</span>, <span class="var">Rand</span>)</span></span>.<span class="fullstop">
+</span><span class="head"><span class="line-no"> 270</span>rifleRan</span><span class="clause">(<span class="var">Out</span>, <span class="var">Out</span>, <span class="empty_list">[]</span>, <span class="empty_list">[]</span>, <span class="var">_</span>) <span class="neck">:-</span>
+<span class="line-no"> 271</span>	<span class="body"><span class="goal-built_in">!</span></span></span>.<span class="fullstop">
+</span><span class="line-no"> 272</span>
+<span id="getPiles/3"><span><span class="structured_comment"><span class="line-no"> 273</span>%% getPiles(-A, -B, +Half) is det.
+<span class="line-no"> 274</span>%
+<span class="line-no"> 275</span>% Generates two piles counters: if the number of cards in the deck is **odd** 
+<span class="line-no"> 276</span>% then it is impossible to split it equally. This predicate takes a float 
+<span class="line-no"> 277</span>% number and outputs two numbers one a half bigger and one a half smaller to 
+<span class="line-no"> 278</span>% create two integers. In general 2*`Half`=`A`+`B`.
+<span class="line-no"> 279</span>%
+<span class="line-no"> 280</span>% @param A     Number rounded to an integer based on above rule.
+<span class="line-no"> 281</span>% @param B     Number rounded to an integer based on above rule.
+<span class="line-no"> 282</span>% @param Half  A number to be rounded based on above rule.
+<span class="line-no"> 283</span>%
+</span><span class="head-exported"><span class="line-no"> 284</span>getPiles</span><span class="clause">(<span class="var">A</span>, <span class="var">B</span>, <span class="var">Half</span>) <span class="neck">:-</span>
+<span class="line-no"> 285</span>	<span class="goal-built_in">float</span><span class="body">(<span class="var">Half</span>)<span class="control">,</span>
+<span class="line-no"> 286</span>	<span class="goal-autoload">random</span>(<span class="int">0</span>,<span class="int">2</span>,<span class="var">Rand</span>)<span class="control">,</span> <span class="comment">% decide whether round up left or right pile
+</span><span class="line-no"> 287</span>	( <span class="var">Rand</span> <span class="goal-built_in">=</span> <span class="int">0</span> <span class="control">-&gt;</span> <span class="var">A</span> <span class="goal-built_in">is</span> <span class="var">Half</span> <span class="functor">-</span> <span class="float">0.5</span><span class="control">,</span> <span class="var">B</span> <span class="goal-built_in">is</span> <span class="var">Half</span> <span class="functor">+</span> <span class="float">0.5</span>
+<span class="line-no"> 288</span>	<span class="control">;</span> <span class="var">Rand</span> <span class="goal-built_in">=</span> <span class="int">1</span> <span class="control">-&gt;</span> <span class="var">A</span> <span class="goal-built_in">is</span> <span class="var">Half</span> <span class="functor">+</span> <span class="float">0.5</span><span class="control">,</span> <span class="var">B</span> <span class="goal-built_in">is</span> <span class="var">Half</span> <span class="functor">-</span> <span class="float">0.5</span>
+<span class="line-no"> 289</span>	)<span class="control">,</span>
+<span class="line-no"> 290</span>	<span class="goal-built_in">!</span></span></span>.<span class="fullstop">
+</span><span class="head-exported"><span class="line-no"> 291</span>getPiles</span><span class="clause">(<span class="var">Half</span>, <span class="var">Half</span>, <span class="var">Half</span>) <span class="neck">:-</span>
+<span class="line-no"> 292</span>	<span class="goal-built_in">integer</span><span class="body">(<span class="var">Half</span>)</span></span>.<span class="fullstop">
+</span><span class="line-no"> 293</span>
+<span id="addCard/5"><span><span class="structured_comment"><span class="line-no"> 294</span>%% addCard(-NewDeal, -NewDeck, +OldDeck, +OldDeal, +PlayerNo) is det.
+<span class="line-no"> 295</span>%
+<span class="line-no"> 296</span>% Deals additional card to player with sequential number `PlayerNo`. After the 
+<span class="line-no"> 297</span>% deal it returns new deck and new hand of given player.
+<span class="line-no"> 298</span>%
+<span class="line-no"> 299</span>% @param NewDeal   List of cards held by all player (list of lists) **after** 
+<span class="line-no"> 300</span>%                  adding a new card.
+<span class="line-no"> 301</span>% @param NewDeck   **New** list of cards remaining in the deck after current 
+<span class="line-no"> 302</span>%                  round.
+<span class="line-no"> 303</span>% @param OldDeck   Current list of cards in the deck after.
+<span class="line-no"> 304</span>% @param OldDeal   List of cards held by all player (list of lists) **before** 
+<span class="line-no"> 305</span>%                  adding a new card.
+<span class="line-no"> 306</span>% @param PlayerNo  An id of the player counting from 1 which is to be dealt a 
+<span class="line-no"> 307</span>%                  new card.
+<span class="line-no"> 308</span>%
+</span><span class="head-exported"><span class="line-no"> 309</span>addCard</span><span class="clause">(<span class="var">NewDeal</span>, <span class="var">NewDeck</span>, <span class="list">[<span class="var">Card</span>|<span class="var">NewDeck</span>]</span>, <span class="var">OldDeal</span>, <span class="var">PlayerNo</span>) <span class="neck">:-</span>
+<span class="line-no"> 310</span>	<span class="goal-imported">split</span><span class="body">(<span class="var">A</span>, <span class="list">[<span class="var">X</span>|<span class="var">C</span>]</span>, <span class="var">OldDeal</span>, <span class="var">PlayerNo</span>)<span class="control">,</span> <span class="comment">% get sublist
+</span><span class="line-no"> 311</span>	<span class="goal-autoload">append</span>(<span class="var">X</span>, <span class="list">[<span class="var">Card</span>]</span>, <span class="var">Y</span>)<span class="control">,</span> <span class="comment">% extend sublist
+</span><span class="line-no"> 312</span>	<span class="goal-autoload">append</span>(<span class="var">A</span>, <span class="list">[<span class="var">Y</span>]</span>, <span class="var">Alpha</span>)<span class="control">,</span> <span class="comment">% put at the same place new list
+</span><span class="line-no"> 313</span>	<span class="goal-autoload">append</span>(<span class="var">Alpha</span>, <span class="var">C</span>, <span class="var">NewDeal</span>)</span></span>.<span class="fullstop"> </span><span class="comment">% put at the same place new list
+</span></pre>
+</body>
+</html>

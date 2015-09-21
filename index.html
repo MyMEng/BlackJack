@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>BlackJack</title>
+
+<script type="text/javascript" src="res/jquery.js">
+
+</script>
+<script type="text/javascript" src="res/pldoc.js">
+
+</script>
+<link rel="stylesheet" type="text/css" href="res/pldoc.css">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+</head>
+<body>
+
+<h1 class="wiki">BlackJack card game in SWI-Prolog</h1>
+
+<h2 class="wiki">Introduction</h2>
+
+<p>
+Implementation of a <b>BlackJack</b> card game in <code>prolog</code> and `r..eal<code> library. The later is an interface to </code>R` statistical package within <var>SWI</var> code.</p>
+
+<p>
+To run the code one needs to have <var>R</var>, <code>R-dev</code>, <code>SWI-Prolog</code> and `r..eal` installed.</p>
+
+<p>
+The <code>pldoc</code> generated documentation of the code is available <a href="http://so-cool.github.io/BlackJack">here</a>.</p>
+
+<h2 class="wiki">Pre-configuration</h2>
+
+<p>
+There are number of parameters available, to customize the program. They are listed at the top of each package file.</p>
+
+<ol>
+<li><b>Plays</b> - Number of games to be played. (<code>blackJack.pl</code>)</li>
+<li><b>Decks</b> - Number of decks used in a single game. (<code>deck.pl</code>)</li>
+<li><b>Players</b> - Number of AI players. AI1 plays <b>deterministic table</b>, AI2 plays <b>deck probabilities</b>, AI3 plays <b>probabilistic choice</b>, AI4 plays <b>hold on all</b>. If not otherwise defined, all other players are using <b>deterministic table</b>. (<code>blackJack.pl</code>)</li>
+<li><b>PlayerMode</b> - The game-play can be either defined to be: <b>experimental</b> - no user interaction required, this mode is mainly used to test AI algorithms; or <b>interactive</b> - user can play along AI algorithms. (<code>blackJack.pl</code>)</li>
+<li><b>ShuffleMode</b> - The simulation performs <b>riffle shuffle</b>(see the report); it can be either <b>deterministic</b> - there is only one (fair)coin toss to decide whether left or right pile starts the shuffle; or <b>random</b> - coin is tossed for each card(from left pile) to decide whether it goes on the top or on the bottom. (<code>deck.pl</code>)</li>
+<li><b>InitShuffles</b> - Number of deck shuffles before the game starts. (<code>blackJack.pl</code>)</li>
+<li><b>Shuffles</b> - Number of deck shuffles between games. (<code>blackJack.pl</code>)</li>
+<li><b>Dealer</b> - Dealer strategy to be used: <b>H17</b> and <b>S17</b>, both described in details in the report. (<code>dealerStrategies.pl</code>)</li>
+</ol>
+
+<h2 class="wiki">Executing the program(i.e. playing BlackJack)</h2>
+
+<p>
+To run the script:</p>
+
+<pre class="code">
+cd ~
+git clone git@github.com:So-Cool/BlackJack.git
+cd BlackJack
+swipl
+</pre>
+
+<p>
+and then within SWI-Prolog:</p>
+
+<pre class="code">
+[blackJack].
+blackJack.
+</pre>
+
+<p>
+After the game is finished there will be a <b>score graph</b> and <b>score table</b>(in the `.csv` format) produced within the <var>BlackJack</var> directory. The rows in the file are scores from particular round and the columns are in order: <b>dealer</b>, <b>AI1-deterministic table</b>, <b>AI2-deck probabilities</b>, <b>AI3-mixture of previous two</b>, <b>AI4-always stand</b> and finally, if enabled, <strong>user's</strong> score. The same order applies to vertical bars visible in the plot.</p>
+
+<h2 class="wiki">Remark on point counting</h2>
+
+<p>
+The scores are win/lose based; the player score is only compared against the dealer's points:</p>
+<ul>
+<li>if the player has <strong>more</strong> points than the dealer and has <strong>not exceeded</strong> 21 only he gets a point;</li>
+<li>if the player has <strong>less</strong> points than the dealer and has <strong>not exceeded</strong> 21 only the dealer gets a point;</li>
+<li>if there is a <strong>draw</strong> between the player and the dealer and both have less than 21 points both get a point;</li>
+<li>if there is a <strong>draw</strong> between the player and the dealer and both have more than 21 points no one get a point;</li>
+<li>if the player <strong>exceeded</strong> 21 points and the dealer has not only the dealer gets a point;</li>
+<li>if the dealer exceeded 21 points and the player has not only the player gets a point.
+<hr>
+
+<p>
+<strong>Warning!</strong> it may become addictive <strong>Warning!</strong></p>
+<hr>
+
+<p>
+<strong>For more information please refer to the report available within this repository.</strong></p>
+<hr>
+</li>
+</ul>
+
+<h2 class="wiki">ToDo</h2>
+
+<ul>
+<li>[ ] Possibility to <strong>split</strong> on pairs.</li>
+<li>[ ] Strategy idea: create a sampling distribution over all possible cards that can be drawn and sample a card ,based on that card predict according to table whether it is worth taking it or not.</li>
+<li>[ ] Preserve the deck after each game and shuffle it instead of discarding (adds more variability):
+<code></code><code>
+%% define number of shuffles after each game
+shuffles(2).
+</code><code></code></li>
+</ul>
+
+<h2 class="wiki plfiles">Prolog files</h2>
+
+<table class="summary">
+<tr><th colspan="3" class="file"><span style="float:left"><a href="blackJack.pl.html">blackJack.pl</a></span>&nbsp; -- Blackjack game simulator<span style="float:right"><a href="blackJack.pl-show=src.html"><img class="action" alt="Show source" title="Show source" src="res/source.png"></a></span></th></tr>
+<tr class="public"><td><a href="blackJack.pl.html#blackJack/0">blackJack/0</a></td><td class="summary">The game's main loop.</td><td align="right"><span style="white-space: nowrap"><a href="blackJack.pl-show=src.html#blackJack/0"><img class="action" alt="Source" title="Show source" src="res/source.png"></a></span></td></tr>
+<tr class="public"><td><a href="blackJack.pl.html#initShuffles/1">initShuffles/1</a></td><td class="summary">Defines number of initial shuffles: the shuffles before cards are dealt and the game starts.</td><td align="right"><span style="white-space: nowrap"><a href="blackJack.pl-show=src.html#initShuffles/1"><img class="action" alt="Source" title="Show source" src="res/source.png"></a></span></td></tr>
+<tr class="public"><td><a href="blackJack.pl.html#players/1">players/1</a></td><td class="summary">Defines number of AI controlled players; the AI algorithms are assigned in <code>playAISequence</code> predicate in <code>playerStrategies</code> module.</td><td align="right"><span style="white-space: nowrap"><a href="blackJack.pl-show=src.html#players/1"><img class="action" alt="Source" title="Show source" src="res/source.png"></a></span></td></tr>
+<tr class="public"><td><a href="blackJack.pl.html#scoreTop/2">scoreTop/2</a></td><td class="summary">Gets the highest score closest to 21 but not exceeding it if possible (ace handling).</td><td align="right"><span style="white-space: nowrap"><a href="blackJack.pl-show=src.html#scoreTop/2"><img class="action" alt="Source" title="Show source" src="res/source.png"></a></span></td></tr>
+<tr class="public"><td><a href="blackJack.pl.html#split/4">split/4</a></td><td class="summary">Split a list into two sub-lists at given index.</td><td align="right"><span style="white-space: nowrap"><a href="blackJack.pl-show=src.html#split/4"><img class="action" alt="Source" title="Show source" src="res/source.png"></a></span></td></tr>
+<tr class="public"><td><a href="blackJack.pl.html#userPlayer/1">userPlayer/1</a></td><td class="summary">Checks whether interactive player is activated and returns 1 if so.</td><td align="right"><span style="white-space: nowrap"><a href="blackJack.pl-show=src.html#userPlayer/1"><img class="action" alt="Source" title="Show source" src="res/source.png"></a></span></td></tr>
+<tr><th colspan="3" class="file"><span style="float:left"><a href="dealerStrategies.pl.html">dealerStrategies.pl</a></span>&nbsp; -- Dealer strategies for the Blackjack game simulator<span style="float:right"><a href="dealerStrategies.pl-show=src.html"><img class="action" alt="Show source" title="Show source" src="res/source.png"></a></span></th></tr>
+<tr class="public"><td><a href="dealerStrategies.pl.html#croupierAI/4">croupierAI/4</a></td><td class="summary">Plays defined dealer strategy based on <code>dealer</code> predicate.</td><td align="right"><span style="white-space: nowrap"><a href="dealerStrategies.pl-show=src.html#croupierAI/4"><img class="action" alt="Source" title="Show source" src="res/source.png"></a></span></td></tr>
+<tr><th colspan="3" class="file"><span style="float:left"><a href="deck.pl.html">deck.pl</a></span>&nbsp; -- Predicates for handling a deck of card<span style="float:right"><a href="deck.pl-show=src.html"><img class="action" alt="Show source" title="Show source" src="res/source.png"></a></span></th></tr>
+<tr class="public"><td><a href="deck.pl.html#addCard/5">addCard/5</a></td><td class="summary">Deals additional card to player with sequential number <var>PlayerNo</var>.</td><td align="right"><span style="white-space: nowrap"><a href="deck.pl-show=src.html#addCard/5"><img class="action" alt="Source" title="Show source" src="res/source.png"></a></span></td></tr>
+<tr class="public"><td><a href="deck.pl.html#deck/1">deck/1</a></td><td class="summary">Generates <code>deck(s)</code> based on their predefined number (<code>decks</code> parameter in <code>deck</code> module).</td><td align="right"><span style="white-space: nowrap"><a href="deck.pl-show=src.html#deck/1"><img class="action" alt="Source" title="Show source" src="res/source.png"></a></span></td></tr>
+<tr class="public"><td><a href="deck.pl.html#decks/1">decks/1</a></td><td class="summary">Defines the number of decks used in the game.</td><td align="right"><span style="white-space: nowrap"><a href="deck.pl-show=src.html#decks/1"><img class="action" alt="Source" title="Show source" src="res/source.png"></a></span></td></tr>
+<tr class="public"><td><a href="deck.pl.html#getPiles/3">getPiles/3</a></td><td class="summary">Generates two piles counters: if the number of cards in the deck is <strong>odd</strong> then it is impossible to split it equally.</td><td align="right"><span style="white-space: nowrap"><a href="deck.pl-show=src.html#getPiles/3"><img class="action" alt="Source" title="Show source" src="res/source.png"></a></span></td></tr>
+<tr class="public"><td><a href="deck.pl.html#initDeal/3">initDeal/3</a></td><td class="summary">Deals the cards from the <var>Deck</var> to all players defined by <code>players</code> predicate defined in <code>blackJack</code> module.</td><td align="right"><span style="white-space: nowrap"><a href="deck.pl-show=src.html#initDeal/3"><img class="action" alt="Source" title="Show source" src="res/source.png"></a></span></td></tr>
+<tr class="public"><td><a href="deck.pl.html#score/2">score/2</a></td><td class="summary">Calculates value of player's hand.</td><td align="right"><span style="white-space: nowrap"><a href="deck.pl-show=src.html#score/2"><img class="action" alt="Source" title="Show source" src="res/source.png"></a></span></td></tr>
+<tr class="public"><td><a href="deck.pl.html#shuffle/3">shuffle/3</a></td><td class="summary">Manages shuffling: decides which shuffling algorithm to use based on type defined by <code>shuffleMode</code> predicate defined in <code>deck</code> package.</td><td align="right"><span style="white-space: nowrap"><a href="deck.pl-show=src.html#shuffle/3"><img class="action" alt="Source" title="Show source" src="res/source.png"></a></span></td></tr>
+<tr class="public"><td><a href="deck.pl.html#shuffleMode/1">shuffleMode/1</a></td><td class="summary">Defines the type of deck shuffling used in the game; can be either: * deterministic, or * random.</td><td align="right"><span style="white-space: nowrap"><a href="deck.pl-show=src.html#shuffleMode/1"><img class="action" alt="Source" title="Show source" src="res/source.png"></a></span></td></tr>
+<tr><th colspan="3" class="file"><span style="float:left"><a href="playerStrategies.pl.html">playerStrategies.pl</a></span>&nbsp; -- Player strategies for the Blackjack game simulator<span style="float:right"><a href="playerStrategies.pl-show=src.html"><img class="action" alt="Show source" title="Show source" src="res/source.png"></a></span></th></tr>
+<tr class="public"><td><a href="playerStrategies.pl.html#playAI/6">playAI/6</a></td><td class="summary">Assigns strategy to each player via <code>playAISequence</code> predicate and return resulting: table, deck, refusal list.</td><td align="right"><span style="white-space: nowrap"><a href="playerStrategies.pl-show=src.html#playAI/6"><img class="action" alt="Source" title="Show source" src="res/source.png"></a></span></td></tr>
+</table>
+
+</body>
+</html>
